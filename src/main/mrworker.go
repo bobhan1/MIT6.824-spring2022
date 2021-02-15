@@ -3,14 +3,14 @@ package main
 //
 // start a worker process, which is implemented
 // in ../mr/worker.go. typically there will be
-// multiple worker processes, talking to one master.
+// multiple worker processes, talking to one coordinator.
 //
 // go run mrworker.go wc.so
 //
 // Please do not change this file.
 //
 
-import "../mr"
+import "6.824/mr"
 import "plugin"
 import "os"
 import "fmt"
