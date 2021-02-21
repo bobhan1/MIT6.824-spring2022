@@ -47,6 +47,7 @@ type config struct {
 	saved     []*Persister
 	endnames  [][]string            // the port file names each sends to
 	logs      []map[int]interface{} // copy of each server's committed entries
+	nextIndex []int                 // for each peer store the next expected committed index
 	start     time.Time             // time at which make_config() was called
 	// begin()/end() statistics
 	t0        time.Time // time at which test_test.go called cfg.begin()
@@ -77,6 +78,7 @@ func make_config(t *testing.T, n int, unreliable bool, snapshot bool) *config {
 	cfg.saved = make([]*Persister, cfg.n)
 	cfg.endnames = make([][]string, cfg.n)
 	cfg.logs = make([]map[int]interface{}, cfg.n)
+	cfg.nextIndex = make([]int, cfg.n)
 	cfg.start = time.Now()
 
 	cfg.setunreliable(unreliable)
@@ -90,6 +92,7 @@ func make_config(t *testing.T, n int, unreliable bool, snapshot bool) *config {
 	// create a full set of Rafts.
 	for i := 0; i < cfg.n; i++ {
 		cfg.logs[i] = map[int]interface{}{}
+		cfg.nextIndex[i] = 1
 		cfg.start1(i, applier)
 	}
 
@@ -132,7 +135,7 @@ func (cfg *config) crash1(i int) {
 	}
 }
 
-func (cfg *config) checkLogs(i int, m ApplyMsg) (string, bool) {
+func (cfg *config) checkLogs(i int, m ApplyMsg) string {
 	err_msg := ""
 	v := m.Command
 	for j := 0; j < len(cfg.logs); j++ {
@@ -143,26 +146,35 @@ func (cfg *config) checkLogs(i int, m ApplyMsg) (string, bool) {
 				m.CommandIndex, i, m.Command, j, old)
 		}
 	}
-	_, prevok := cfg.logs[i][m.CommandIndex-1]
 	cfg.logs[i][m.CommandIndex] = v
 	if m.CommandIndex > cfg.maxIndex {
 		cfg.maxIndex = m.CommandIndex
 	}
-	return err_msg, prevok
+	return err_msg
 }
 
 // applier reads message from apply ch and checks that they match the log
 // contents
 func (cfg *config) applier(i int, applyCh chan ApplyMsg) {
 	for m := range applyCh {
+		err_msg := ""
+
+		cfg.mu.Lock()
+		if m.CommandIndex != cfg.nextIndex[i] {
+			err_msg = fmt.Sprintf("expected index %d but got %d",
+				cfg.nextIndex[i], m.CommandIndex)
+		} else {
+			cfg.nextIndex[i]++
+		}
+		cfg.mu.Unlock()
+
 		if m.CommandValid == false {
 			// ignore other types of ApplyMsg
 		} else {
-			cfg.mu.Lock()
-			err_msg, prevok := cfg.checkLogs(i, m)
-			cfg.mu.Unlock()
-			if m.CommandIndex > 1 && prevok == false {
-				err_msg = fmt.Sprintf("server %v apply out of order %v", i, m.CommandIndex)
+			if err_msg == "" {
+				cfg.mu.Lock()
+				err_msg = cfg.checkLogs(i, m)
+				cfg.mu.Unlock()
 			}
 			if err_msg != "" {
 				log.Fatalf("apply error: %v\n", err_msg)
@@ -193,7 +205,8 @@ func (cfg *config) applierSnap(i int, applyCh chan ApplyMsg) {
 			}
 		} else if m.CommandValid {
 			cfg.mu.Lock()
-			err_msg, prevok := cfg.checkLogs(i, m)
+			err_msg := cfg.checkLogs(i, m)
+			prevok := true // TODO: fix
 			cfg.mu.Unlock()
 			if m.CommandIndex > 1 && prevok == false {
 				err_msg = fmt.Sprintf("server %v apply out of order %v", i, m.CommandIndex)
