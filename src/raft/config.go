@@ -178,12 +178,12 @@ func (cfg *config) applier(i int, applyCh chan ApplyMsg) {
 			}
 		}
 
-    if err_msg != "" {
-      log.Fatalf("apply error: %v\n", err_msg)
-      cfg.applyErr[i] = err_msg
-      // keep reading after error so that Raft doesn't block
-      // holding locks...
-    }
+		if err_msg != "" {
+			log.Fatalf("apply error: %v\n", err_msg)
+			cfg.applyErr[i] = err_msg
+			// keep reading after error so that Raft doesn't block
+			// holding locks...
+		}
 	}
 }
 
