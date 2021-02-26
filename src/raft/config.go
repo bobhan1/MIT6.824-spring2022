@@ -92,7 +92,7 @@ func make_config(t *testing.T, n int, unreliable bool, snapshot bool) *config {
 	// create a full set of Rafts.
 	for i := 0; i < cfg.n; i++ {
 		cfg.logs[i] = map[int]interface{}{}
-		cfg.nextIndex[i] = 1
+		cfg.nextIndex[i] = 0
 		cfg.start1(i, applier)
 	}
 
@@ -176,13 +176,14 @@ func (cfg *config) applier(i int, applyCh chan ApplyMsg) {
 				err_msg = cfg.checkLogs(i, m)
 				cfg.mu.Unlock()
 			}
-			if err_msg != "" {
-				log.Fatalf("apply error: %v\n", err_msg)
-				cfg.applyErr[i] = err_msg
-				// keep reading after error so that Raft doesn't block
-				// holding locks...
-			}
 		}
+
+    if err_msg != "" {
+      log.Fatalf("apply error: %v\n", err_msg)
+      cfg.applyErr[i] = err_msg
+      // keep reading after error so that Raft doesn't block
+      // holding locks...
+    }
 	}
 }
 
