@@ -612,11 +612,11 @@ func TestPersist12C(t *testing.T) {
 
 	leader2 := cfg.checkOneLeader()
 	cfg.disconnect(leader2)
-	cfg.one(14, servers-1, true)
+	index := cfg.one(14, servers-1, true)
 	cfg.start1(leader2, cfg.applier)
 	cfg.connect(leader2)
 
-	cfg.wait(4, servers, -1) // wait for leader2 to join before killing i3
+	cfg.wait(index, servers, -1) // wait for leader2 to join before killing i3
 
 	i3 := (cfg.checkOneLeader() + 1) % servers
 	cfg.disconnect(i3)
@@ -885,7 +885,9 @@ func internalChurn(t *testing.T, unreliable bool) {
 				rf := cfg.rafts[i]
 				cfg.mu.Unlock()
 				if rf != nil {
+					//fmt.Printf("h7 me: %d x: %d\n", me, x)
 					index1, _, ok1 := rf.Start(x)
+					//fmt.Printf("h8 me: %d\n", me)
 					if ok1 {
 						ok = ok1
 						index = index1
@@ -902,7 +904,7 @@ func internalChurn(t *testing.T, unreliable bool) {
 							if xx == x {
 								values = append(values, x)
 							}
-						} else {
+						} else if cmd != nil {
 							cfg.t.Fatalf("wrong command type")
 						}
 						break
@@ -976,11 +978,11 @@ func internalChurn(t *testing.T, unreliable bool) {
 	lastIndex := cfg.one(rand.Int(), servers, true)
 
 	really := make([]int, lastIndex+1)
-	for index := 1; index <= lastIndex; index++ {
+	for index := 0; index <= lastIndex; index++ {
 		v := cfg.wait(index, servers, -1)
 		if vi, ok := v.(int); ok {
 			really = append(really, vi)
-		} else {
+		} else if v != nil {
 			t.Fatalf("not an int")
 		}
 	}

@@ -56,6 +56,7 @@ type config struct {
 	bytes0    int64
 	maxIndex  int
 	maxIndex0 int
+	stopCh    []chan struct{}
 }
 
 var ncpu_once sync.Once
@@ -80,6 +81,7 @@ func make_config(t *testing.T, n int, unreliable bool, snapshot bool) *config {
 	cfg.logs = make([]map[int]interface{}, cfg.n)
 	cfg.nextIndex = make([]int, cfg.n)
 	cfg.start = time.Now()
+	cfg.stopCh = make([]chan struct{}, cfg.n)
 
 	cfg.setunreliable(unreliable)
 
@@ -92,7 +94,6 @@ func make_config(t *testing.T, n int, unreliable bool, snapshot bool) *config {
 	// create a full set of Rafts.
 	for i := 0; i < cfg.n; i++ {
 		cfg.logs[i] = map[int]interface{}{}
-		cfg.nextIndex[i] = 0
 		cfg.start1(i, applier)
 	}
 
@@ -123,6 +124,7 @@ func (cfg *config) crash1(i int) {
 	rf := cfg.rafts[i]
 	if rf != nil {
 		cfg.mu.Unlock()
+		cfg.stopCh[i] <- struct{}{}
 		rf.Kill()
 		cfg.mu.Lock()
 		cfg.rafts[i] = nil
@@ -155,34 +157,47 @@ func (cfg *config) checkLogs(i int, m ApplyMsg) string {
 
 // applier reads message from apply ch and checks that they match the log
 // contents
-func (cfg *config) applier(i int, applyCh chan ApplyMsg) {
-	for m := range applyCh {
-		err_msg := ""
-
-		cfg.mu.Lock()
-		if m.CommandIndex != cfg.nextIndex[i] {
-			err_msg = fmt.Sprintf("expected index %d but got %d",
-				cfg.nextIndex[i], m.CommandIndex)
-		} else {
-			cfg.nextIndex[i]++
-		}
-		cfg.mu.Unlock()
-
-		if m.CommandValid == false {
-			// ignore other types of ApplyMsg
-		} else {
-			if err_msg == "" {
-				cfg.mu.Lock()
-				err_msg = cfg.checkLogs(i, m)
-				cfg.mu.Unlock()
+func (cfg *config) applier(i int, applyCh chan ApplyMsg, stopCh <-chan struct{}) {
+	stopped := false
+	for {
+		select {
+		case <-stopCh:
+			{
+				// When applier is stopped, it still continues to empty `applyCh`.
+				stopped = true
 			}
-		}
+		case m := <-applyCh:
+			{
+				if !stopped {
+					err_msg := ""
 
-		if err_msg != "" {
-			log.Fatalf("apply error: %v\n", err_msg)
-			cfg.applyErr[i] = err_msg
-			// keep reading after error so that Raft doesn't block
-			// holding locks...
+					cfg.mu.Lock()
+					if m.CommandIndex != cfg.nextIndex[i] {
+						err_msg = fmt.Sprintf("expected index %d but got %d",
+							cfg.nextIndex[i], m.CommandIndex)
+					} else {
+						cfg.nextIndex[i]++
+					}
+					cfg.mu.Unlock()
+
+					if m.CommandValid == false {
+						// ignore other types of ApplyMsg
+					} else {
+						if err_msg == "" {
+							cfg.mu.Lock()
+							err_msg = cfg.checkLogs(i, m)
+							cfg.mu.Unlock()
+						}
+					}
+
+					if err_msg != "" {
+						log.Fatalf("apply error: %v\n", err_msg)
+						cfg.applyErr[i] = err_msg
+						// keep reading after error so that Raft doesn't block
+						// holding locks...
+					}
+				}
+			}
 		}
 	}
 }
@@ -190,7 +205,7 @@ func (cfg *config) applier(i int, applyCh chan ApplyMsg) {
 const SnapShotInterval = 10
 
 // periodically snapshot raft state
-func (cfg *config) applierSnap(i int, applyCh chan ApplyMsg) {
+func (cfg *config) applierSnap(i int, applyCh chan ApplyMsg, stopCh <-chan struct{}) {
 	for m := range applyCh {
 		if m.SnapshotValid {
 			if cfg.rafts[i].CondInstallSnapshot(m.SnapshotTerm,
@@ -238,7 +253,7 @@ func (cfg *config) applierSnap(i int, applyCh chan ApplyMsg) {
 // state persister, to isolate previous instance of
 // this server. since we cannot really kill it.
 //
-func (cfg *config) start1(i int, applier func(int, chan ApplyMsg)) {
+func (cfg *config) start1(i int, applier func(int, chan ApplyMsg, <-chan struct{})) {
 	cfg.crash1(i)
 
 	// a fresh set of outgoing ClientEnd names.
@@ -257,6 +272,8 @@ func (cfg *config) start1(i int, applier func(int, chan ApplyMsg)) {
 
 	cfg.mu.Lock()
 
+	cfg.nextIndex[i] = 0
+
 	// a fresh persister, so old instance doesn't overwrite
 	// new instance's persisted state.
 	// but copy old persister's content so that we always
@@ -270,7 +287,8 @@ func (cfg *config) start1(i int, applier func(int, chan ApplyMsg)) {
 	cfg.mu.Unlock()
 
 	applyCh := make(chan ApplyMsg)
-	go applier(i, applyCh)
+	cfg.stopCh[i] = make(chan struct{})
+	go applier(i, applyCh, cfg.stopCh[i])
 
 	rf := Make(ends, i, cfg.saved[i], applyCh)
 
@@ -449,6 +467,19 @@ func (cfg *config) nCommitted(index int) (int, interface{}) {
 			}
 			count += 1
 			cmd = cmd1
+		} else {
+			cfg.mu.Lock()
+			commitIndex := cfg.nextIndex[i]
+			cfg.mu.Unlock()
+
+			if commitIndex > index {
+				// Dummy log entry.
+				if cmd != nil {
+					cfg.t.Fatalf("dummy log entry and a normal log entry committed for "+
+						"the same index %d", index)
+				}
+				count++
+			}
 		}
 	}
 	return count, cmd
