@@ -458,6 +458,7 @@ func (cfg *config) nCommitted(index int) (int, interface{}) {
 
 		cfg.mu.Lock()
 		cmd1, ok := cfg.logs[i][index]
+		commitIndex := cfg.nextIndex[i]
 		cfg.mu.Unlock()
 
 		if ok {
@@ -468,10 +469,6 @@ func (cfg *config) nCommitted(index int) (int, interface{}) {
 			count += 1
 			cmd = cmd1
 		} else {
-			cfg.mu.Lock()
-			commitIndex := cfg.nextIndex[i]
-			cfg.mu.Unlock()
-
 			if commitIndex > index {
 				// Dummy log entry.
 				if cmd != nil {
