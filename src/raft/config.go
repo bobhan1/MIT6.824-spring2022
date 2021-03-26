@@ -95,12 +95,12 @@ func make_config(t *testing.T, n int, unreliable bool, snapshot bool) *config {
 	if snapshot {
 		applier = cfg.applierSnap
 	}
-	// create a full set of Rafts.
 	for i := 0; i < cfg.n; i++ {
 		cfg.logs[i] = map[int]logEntry{}
+	}
+	for i := 0; i < cfg.n; i++ {
 		cfg.start1(i, applier)
 	}
-
 	// connect everyone
 	for i := 0; i < cfg.n; i++ {
 		cfg.connect(i)
@@ -329,14 +329,14 @@ func (cfg *config) start1(i int, applier func(int, chan ApplyMsg, <-chan struct{
 	cfg.mu.Unlock()
 
 	applyCh := make(chan ApplyMsg)
+	cfg.stopCh[i] = make(chan struct{})
+	go applier(i, applyCh, cfg.stopCh[i])
+
 	rf := Make(ends, i, cfg.saved[i], applyCh)
 
 	cfg.mu.Lock()
 	cfg.rafts[i] = rf
 	cfg.mu.Unlock()
-
-	cfg.stopCh[i] = make(chan struct{})
-	go applier(i, applyCh, cfg.stopCh[i])
 
 	svc := labrpc.MakeService(rf)
 	srv := labrpc.MakeServer()
