@@ -1,9 +1,9 @@
 # This is the Makefile helping you submit the labs.
 # Submit your lab with the following command:
-#     $ make [lab1|lab2a|lab2b|lab2c|lab3a|lab3b|lab4a|lab4b]
+#     $ make [lab1|lab2a|lab2b|lab2c|lab2d|lab3a|lab3b|lab4a|lab4b]
 
 COURSE=cs451
-LABS=" lab1 lab2a lab2b lab2c lab3a lab3b lab4a lab4b "
+LABS=" lab1 lab2a lab2b lab2c lab2d lab3a lab3b lab4a lab4b "
 
 %:
 	@echo "Preparing $@-handin.tar.gz"

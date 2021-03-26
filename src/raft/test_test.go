@@ -315,18 +315,20 @@ loop:
 		failed := false
 		cmds := []int{}
 		for index := range is {
-			cmd := cfg.wait(index, servers, term)
-			if ix, ok := cmd.(int); ok {
-				if ix == -1 {
-					// peers have moved on to later terms
-					// so we can't expect all Start()s to
-					// have succeeded
-					failed = true
-					break
+			sameTerm, e := cfg.wait(index, servers, term)
+			if !sameTerm {
+				// peers have moved on to later terms
+				// so we can't expect all Start()s to
+				// have succeeded
+				failed = true
+				break
+			}
+			if e.valid {
+				if ix, ok := e.command.(int); ok {
+					cmds = append(cmds, ix)
+				} else {
+					t.Fatalf("value %v is not an int", e.command)
 				}
-				cmds = append(cmds, ix)
-			} else {
-				t.Fatalf("value %v is not an int", cmd)
 			}
 		}
 
@@ -532,13 +534,14 @@ loop:
 		}
 
 		for i := 1; i < iters+1; i++ {
-			cmd := cfg.wait(starti+i, servers, term)
-			if ix, ok := cmd.(int); ok == false || ix != cmds[i-1] {
-				if ix == -1 {
-					// term changed -- try again
-					continue loop
-				}
-				t.Fatalf("wrong value %v committed for index %v; expected %v\n", cmd, starti+i, cmds)
+			sameTerm, e := cfg.wait(starti+i, servers, term)
+			if !sameTerm {
+				// term changed -- try again
+				continue loop
+			}
+			if e != (logEntry{true, cmds[i-1]}) {
+				t.Fatalf("wrong value %+v committed for index %v; expected %+v\n",
+					e, starti+i, logEntry{true, cmds[i-1]})
 			}
 		}
 
@@ -885,9 +888,7 @@ func internalChurn(t *testing.T, unreliable bool) {
 				rf := cfg.rafts[i]
 				cfg.mu.Unlock()
 				if rf != nil {
-					//fmt.Printf("h7 me: %d x: %d\n", me, x)
 					index1, _, ok1 := rf.Start(x)
-					//fmt.Printf("h8 me: %d\n", me)
 					if ok1 {
 						ok = ok1
 						index = index1
@@ -898,14 +899,16 @@ func internalChurn(t *testing.T, unreliable bool) {
 				// maybe leader will commit our value, maybe not.
 				// but don't wait forever.
 				for _, to := range []int{10, 20, 50, 100, 200} {
-					nd, cmd := cfg.nCommitted(index)
+					nd, e := cfg.nCommitted(index)
 					if nd > 0 {
-						if xx, ok := cmd.(int); ok {
-							if xx == x {
-								values = append(values, x)
+						if e.valid {
+							if xx, ok := e.command.(int); ok {
+								if xx == x {
+									values = append(values, x)
+								}
+							} else {
+								cfg.t.Fatalf("wrong command type")
 							}
-						} else if cmd != nil {
-							cfg.t.Fatalf("wrong command type")
 						}
 						break
 					}
@@ -977,13 +980,15 @@ func internalChurn(t *testing.T, unreliable bool) {
 
 	lastIndex := cfg.one(rand.Int(), servers, true)
 
-	really := make([]int, lastIndex+1)
+	really := []int{}
 	for index := 0; index <= lastIndex; index++ {
-		v := cfg.wait(index, servers, -1)
-		if vi, ok := v.(int); ok {
-			really = append(really, vi)
-		} else if v != nil {
-			t.Fatalf("not an int")
+		_, e := cfg.wait(index, servers, -1)
+		if e.valid {
+			if vi, ok := e.command.(int); ok {
+				really = append(really, vi)
+			} else {
+				t.Fatalf("%v is not an int", e.command)
+			}
 		}
 	}
 
@@ -995,7 +1000,7 @@ func internalChurn(t *testing.T, unreliable bool) {
 			}
 		}
 		if ok == false {
-			cfg.t.Fatalf("didn't find a value")
+			cfg.t.Fatalf("didn't find value %d", v1)
 		}
 	}
 
@@ -1040,7 +1045,7 @@ func snapcommon(t *testing.T, name string, disconnect bool, reliable bool, crash
 			cfg.one(rand.Int(), servers-1, true)
 		}
 		// send enough to get a snapshot
-		for i := 0; i < SnapShotInterval+1; i++ {
+		for i := 0; i < SnapshotInterval+1; i++ {
 			cfg.rafts[sender].Start(rand.Int())
 		}
 		// let applier threads catch up with the Start()'s
