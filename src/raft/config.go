@@ -128,7 +128,7 @@ func (cfg *config) crash1(i int) {
 	rf := cfg.rafts[i]
 	if rf != nil {
 		cfg.mu.Unlock()
-		cfg.stopCh[i] <- struct{}{}
+		close(cfg.stopCh[i])
 		rf.Kill()
 		cfg.mu.Lock()
 		cfg.rafts[i] = nil
@@ -189,8 +189,11 @@ func (cfg *config) applier(server int, applyCh chan ApplyMsg, stopCh <-chan stru
 				// When applier is stopped, it still continues to empty `applyCh`.
 				stopped = true
 			}
-		case m := <-applyCh:
+		case m, ok := <-applyCh:
 			{
+				if !ok {
+					return
+				}
 				if !stopped {
 					cfg.apply(server, m)
 				}
@@ -278,8 +281,11 @@ func (cfg *config) applierSnap(server int, applyCh chan ApplyMsg, stopCh <-chan 
 				// When applier is stopped, it still continues to empty `applyCh`.
 				stopped = true
 			}
-		case m := <-applyCh:
+		case m, ok := <-applyCh:
 			{
+				if !ok {
+					return
+				}
 				if !stopped {
 					cfg.applySnap(server, m)
 				}
