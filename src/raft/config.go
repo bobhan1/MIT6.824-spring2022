@@ -181,20 +181,19 @@ func (cfg *config) apply(server int, m ApplyMsg) {
 // applier reads message from apply ch and checks that they match the log
 // contents
 func (cfg *config) applier(server int, applyCh chan ApplyMsg, stopCh <-chan struct{}) {
-	stopped := false
 	for {
 		select {
 		case <-stopCh:
 			{
 				// When applier is stopped, it still continues to empty `applyCh`.
-				stopped = true
+				stopCh = nil
 			}
 		case m, ok := <-applyCh:
 			{
 				if !ok {
 					return
 				}
-				if !stopped {
+				if stopCh != nil {
 					cfg.apply(server, m)
 				}
 			}
@@ -273,20 +272,19 @@ func (cfg *config) applySnap(server int, m ApplyMsg) {
 
 // periodically snapshot raft state
 func (cfg *config) applierSnap(server int, applyCh chan ApplyMsg, stopCh <-chan struct{}) {
-	stopped := false
 	for {
 		select {
 		case <-stopCh:
 			{
 				// When applier is stopped, it still continues to empty `applyCh`.
-				stopped = true
+				stopCh = nil
 			}
 		case m, ok := <-applyCh:
 			{
 				if !ok {
 					return
 				}
-				if !stopped {
+				if stopCh != nil {
 					cfg.applySnap(server, m)
 				}
 			}
