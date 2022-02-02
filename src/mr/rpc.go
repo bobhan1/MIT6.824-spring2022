@@ -13,7 +13,7 @@ import "strconv"
 // example to show how to declare the arguments
 // and reply for an RPC.
 //
-////try here
+
 type ExampleArgs struct {
 	X int
 }
@@ -22,7 +22,33 @@ type ExampleReply struct {
 	Y int
 }
 
-// Add your RPC definitions here.
+// WorkerReply Add your RPC definitions here.
+type TaskArgs struct {
+	WId string //worker id
+}
+type TaskReply struct {
+	TaskId   int
+	TaskType string //map or reduce
+	FileName string
+	NReduce  int //number of bucket need in reduce phase
+}
+
+//worker apply task to coordinator
+type askTaskArgs struct {
+	WId               string //worker id
+	FinishedTask      string //last finished task type
+	FinishedTaskIndex int    //last finished task index
+}
+
+//worker get reply from coordinator
+type askTaskReply struct {
+	Done     bool //all task finished
+	Type     string
+	index    int
+	FileName string
+	NMap     int //number of maps
+	NReduce  int
+}
 
 // Cook up a unique-ish UNIX-domain socket name
 // in /var/tmp, for the coordinator.
