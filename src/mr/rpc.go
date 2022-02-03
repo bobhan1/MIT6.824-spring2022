@@ -23,14 +23,15 @@ type ExampleReply struct {
 }
 
 // WorkerReply Add your RPC definitions here.
+
+//single tasks arguments
 type TaskArgs struct {
-	WId string //worker id
-}
-type TaskReply struct {
-	TaskId   int
+	index    int    //current task index
 	TaskType string //map or reduce
 	FileName string
 	NReduce  int //number of bucket need in reduce phase
+
+	WId string //worker id
 }
 
 //worker apply task to coordinator
@@ -42,8 +43,8 @@ type askTaskArgs struct {
 
 //worker get reply from coordinator
 type askTaskReply struct {
-	Done     bool //all task finished
-	Type     string
+	Done     bool   //all task finished
+	Type     string //its map or reduce
 	index    int
 	FileName string
 	NMap     int //number of maps
