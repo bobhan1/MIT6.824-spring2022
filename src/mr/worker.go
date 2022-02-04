@@ -7,6 +7,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 )
 import "log"
 import "net/rpc"
@@ -52,35 +53,53 @@ func Worker(mapf func(string, string) []KeyValue,
 	// Your worker implementation here.
 	var finishedTask string
 	var finishedTaskIndex int
+	log.Println("worker started")
+	retry := 3
 	//keep asking coordinator for task until finished
 	for {
-		args := askTaskArgs{
+		args := AskTaskArgs{
 			WId:               getID(),
 			FinishedTask:      finishedTask,
 			FinishedTaskIndex: finishedTaskIndex,
 		}
-		reply := askTaskReply{}
-		call("Coordinator.askTask", &args, &reply)
+		reply := AskTaskReply{}
+		//this will call function in Coordinator.askTaskReply
+		call("Coordinator.AskReply", &args, &reply)
+
 		if reply.Done {
 			log.Println("All task finished!")
 			break
 		}
-		if reply.Type == "map" {
-			MapTask(reply, mapf)
 
-		} else if reply.Type == "reduce" {
+		log.Printf("Received %s task %d from coordinator", reply.Type, reply.Index)
+
+		switch reply.Type {
+		case "map":
+			MapTask(reply, mapf)
+			println("mapping stage!!!\n")
+			retry = 3
+		case "reduce":
 			ReduceTask(reply, reducef)
+			println("Reduce stage!!!!!\n")
+			retry = 3
+		default:
+			log.Println("error reply: would retry times: ", retry)
+			if retry < 0 {
+				return
+			}
+			retry--
 		}
 		finishedTask = reply.Type
-		finishedTaskIndex = reply.index
-
+		finishedTaskIndex = reply.Index
+		time.Sleep(1000 * time.Millisecond)
 	}
 	// uncomment to send the Example RPC to the coordinator.
 	//CallExample()
+	log.Printf("Worker exit\n")
 }
 
 // MapTask handle task for Mapping
-func MapTask(reply askTaskReply, mapf func(string, string) []KeyValue) {
+func MapTask(reply AskTaskReply, mapf func(string, string) []KeyValue) {
 	//open replied file
 	file, err := os.Open(reply.FileName)
 	if err != nil {
@@ -103,7 +122,7 @@ func MapTask(reply askTaskReply, mapf func(string, string) []KeyValue) {
 	}
 	//store bucketMap into intermediate file
 	//convention mr-X-Y, X=task index(map task number), Y = reduce index(reduce task number)
-	tmpName := "mr-" + strconv.Itoa(reply.index)
+	tmpName := "mr-" + strconv.Itoa(reply.Index)
 	for i := 0; i < reply.NReduce; i++ {
 		tempFile, _ := os.Create(tmpName + "-" + strconv.Itoa(i))
 		//there are NReduce number of buckets
@@ -124,13 +143,13 @@ func MapTask(reply askTaskReply, mapf func(string, string) []KeyValue) {
 }
 
 //ReduceTask handle task for reduce
-func ReduceTask(reply askTaskReply, reducef func(string, []string) string) {
+func ReduceTask(reply AskTaskReply, reducef func(string, []string) string) {
 	//create empty intermediate key value slice
 	var intermediate []KeyValue
 	var lines []string
 	for mapIndex := 0; mapIndex < reply.NMap; mapIndex++ {
 		//mr-X-Y, Y is current worker index
-		fileName := "mr-" + strconv.Itoa(mapIndex) + "-" + strconv.Itoa(reply.index)
+		fileName := "mr-" + strconv.Itoa(mapIndex) + "-" + strconv.Itoa(reply.Index)
 		tempFile, err := os.Open(fileName)
 		if err != nil {
 			log.Fatalf("cannot open this file %v", reply.FileName)
@@ -139,10 +158,13 @@ func ReduceTask(reply askTaskReply, reducef func(string, []string) string) {
 		if err != nil {
 			log.Fatalf("cannot read input file  %v", reply.FileName)
 		}
-		lines = strings.Split(string(bytesFile), "\n")
+		lines = append(lines, strings.Split(string(bytesFile), "\n")...)
 
 	}
 	for _, line := range lines {
+		if strings.TrimSpace(line) == "" {
+			continue
+		}
 		pairs := strings.Split(line, ",")
 		intermediate = append(intermediate, KeyValue{pairs[0], pairs[1]})
 	}
@@ -150,7 +172,7 @@ func ReduceTask(reply askTaskReply, reducef func(string, []string) string) {
 	//copy code from mrsequential
 	sort.Sort(ByKey(intermediate))
 
-	ofile, _ := os.Create("mr-out-" + strconv.Itoa(reply.index))
+	ofile, _ := os.Create("mr-out-" + strconv.Itoa(reply.Index))
 	i := 0
 	for i < len(intermediate) {
 		j := i + 1
@@ -183,7 +205,7 @@ func ReduceTask(reply askTaskReply, reducef func(string, []string) string) {
 //
 // the RPC argument and reply types are defined in rpc.go.
 //
-func CallCoordinator() {
+func CallExample() {
 
 	// declare an argument structure.
 	args := ExampleArgs{}
@@ -195,7 +217,7 @@ func CallCoordinator() {
 	reply := ExampleReply{}
 
 	// send the RPC request, wait for the reply.
-	call("Coordinator.Example", &args, &reply)
+	//call("Coordinator.Example", &args, &reply)
 
 	// reply.Y should be 100.
 	fmt.Printf("reply.Y %v\n", reply.Y)

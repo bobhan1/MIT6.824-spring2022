@@ -6,7 +6,10 @@ package mr
 // remember to capitalize all names.
 //
 
-import "os"
+import (
+	"os"
+	"time"
+)
 import "strconv"
 
 //
@@ -24,28 +27,29 @@ type ExampleReply struct {
 
 // WorkerReply Add your RPC definitions here.
 
-//single tasks arguments
+// TaskArgs is single tasks arguments
 type TaskArgs struct {
-	index    int    //current task index
+	Index    int    //current task index
 	TaskType string //map or reduce
 	FileName string
 	NReduce  int //number of bucket need in reduce phase
 
-	WId string //worker id
+	WId string    //worker id
+	Due time.Time //need to wait 10 secs if worker not reply
 }
 
 //worker apply task to coordinator
-type askTaskArgs struct {
+type AskTaskArgs struct {
 	WId               string //worker id
 	FinishedTask      string //last finished task type
 	FinishedTaskIndex int    //last finished task index
 }
 
 //worker get reply from coordinator
-type askTaskReply struct {
+type AskTaskReply struct {
 	Done     bool   //all task finished
 	Type     string //its map or reduce
-	index    int
+	Index    int
 	FileName string
 	NMap     int //number of maps
 	NReduce  int
