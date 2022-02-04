@@ -53,7 +53,7 @@ func Worker(mapf func(string, string) []KeyValue,
 	// Your worker implementation here.
 	var finishedTask string
 	var finishedTaskIndex int
-	log.Println("worker started")
+	log.Println("worker has started")
 	retry := 3
 	//keep asking coordinator for task until finished
 	for {
@@ -64,9 +64,9 @@ func Worker(mapf func(string, string) []KeyValue,
 		}
 		reply := AskTaskReply{}
 		//this will call function in Coordinator.askTaskReply
-		call("Coordinator.AskReply", &args, &reply)
+		check := call("Coordinator.AskReply", &args, &reply)
 
-		if reply.Done {
+		if reply.Done || !check {
 			log.Println("All task finished!")
 			break
 		}
@@ -83,7 +83,7 @@ func Worker(mapf func(string, string) []KeyValue,
 			println("Reduce stage!!!!!\n")
 			retry = 3
 		default:
-			log.Println("error reply: would retry times: ", retry)
+			log.Println("retry times: ", retry)
 			if retry < 0 {
 				return
 			}

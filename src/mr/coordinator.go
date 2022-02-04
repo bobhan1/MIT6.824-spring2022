@@ -47,12 +47,9 @@ func (c *Coordinator) AskReply(args *AskTaskArgs, reply *AskTaskReply) error {
 		task, isWorker := c.tasks[taskID]
 		//make sure the task has not been rearranged to other worker
 		if isWorker && task.WId == args.WId {
-			print("11111111111111111")
-			log.Printf("Mark %s task %d as finished on worker %s\n", task.TaskType, task.Index, task.WId)
-			//if args.FinishedTask == "map"{
-			//	 for i := 0; i < c.NReduce; i++{
-			//	 }
-			//}
+			//print("11111111111111111")
+			//log.Printf("%s task %d finished for worker %s\n", task.TaskType, task.Index, task.WId)
+
 			//delete finished task from tasks collection
 			delete(c.tasks, taskID)
 			if len(c.tasks) == 0 {
@@ -169,17 +166,19 @@ func MakeCoordinator(files []string, nReduce int) *Coordinator {
 
 	}
 	println("task length ", len(c.tasks))
-	log.Println("Coordinator started")
+	log.Println("Coordinator has started")
 	c.server()
 
+	//periodically check if worker exceeds 10s and not return their work
+	//if so, redeliver this task
 	go func() {
 		for {
-			time.Sleep(500 * time.Millisecond)
+			time.Sleep(600 * time.Millisecond)
 
 			c.mutex.Lock()
 			for _, task := range c.tasks {
 				if task.WId != "" && time.Now().After(task.Due) {
-					log.Printf("found timed-out %s task %d previously running on worker %s. prepare reassign",
+					log.Printf("timed-out %s task %d on worker %s. Rediliever this task",
 						task.TaskType, task.Index, task.WId)
 					task.WId = ""
 					c.channelTask <- task

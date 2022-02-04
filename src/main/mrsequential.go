@@ -49,6 +49,18 @@ func main() {
 		kva := mapf(filename, string(content))
 		intermediate = append(intermediate, kva...)
 	}
+	//filename := "pg-being_ernest.txt"
+	//file, err := os.Open(filename)
+	//if err != nil {
+	//	log.Fatalf("cannot open %v", filename)
+	//}
+	//content, err := ioutil.ReadAll(file)
+	//if err != nil {
+	//	log.Fatalf("cannot read %v", filename)
+	//}
+	//file.Close()
+	//kva := mapf(filename, string(content))
+	//intermediate = append(intermediate, kva...)
 
 	//
 	// a big difference from real MapReduce is that all the
