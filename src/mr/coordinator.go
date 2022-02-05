@@ -38,7 +38,26 @@ type Coordinator struct {
 //worker call this function to ask for tasks
 func (c *Coordinator) AskReply(args *AskTaskArgs, reply *AskTaskReply) error {
 
-	//
+	//periodically check if worker exceeds 10s and not return their work
+	//if so, redeliver this task
+	go func() {
+		for {
+			time.Sleep(600 * time.Millisecond)
+
+			c.mutex.Lock()
+			for _, task := range c.tasks {
+				if task.WId != "" && time.Now().After(task.Due) {
+					log.Printf("timed-out %s task %d on worker %s. Rediliever this task",
+						task.TaskType, task.Index, task.WId)
+					task.WId = ""
+					c.channelTask <- task
+				}
+			}
+			c.mutex.Unlock()
+		}
+	}()
+
+	//clear finished task from task collection
 	if args.FinishedTask != "" {
 		c.mutex.Lock()
 		//defer c.mutex.Lock()
@@ -168,25 +187,6 @@ func MakeCoordinator(files []string, nReduce int) *Coordinator {
 	println("task length ", len(c.tasks))
 	log.Println("Coordinator has started")
 	c.server()
-
-	//periodically check if worker exceeds 10s and not return their work
-	//if so, redeliver this task
-	go func() {
-		for {
-			time.Sleep(600 * time.Millisecond)
-
-			c.mutex.Lock()
-			for _, task := range c.tasks {
-				if task.WId != "" && time.Now().After(task.Due) {
-					log.Printf("timed-out %s task %d on worker %s. Rediliever this task",
-						task.TaskType, task.Index, task.WId)
-					task.WId = ""
-					c.channelTask <- task
-				}
-			}
-			c.mutex.Unlock()
-		}
-	}()
 
 	return &c
 }
