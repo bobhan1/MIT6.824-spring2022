@@ -27,8 +27,6 @@ import (
 // import "bytes"
 // import "6.824/labgob"
 
-
-
 //
 // as each Raft peer becomes aware that successive log entries are
 // committed, the peer should send an ApplyMsg to the service (or
@@ -52,6 +50,19 @@ type ApplyMsg struct {
 	SnapshotIndex int
 }
 
+// LogEntry holds information about each log
+type LogEntry struct {
+	command interface{}
+	term    int
+}
+
+//enum for different server states
+const (
+	LEADER     = "Leader"
+	FOLLOWER   = "Follower"
+	CANDIDATES = "Candidates"
+)
+
 //
 // A Go object implementing a single Raft peer.
 //
@@ -66,6 +77,22 @@ type Raft struct {
 	// Look at the paper's Figure 2 for a description of what
 	// state a Raft server must maintain.
 
+	//server states
+	state    string
+	leaderId int
+
+	//Persistent state
+	currentTerm int
+	votedFor    int //candidateId that received vote in current term(or null if none)
+	log         []LogEntry
+
+	//volatile state on all servers
+	commitIndex int
+	lastApplied int
+
+	//volatile state on leaders
+	nextIndex  []int
+	matchIndex []int
 }
 
 // return currentTerm and whether this server
@@ -75,6 +102,8 @@ func (rf *Raft) GetState() (int, bool) {
 	var term int
 	var isleader bool
 	// Your code here (2A).
+	term = rf.currentTerm
+	isleader = rf.state == LEADER
 	return term, isleader
 }
 
@@ -93,7 +122,6 @@ func (rf *Raft) persist() {
 	// data := w.Bytes()
 	// rf.persister.SaveRaftState(data)
 }
-
 
 //
 // restore previously persisted state.
@@ -117,7 +145,6 @@ func (rf *Raft) readPersist(data []byte) {
 	// }
 }
 
-
 //
 // A service wants to switch to snapshot.  Only do so if Raft hasn't
 // have more recent info since it communicate the snapshot on applyCh.
@@ -138,13 +165,17 @@ func (rf *Raft) Snapshot(index int, snapshot []byte) {
 
 }
 
-
 //
 // example RequestVote RPC arguments structure.
 // field names must start with capital letters!
 //
 type RequestVoteArgs struct {
 	// Your data here (2A, 2B).
+	term         int //candidate's term
+	candidateId  int //candidate requesting vote
+	lastLogIndex int //index of candidate's last log entry
+	lastLogTerm  int //term of candidate's last log entry
+
 }
 
 //
@@ -153,13 +184,48 @@ type RequestVoteArgs struct {
 //
 type RequestVoteReply struct {
 	// Your data here (2A).
+	term        int  //currentTerm, for candidate to update itself
+	voteGranted bool //true means that candidate received vote
 }
 
-//
+// RequestVote
 // example RequestVote RPC handler.
-//
+// rf is receiver, args is candidate
 func (rf *Raft) RequestVote(args *RequestVoteArgs, reply *RequestVoteReply) {
 	// Your code here (2A, 2B).
+	//candidate term cannot smaller than receiver's id
+	if args.term < rf.currentTerm {
+		reply.term = rf.currentTerm
+		reply.voteGranted = false
+		return
+	}
+	//if candidate terms bigger than receiver,
+	//receiver change its terms and becomes follower of this term's leader
+	if args.term > rf.currentTerm {
+		rf.currentTerm = args.term
+		rf.state = FOLLOWER
+		rf.votedFor = -1
+		rf.leaderId = -1
+	}
+	//if receiver has not voted yet or votedFor is candidateId
+	if rf.votedFor == -1 || rf.votedFor == args.candidateId {
+		//candidate log is at lease as up-to-date as receivers log
+
+		//if receiver's latest log term is bigger than candidates term
+		//Or if receiver's latest log term is equal to candidates term
+		//but its log longer than candidates log, Reject to vote
+		lastLogIndexTerm := rf.log[len(rf.log)-1].term
+		if lastLogIndexTerm > args.lastLogTerm ||
+			(lastLogIndexTerm == args.lastLogTerm && (len(rf.log) > args.lastLogIndex)) {
+			reply.voteGranted = false
+			reply.term = rf.currentTerm
+		}
+		//else granted to vote
+		reply.voteGranted = true
+		rf.votedFor = args.candidateId
+		reply.term = rf.currentTerm
+
+	}
 }
 
 //
@@ -196,7 +262,6 @@ func (rf *Raft) sendRequestVote(server int, args *RequestVoteArgs, reply *Reques
 	return ok
 }
 
-
 //
 // the service using Raft (e.g. a k/v server) wants to start
 // agreement on the next command to be appended to Raft's log. if this
@@ -217,7 +282,6 @@ func (rf *Raft) Start(command interface{}) (int, int, bool) {
 	isLeader := true
 
 	// Your code here (2B).
-
 
 	return index, term, isLeader
 }
@@ -280,7 +344,6 @@ func Make(peers []*labrpc.ClientEnd, me int,
 
 	// start ticker goroutine to start elections
 	go rf.ticker()
-
 
 	return rf
 }
