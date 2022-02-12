@@ -18,6 +18,7 @@ package raft
 //
 
 import (
+	"log"
 	"math/rand"
 	"sync"
 	"sync/atomic"
@@ -54,8 +55,8 @@ type ApplyMsg struct {
 
 // LogEntry holds information about each log
 type LogEntry struct {
-	command interface{}
-	term    int
+	Command interface{}
+	Term    int
 }
 
 //enum for different server states
@@ -64,9 +65,6 @@ const (
 	FOLLOWER   = "Follower"
 	CANDIDATES = "Candidates"
 )
-
-//enum timeout
-const ()
 
 //
 // A Go object implementing a single Raft peer.
@@ -141,13 +139,16 @@ type AppendEntryReply struct {
 func (rf *Raft) changeState(state string) {
 
 	if state == FOLLOWER {
+		log.Printf("Raft ID: %v change state from %s to Follower", rf.me, rf.state)
 		rf.state = FOLLOWER
 		rf.votedFor = -1
 		rf.lastReceiveTime = time.Now().Unix()
 	} else if state == LEADER {
+		log.Printf("Raft ID: %v change state from %s to Leader", rf.me, rf.state)
 		rf.state = LEADER
 		rf.lastReceiveTime = time.Now().Unix()
 	} else if state == CANDIDATES {
+		log.Printf("Raft ID: %v change state from %s to Candidate", rf.me, rf.state)
 		rf.state = CANDIDATES
 		rf.votedFor = rf.me
 		rf.currentTerm++
@@ -162,6 +163,9 @@ func (rf *Raft) GetState() (int, bool) {
 	var term int
 	var isleader bool
 	// Your code here (2A).
+	rf.mu.Lock()
+	defer rf.mu.Unlock()
+	log.Print("Getting stage")
 	term = rf.currentTerm
 	isleader = rf.state == LEADER
 	return term, isleader
@@ -232,8 +236,10 @@ func (rf *Raft) RequestVote(args *RequestVoteArgs, reply *RequestVoteReply) {
 	// Your code here (2A, 2B).
 	rf.mu.Lock()
 	defer rf.mu.Unlock()
+	log.Printf("Raft %d: received vote request from candidate %d", rf.me, args.CandidateId)
 	//candidate term cannot smaller than receiver's id
 	if args.Term < rf.currentTerm {
+		log.Printf("candidate Term %d has smaller term than receiver term %d denied vote", rf.currentTerm, args.Term)
 		reply.Term = rf.currentTerm
 		reply.VoteGranted = false
 		return
@@ -241,9 +247,11 @@ func (rf *Raft) RequestVote(args *RequestVoteArgs, reply *RequestVoteReply) {
 	//if candidate terms bigger than receiver,
 	//receiver change its terms and becomes follower of this term's leader
 	if args.Term > rf.currentTerm {
+		log.Printf("candidate Term %d has bigger term than receiver term %d", args.Term, rf.currentTerm)
 		rf.currentTerm = args.Term
 		rf.changeState(FOLLOWER)
 		rf.leaderId = -1
+
 	}
 	//if receiver has not voted yet or votedFor is candidateId
 	if rf.votedFor == -1 || rf.votedFor == args.CandidateId {
@@ -254,19 +262,46 @@ func (rf *Raft) RequestVote(args *RequestVoteArgs, reply *RequestVoteReply) {
 		//but its log longer than candidates log, Reject to vote
 		lastLogIndexTerm := 0
 		if len(rf.log) != 0 {
-			lastLogIndexTerm = rf.log[len(rf.log)-1].term
+			lastLogIndexTerm = rf.log[len(rf.log)-1].Term
+			log.Printf("last log index: %d", lastLogIndexTerm)
 		}
 		if lastLogIndexTerm > args.LastLogTerm ||
 			(lastLogIndexTerm == args.LastLogTerm && (len(rf.log) > args.LastLogIndex)) {
 			reply.VoteGranted = false
 			reply.Term = rf.currentTerm
+			log.Printf("Voting failed 22222")
+			return
 		}
 		//else granted to vote
 		reply.VoteGranted = true
 		rf.votedFor = args.CandidateId
 		reply.Term = rf.currentTerm
 		rf.lastReceiveTime = time.Now().Unix()
+		log.Printf("Raft ID %d: voted to ID %d", rf.me, args.CandidateId)
 	}
+}
+
+func (rf *Raft) AppendEntry(args *AppendEntryArgs, reply *AppendEntryReply) {
+	rf.mu.Lock()
+	defer rf.mu.Unlock()
+
+	reply.Success = false
+	reply.Term = rf.currentTerm
+
+	if args.Term < rf.currentTerm {
+		return
+	}
+	if args.Term > rf.currentTerm {
+		rf.changeState(FOLLOWER)
+		rf.currentTerm = args.Term
+		rf.votedFor = -1
+		rf.leaderId = -1
+	}
+
+	rf.leaderId = args.LeaderId
+	rf.lastReceiveTime = time.Now().Unix()
+	reply.Success = true
+
 }
 
 //
@@ -353,7 +388,7 @@ func (rf *Raft) killed() bool {
 }
 
 // The ticker go routine starts a new election if this peer hasn't received
-// heartsbeats recently.
+// heartbeats recently.
 func (rf *Raft) ticker() {
 	// Your code here to check if a leader election should
 	// be started and to randomize sleeping time using
@@ -373,13 +408,23 @@ func (rf *Raft) ticker() {
 			startTickTime = time.Now().Unix()
 			endSleepTime := rf.lastReceiveTime + 200 + rand.Int63n(150)
 			//if time of recent raft receive RPC smaller than lastStartTickTime, means no new RPC receive
-			//EndSleep time has to bigger than startTime
+			//EndSleep time has to bigger than startTime. Enter leader election
 			if rf.lastReceiveTime < lastStartTickTime || endSleepTime <= startTickTime {
 				//enter leader selection
+
 				rf.leaderSelection()
+				//update sleep time, candidate waiting time
+				timeout = time.Duration(200+rand.Int63n(150)) * time.Millisecond
 			} else {
 				//get new RPC without timeout, reset sleep time
-				timeout = time.Duration(endSleepTime - startTickTime)
+				if rf.state == FOLLOWER {
+					log.Printf("Raft ID: %d get Rpc from raft Leader ID %d, keep sleep. ", rf.me, rf.leaderId)
+				} else if rf.state == CANDIDATES {
+					log.Printf("Raft candidate ID: %d send vote request Rpc, Waiting response. Leader Id: %d",
+						rf.me, rf.leaderId)
+				}
+				log.Printf("Last Receive time %v", rf.lastReceiveTime)
+				timeout = time.Duration(endSleepTime-startTickTime) * time.Millisecond
 			}
 
 		}()
@@ -388,9 +433,10 @@ func (rf *Raft) ticker() {
 }
 
 func (rf *Raft) leaderSelection() {
+	log.Printf("raft: %d start election", rf.me)
 
-	voteCount := 1 //num of vote this candidate received(1 is his own vote)
-	totalVote := 1 //total number of vote
+	grantedVote := 1 //num of vote this candidate received(1 is his own vote)
+	totalVote := 1   //total number of vote
 	rf.changeState(CANDIDATES)
 
 	cond := sync.NewCond(&rf.mu)
@@ -406,23 +452,30 @@ func (rf *Raft) leaderSelection() {
 				Term:         rf.currentTerm,
 				CandidateId:  rf.me,
 				LastLogIndex: len(rf.log),
-				LastLogTerm:  -1,
+			}
+			if len(rf.log) != 0 {
+				args.LastLogTerm = rf.log[len(rf.log)-1].Term
 			}
 			reply := RequestVoteReply{}
-			DPrintf("[%d]: term: [%d], send request vote to: [%d]", rf.me, rf.currentTerm, id)
-			//send request to peers
+			log.Printf("Raft ID %d in term: %d, send request vote to: %d", rf.me, rf.currentTerm, id)
+			//send request to peer
+			//cannot add lock here otherwise cause deadlock
 			ok := rf.sendRequestVote(id, &args, &reply)
 
 			rf.mu.Lock()
 			defer rf.mu.Lock()
 			totalVote++
-
+			log.Printf("Raft ID %d in term: %d, totalvote %d, total granted Vote %d",
+				rf.me, rf.currentTerm, totalVote, grantedVote)
 			if !ok {
+				cond.Broadcast()
 				return
 			}
 			//vote granted and reply term equal to current term(to avoid old rpc)
 			if reply.VoteGranted && rf.currentTerm == reply.Term {
-				voteCount++
+				grantedVote++
+				log.Printf("\"Raft ID %d in term: %d vote granted, total granted Vote %d",
+					rf.me, rf.currentTerm, grantedVote)
 			} else if reply.Term > rf.currentTerm {
 				//if receiver term bigger than candidate term, candidate change to follower
 				rf.changeState(FOLLOWER)
@@ -431,25 +484,30 @@ func (rf *Raft) leaderSelection() {
 			}
 			cond.Broadcast() //tell counting request vote goroutine to start counting
 		}(peerId)
-
-		//keep waiting for the end of voting, then counting request vote
-		go func() {
-			rf.mu.Lock()
-			defer rf.mu.Unlock()
-			if rf.state != CANDIDATES {
-				return
-			}
-			//keep waiting until every peer sends vote
-			for voteCount <= len(rf.peers)/2 && totalVote < len(rf.peers) {
-				cond.Wait()
-			}
-			//if current candidate get more than half votes, change to leader
-			if voteCount > len(rf.peers)/2 {
-				rf.changeState(LEADER)
-			}
-		}()
-
 	}
+
+	log.Printf("Raft ID %d in term: %d, total granted Vote %d!!!!!",
+		rf.me, rf.currentTerm, grantedVote)
+
+	//keep waiting for the end of voting, then counting request vote
+	go func() {
+		rf.mu.Lock()
+		defer rf.mu.Unlock()
+		if rf.state != CANDIDATES {
+			return
+		}
+		//keep waiting until every peer sends vote
+		for rf.state == CANDIDATES && grantedVote <= len(rf.peers)/2 && totalVote < len(rf.peers) {
+			log.Printf("wating to finish vote")
+			cond.Wait()
+		}
+		//if current candidate get more than half votes, change to leader
+		if grantedVote > len(rf.peers)/2 {
+			rf.changeState(LEADER)
+			log.Printf("Raft Id %d, I AM LEADER NOW, Leader ID %d", rf.me, rf.leaderId)
+		}
+	}()
+
 }
 
 func (rf *Raft) sendHeartBeat() {
@@ -458,22 +516,36 @@ func (rf *Raft) sendHeartBeat() {
 			rf.mu.Lock()
 			defer rf.mu.Unlock()
 			//if not leader just return
+			log.Printf("send heart beat!!!!!!!!!!! Raft state %s", rf.state)
 			if rf.state != LEADER {
+				log.Printf("raft ID %d, state %s. NOT Leader return ", rf.me, rf.state)
 				return
 			}
 			//loop through every peer
 			for peerId := 0; peerId < len(rf.peers); peerId++ {
+				log.Printf("enter looooooop send heart beats")
 				if peerId == rf.me {
 					continue
 				}
-				//args := AppendEntryArgs{
-				//	Term:     rf.currentTerm,
-				//	LeaderId: rf.me,
-				//}
-				//go func(id int) {
-				//	reply := AppendEntryReply{}
-				//	ok := rf.sendAppendEntry
-				//}(peerId)
+				args := AppendEntryArgs{
+					Term:     rf.currentTerm,
+					LeaderId: rf.me,
+				}
+				go func(id int) {
+					rf.mu.Lock()
+					defer rf.mu.Unlock()
+					reply := AppendEntryReply{}
+					ok := rf.sendAppendEntry(id, &args, &reply)
+					if !ok {
+						return
+					}
+					//if reply term bigger than current raft, current raft change to follower
+					if reply.Term > rf.currentTerm {
+						log.Printf("change Raft Id %d to follower", rf.me)
+						rf.changeState(FOLLOWER)
+						rf.currentTerm = reply.Term
+					}
+				}(peerId)
 
 			}
 
