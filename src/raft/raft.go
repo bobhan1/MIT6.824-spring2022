@@ -125,10 +125,10 @@ type RequestVoteReply struct {
 type AppendEntryArgs struct {
 	Term         int
 	LeaderId     int
-	prevLogIndex int
-	prevLogTerm  int
-	entries      []logEntry
-	leaderCommit int
+	PrevLogIndex int
+	PrevLogTerm  int
+	Entries      []LogEntry
+	LeaderCommit int
 }
 
 type AppendEntryReply struct {
@@ -165,7 +165,7 @@ func (rf *Raft) GetState() (int, bool) {
 	// Your code here (2A).
 	rf.mu.Lock()
 	defer rf.mu.Unlock()
-	log.Print("Getting stage")
+	log.Printf("Getting stage, Raft ID %d, stage: %s ", rf.me, rf.state)
 	term = rf.currentTerm
 	isleader = rf.state == LEADER
 	return term, isleader
@@ -291,7 +291,8 @@ func (rf *Raft) AppendEntry(args *AppendEntryArgs, reply *AppendEntryReply) {
 	if args.Term < rf.currentTerm {
 		return
 	}
-	if args.Term > rf.currentTerm {
+
+	if args.Term > rf.currentTerm || rf.state != FOLLOWER {
 		rf.changeState(FOLLOWER)
 		rf.currentTerm = args.Term
 		rf.votedFor = -1
@@ -301,7 +302,6 @@ func (rf *Raft) AppendEntry(args *AppendEntryArgs, reply *AppendEntryReply) {
 	rf.leaderId = args.LeaderId
 	rf.lastReceiveTime = time.Now().Unix()
 	reply.Success = true
-
 }
 
 //
@@ -407,12 +407,14 @@ func (rf *Raft) ticker() {
 			//update current start tick time to know
 			startTickTime = time.Now().Unix()
 			endSleepTime := rf.lastReceiveTime + 200 + rand.Int63n(150)
+
 			//if time of recent raft receive RPC smaller than lastStartTickTime, means no new RPC receive
 			//EndSleep time has to bigger than startTime. Enter leader election
 			if rf.lastReceiveTime < lastStartTickTime || endSleepTime <= startTickTime {
 				//enter leader selection
-
-				rf.leaderSelection()
+				if rf.state != LEADER {
+					rf.leaderSelection()
+				}
 				//update sleep time, candidate waiting time
 				timeout = time.Duration(200+rand.Int63n(150)) * time.Millisecond
 			} else {
@@ -426,7 +428,7 @@ func (rf *Raft) ticker() {
 				log.Printf("Last Receive time %v", rf.lastReceiveTime)
 				timeout = time.Duration(endSleepTime-startTickTime) * time.Millisecond
 			}
-
+			log.Printf("raft id: %d lock release ", rf.me)
 		}()
 
 	}
@@ -463,10 +465,10 @@ func (rf *Raft) leaderSelection() {
 			ok := rf.sendRequestVote(id, &args, &reply)
 
 			rf.mu.Lock()
-			defer rf.mu.Lock()
+			defer rf.mu.Unlock()
 			totalVote++
-			log.Printf("Raft ID %d in term: %d, totalvote %d, total granted Vote %d",
-				rf.me, rf.currentTerm, totalVote, grantedVote)
+			log.Printf("Raft ID %d in term: %d, totalvote %d, total granted Vote %d PeerID %d",
+				rf.me, rf.currentTerm, totalVote, grantedVote, id)
 			if !ok {
 				cond.Broadcast()
 				return
@@ -474,14 +476,15 @@ func (rf *Raft) leaderSelection() {
 			//vote granted and reply term equal to current term(to avoid old rpc)
 			if reply.VoteGranted && rf.currentTerm == reply.Term {
 				grantedVote++
-				log.Printf("\"Raft ID %d in term: %d vote granted, total granted Vote %d",
-					rf.me, rf.currentTerm, grantedVote)
+				log.Printf("\"Raft ID %d in term: %d vote granted, total granted Vote %d, peerId: %d",
+					rf.me, rf.currentTerm, grantedVote, id)
 			} else if reply.Term > rf.currentTerm {
 				//if receiver term bigger than candidate term, candidate change to follower
 				rf.changeState(FOLLOWER)
 				//change term
 				rf.currentTerm = reply.Term
 			}
+
 			cond.Broadcast() //tell counting request vote goroutine to start counting
 		}(peerId)
 	}
@@ -527,15 +530,20 @@ func (rf *Raft) sendHeartBeat() {
 				if peerId == rf.me {
 					continue
 				}
-				args := AppendEntryArgs{
-					Term:     rf.currentTerm,
-					LeaderId: rf.me,
-				}
 				go func(id int) {
-					rf.mu.Lock()
-					defer rf.mu.Unlock()
+					args := AppendEntryArgs{
+						Term:         rf.currentTerm,
+						LeaderId:     rf.me,
+						PrevLogIndex: -1,
+						PrevLogTerm:  -1,
+						Entries:      nil,
+						LeaderCommit: -1,
+					}
 					reply := AppendEntryReply{}
 					ok := rf.sendAppendEntry(id, &args, &reply)
+
+					rf.mu.Lock()
+					defer rf.mu.Unlock()
 					if !ok {
 						return
 					}
@@ -544,13 +552,14 @@ func (rf *Raft) sendHeartBeat() {
 						log.Printf("change Raft Id %d to follower", rf.me)
 						rf.changeState(FOLLOWER)
 						rf.currentTerm = reply.Term
+						return
 					}
 				}(peerId)
 
 			}
 
 		}()
-		//send heartbeat no more than 10 times per second
+		//send heartbeat no more than 10 times per second, 1s = 1000ms
 		//means 100ms send once
 		time.Sleep(time.Duration(100) * time.Millisecond)
 	}
