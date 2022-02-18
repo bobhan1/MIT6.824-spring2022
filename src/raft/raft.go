@@ -407,7 +407,6 @@ func (rf *Raft) ticker() {
 			//update current start tick time to know
 			startTickTime = time.Now().Unix()
 			endSleepTime := rf.lastReceiveTime + 200 + rand.Int63n(150)
-
 			//if time of recent raft receive RPC smaller than lastStartTickTime, means no new RPC receive
 			//EndSleep time has to bigger than startTime. Enter leader election
 			if rf.lastReceiveTime < lastStartTickTime || endSleepTime <= startTickTime {
@@ -531,6 +530,7 @@ func (rf *Raft) sendHeartBeat() {
 					continue
 				}
 				go func(id int) {
+					rf.mu.Lock() //need to have lock here otherwise, race condition
 					args := AppendEntryArgs{
 						Term:         rf.currentTerm,
 						LeaderId:     rf.me,
@@ -539,6 +539,8 @@ func (rf *Raft) sendHeartBeat() {
 						Entries:      nil,
 						LeaderCommit: -1,
 					}
+					rf.mu.Unlock()
+
 					reply := AppendEntryReply{}
 					ok := rf.sendAppendEntry(id, &args, &reply)
 
