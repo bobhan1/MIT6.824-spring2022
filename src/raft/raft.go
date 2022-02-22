@@ -56,7 +56,7 @@ type ApplyMsg struct {
 // LogEntry holds information about each log
 type LogEntry struct {
 	Command interface{}
-	Term    int
+	Term    int //ensure consistency if leader crash
 }
 
 //enum for different server states
@@ -91,12 +91,20 @@ type Raft struct {
 	log         []LogEntry
 
 	//volatile state on all servers
-	commitIndex int
+
+	//if leader crash, new leader needs to have entire committed log
+	//that is if one log entry has been committed and this log entry must exist in higher term leader's log
+
+	commitIndex int // the highest log entry that has been committed
 	lastApplied int
 
 	//volatile state on leaders
-	nextIndex  []int
-	matchIndex []int
+	//help leader maintain other server's log
+	nextIndex  []int //index of next log entry to send to that server
+	matchIndex []int //index of the highest log entry known to be replicated on server
+
+	applyChan chan ApplyMsg //once logEntry is committed, it sends to applyChan right away
+
 }
 
 //
@@ -123,10 +131,12 @@ type RequestVoteReply struct {
 }
 
 type AppendEntryArgs struct {
-	Term         int
-	LeaderId     int
+	Term     int
+	LeaderId int
+	//used to let follower check if its log same with leader
 	PrevLogIndex int
 	PrevLogTerm  int
+
 	Entries      []LogEntry
 	LeaderCommit int
 }
@@ -134,6 +144,12 @@ type AppendEntryArgs struct {
 type AppendEntryReply struct {
 	Term    int  //current term, for leader update itself
 	Success bool //true if follower contained entry matching prevLogIndex and prevLogTerm
+
+	//Fast back up mechanism, if follower missed long log, won't need to back up step by step
+	//leader the can jump back entire log that needs to delete
+	XTerm  int // the term of conflicting entry
+	XIndex int //index of the first entry with XTerm
+	XLen   int // length of log
 }
 
 func (rf *Raft) changeState(state string) {
@@ -147,6 +163,7 @@ func (rf *Raft) changeState(state string) {
 		log.Printf("Raft ID: %v change state from %s to Leader", rf.me, rf.state)
 		rf.state = LEADER
 		rf.lastReceiveTime = time.Now().Unix()
+
 	} else if state == CANDIDATES {
 		log.Printf("Raft ID: %v change state from %s to Candidate", rf.me, rf.state)
 		rf.state = CANDIDATES
@@ -282,6 +299,9 @@ func (rf *Raft) RequestVote(args *RequestVoteArgs, reply *RequestVoteReply) {
 }
 
 func (rf *Raft) AppendEntry(args *AppendEntryArgs, reply *AppendEntryReply) {
+	//XTerm: the term of conflicting entry
+	//XIndex: index of the first entry with XTerm
+	//XLen: length of follower log
 	rf.mu.Lock()
 	defer rf.mu.Unlock()
 
@@ -297,6 +317,63 @@ func (rf *Raft) AppendEntry(args *AppendEntryArgs, reply *AppendEntryReply) {
 		rf.currentTerm = args.Term
 		rf.votedFor = -1
 		rf.leaderId = -1
+	}
+
+	//check if preLogIndex and prevLogTerm equal to leader
+
+	// 1. no entry with prevLogIndex or term conflicting
+	if args.PrevLogIndex >= len(rf.log) ||
+		(rf.log[args.PrevLogIndex].Term != args.PrevLogTerm) && args.PrevLogIndex >= 0 {
+		//no entry case: s1: 4
+		//       (leader)s2: 4 6 6 6
+		reply.XLen = len(rf.log)
+		//if it's Term conflicting
+		if args.PrevLogIndex < len(rf.log) {
+			//case: s1 : 4 4 4
+			//		s2 : 4 6 6 6
+			reply.XTerm = rf.log[args.PrevLogIndex].Term // XTerm = 4 here
+			// loop back followers' log to find XIndex starts
+			for i := args.PrevLogIndex; i >= 0; i-- {
+				if rf.log[i].Term == reply.XTerm {
+					reply.XIndex = i
+				} else {
+					break
+				}
+			}
+		}
+		return
+	}
+
+	//if log matches prevLogIndex and preLogTerm
+	//        s1: 4 6 6 6 6 6
+	//(leader)s2: 4 6 6 7 new entry is 7, conflict with s1 6
+	// needs to delete s1 6 6 6 three entry and append 7 to the nextIndex
+	for i := 0; i < len(args.Entries); i++ {
+		index := args.PrevLogIndex + 1 + i
+		//if no conflict
+		// s1: 4 6 6
+		// s2: 4 6 6 7 8
+		//here args.Entries only contain 7 8
+		if index >= len(rf.log) {
+			rf.log = append(rf.log, args.Entries[i:]...)
+			//should persist it for lab2c
+			break
+		}
+		//        s1: 4 6 6 6 6 6
+		//(leader)s2: 4 6 6 7 new entry is 7, conflict with s1 6
+		if rf.log[index].Term != args.Entries[i].Term {
+			//delete current conflict index entry and all that follow it
+			rf.log = rf.log[:index-1]
+			rf.log = append(rf.log, args.Entries[i:]...)
+		}
+	}
+
+	//update follower's commitIndex
+	if args.LeaderCommit > rf.commitIndex {
+		rf.commitIndex = args.LeaderCommit
+		if len(rf.log)-1 < rf.commitIndex {
+			rf.commitIndex = len(rf.log) - 1
+		}
 	}
 
 	rf.leaderId = args.LeaderId
@@ -362,6 +439,20 @@ func (rf *Raft) Start(command interface{}) (int, int, bool) {
 	isLeader := true
 
 	// Your code here (2B).
+	rf.mu.Lock()
+	defer rf.mu.Unlock()
+
+	isLeader = rf.state == LEADER
+	if isLeader {
+		//append command to leader's log
+		term = rf.currentTerm
+		rf.log = append(rf.log, LogEntry{Term: term, Command: command})
+		index = len(rf.log) - 1
+		//set leader's nextIndex and matchIndex
+		rf.nextIndex[rf.me] = len(rf.log)
+		rf.matchIndex[rf.me] = len(rf.log) - 1
+		log.Printf("Leader ID %d received command at index %d, currentTerm %d ", rf.me, index, term)
+	}
 
 	return index, term, isLeader
 }
@@ -452,7 +543,7 @@ func (rf *Raft) leaderSelection() {
 			args := RequestVoteArgs{
 				Term:         rf.currentTerm,
 				CandidateId:  rf.me,
-				LastLogIndex: len(rf.log),
+				LastLogIndex: len(rf.log) - 1,
 			}
 			if len(rf.log) != 0 {
 				args.LastLogTerm = rf.log[len(rf.log)-1].Term
@@ -529,15 +620,23 @@ func (rf *Raft) sendHeartBeat() {
 				if peerId == rf.me {
 					continue
 				}
+
 				go func(id int) {
 					rf.mu.Lock() //need to have lock here otherwise, race condition
 					args := AppendEntryArgs{
 						Term:         rf.currentTerm,
 						LeaderId:     rf.me,
-						PrevLogIndex: -1,
+						PrevLogIndex: rf.nextIndex[id] - 1,
 						PrevLogTerm:  -1,
 						Entries:      nil,
 						LeaderCommit: -1,
+					}
+					if args.PrevLogIndex >= 0 {
+						args.PrevLogTerm = rf.log[args.PrevLogIndex].Term
+					}
+					if rf.nextIndex[id] <= len(rf.log)-1 {
+						//send all the entries from nextIndex
+						args.Entries = rf.log[rf.nextIndex[id]:]
 					}
 					rf.mu.Unlock()
 
@@ -556,6 +655,20 @@ func (rf *Raft) sendHeartBeat() {
 						rf.currentTerm = reply.Term
 						return
 					}
+
+					if reply.Term == rf.currentTerm {
+
+						if reply.Success {
+							//update nextIndex and matchIndex of leader for receiver follower
+
+							// append new entries not already in the log
+
+						} else {
+							//follower inconsistent log with leader
+							//delete every thing start from append entry, update to leader's log
+						}
+					}
+
 				}(peerId)
 
 			}
@@ -592,6 +705,14 @@ func Make(peers []*labrpc.ClientEnd, me int,
 	rf.currentTerm = 0
 	rf.votedFor = -1
 	rf.lastReceiveTime = -1
+
+	rf.commitIndex = -1
+	rf.lastApplied = -1
+
+	rf.nextIndex = make([]int, len(peers))
+	rf.matchIndex = make([]int, len(peers))
+	rf.log = make([]LogEntry, 0)
+	rf.applyChan = applyCh
 
 	// initialize from state persisted before a crash
 	rf.readPersist(persister.ReadRaftState())
