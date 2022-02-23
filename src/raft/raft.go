@@ -20,6 +20,7 @@ package raft
 import (
 	"log"
 	"math/rand"
+	"sort"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -162,6 +163,11 @@ func (rf *Raft) changeState(state string) {
 	} else if state == LEADER {
 		log.Printf("Raft ID: %v change state from %s to Leader", rf.me, rf.state)
 		rf.state = LEADER
+		//initialize nextIndex and matchIndex
+		for i := range rf.peers {
+			rf.nextIndex[i] = len(rf.log)
+			rf.matchIndex[i] = -1
+		}
 		rf.lastReceiveTime = time.Now().Unix()
 
 	} else if state == CANDIDATES {
@@ -277,16 +283,20 @@ func (rf *Raft) RequestVote(args *RequestVoteArgs, reply *RequestVoteReply) {
 		//if receiver's latest log term is bigger than candidates term
 		//Or if receiver's latest log term is equal to candidates term
 		//but its log longer than candidates log, Reject to vote
-		lastLogIndexTerm := 0
+		lastLogIndexTerm := -1
+		lastLogIndex := -1
 		if len(rf.log) != 0 {
+			lastLogIndex = len(rf.log) - 1
 			lastLogIndexTerm = rf.log[len(rf.log)-1].Term
 			log.Printf("last log index: %d", lastLogIndexTerm)
 		}
 		if lastLogIndexTerm > args.LastLogTerm ||
-			(lastLogIndexTerm == args.LastLogTerm && (len(rf.log) > args.LastLogIndex)) {
+			(lastLogIndexTerm == args.LastLogTerm && (lastLogIndex > args.LastLogIndex)) {
 			reply.VoteGranted = false
 			reply.Term = rf.currentTerm
-			log.Printf("Voting failed 22222")
+			log.Printf("candidate args.LastLogIndex: %d, follower lastLogIndex %d", args.LastLogIndex, lastLogIndex)
+
+			log.Printf("Voting failed 222222222222222222222222222")
 			return
 		}
 		//else granted to vote
@@ -323,7 +333,7 @@ func (rf *Raft) AppendEntry(args *AppendEntryArgs, reply *AppendEntryReply) {
 
 	// 1. no entry with prevLogIndex or term conflicting
 	if args.PrevLogIndex >= len(rf.log) ||
-		(rf.log[args.PrevLogIndex].Term != args.PrevLogTerm) && args.PrevLogIndex >= 0 {
+		(args.PrevLogIndex >= 0 && rf.log[args.PrevLogIndex].Term != args.PrevLogTerm) {
 		//no entry case: s1: 4
 		//       (leader)s2: 4 6 6 6
 		reply.XLen = len(rf.log)
@@ -363,7 +373,7 @@ func (rf *Raft) AppendEntry(args *AppendEntryArgs, reply *AppendEntryReply) {
 		//(leader)s2: 4 6 6 7 new entry is 7, conflict with s1 6
 		if rf.log[index].Term != args.Entries[i].Term {
 			//delete current conflict index entry and all that follow it
-			rf.log = rf.log[:index-1]
+			rf.log = rf.log[:index]
 			rf.log = append(rf.log, args.Entries[i:]...)
 		}
 	}
@@ -454,7 +464,7 @@ func (rf *Raft) Start(command interface{}) (int, int, bool) {
 		log.Printf("Leader ID %d received command at index %d, currentTerm %d ", rf.me, index, term)
 	}
 
-	return index, term, isLeader
+	return index + 1, term, isLeader
 }
 
 //
@@ -544,6 +554,7 @@ func (rf *Raft) leaderSelection() {
 				Term:         rf.currentTerm,
 				CandidateId:  rf.me,
 				LastLogIndex: len(rf.log) - 1,
+				LastLogTerm:  -1,
 			}
 			if len(rf.log) != 0 {
 				args.LastLogTerm = rf.log[len(rf.log)-1].Term
@@ -645,7 +656,7 @@ func (rf *Raft) sendHeartBeat() {
 
 					rf.mu.Lock()
 					defer rf.mu.Unlock()
-					if !ok {
+					if !ok || rf.state != LEADER || rf.currentTerm != args.Term {
 						return
 					}
 					//if reply term bigger than current raft, current raft change to follower
@@ -660,12 +671,34 @@ func (rf *Raft) sendHeartBeat() {
 
 						if reply.Success {
 							//update nextIndex and matchIndex of leader for receiver follower
+							rf.matchIndex[id] = args.PrevLogIndex + len(args.Entries)
+							rf.nextIndex[id] = args.PrevLogIndex + len(args.Entries) + 1
 
-							// append new entries not already in the log
+							//check if we need to update commitIndex
+							rf.updateCommitIndex()
 
 						} else {
 							//follower inconsistent log with leader
-							//delete every thing start from append entry, update to leader's log
+							//decrement nextIndex
+							rf.nextIndex[id] = args.PrevLogIndex
+							//use (XLen: length of follower log),
+							//(XTerm: the term of conflicting entry),
+							//(XIndex:index of the first entry with XTerm) to get faster backUp
+							//1. if the next prevLogIndex is bigger than XLen, just set nextIndex = XLen
+							if rf.nextIndex[id]-1 >= reply.XLen {
+								rf.nextIndex[id] = reply.XLen
+							} else {
+								//2. s1 4 5 5 XIndex = 1 XTerm = 5
+								//   s2 4 6 6 6 (leader)
+								//loop through preLogIndex to XIndex, jump to the index of first pair
+								for i := rf.nextIndex[id] - 1; i >= reply.XIndex; i-- {
+									if rf.log[i].Term != reply.XTerm {
+										rf.nextIndex[id]--
+									} else {
+										break
+									}
+								}
+							}
 						}
 					}
 
@@ -677,6 +710,51 @@ func (rf *Raft) sendHeartBeat() {
 		//send heartbeat no more than 10 times per second, 1s = 1000ms
 		//means 100ms send once
 		time.Sleep(time.Duration(100) * time.Millisecond)
+	}
+}
+
+func (rf *Raft) updateCommitIndex() {
+	//commitIndex = 1
+	//matchIndex[peer 0] = 2
+	//matchIndex[peer 1] = 2
+	//matchIndex[peer 2] = 1
+	//copy entire matchIndex
+	matchIndexCopy := make([]int, len(rf.matchIndex))
+	copy(matchIndexCopy, rf.matchIndex)
+	//sort copy in ascending order
+	//1, 2, 2
+	sort.Ints(matchIndexCopy)
+	//if there exists an N such that N > commitIndex and a majority of matchIndex[i] >= N
+	//N is the median of matchIndexCopy
+	N := matchIndexCopy[len(matchIndexCopy)/2]
+	if N > rf.commitIndex && rf.log[N-1].Term == rf.currentTerm {
+		rf.commitIndex = N
+
+	}
+
+}
+
+func (rf *Raft) applyLogMessage() {
+	for !rf.killed() {
+		time.Sleep(10 * time.Millisecond)
+		appMessage := make([]ApplyMsg, 0)
+		func() {
+			rf.mu.Lock()
+			defer rf.mu.Unlock()
+			for rf.commitIndex > rf.lastApplied {
+
+				appMessage = append(appMessage, ApplyMsg{
+					CommandValid: true,
+					Command:      rf.log[rf.lastApplied+1].Command,
+					CommandIndex: rf.lastApplied + 1,
+				})
+				rf.lastApplied++
+			}
+		}()
+
+		for _, m := range appMessage {
+			rf.applyChan <- m
+		}
 	}
 }
 
@@ -722,6 +800,8 @@ func Make(peers []*labrpc.ClientEnd, me int,
 
 	//heart beat of leader
 	go rf.sendHeartBeat()
+
+	go rf.applyLogMessage()
 
 	return rf
 }
