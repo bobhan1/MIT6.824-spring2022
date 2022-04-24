@@ -1,12 +1,19 @@
 package kvraft
 
-import "6.824/labrpc"
+import (
+	"6.824/labrpc"
+	"log"
+	mathrand "math/rand"
+)
 import "crypto/rand"
 import "math/big"
 
 type Clerk struct {
 	servers []*labrpc.ClientEnd
 	// You will have to modify this struct.
+	clientId  int64
+	requestId int
+	leaderId  int
 }
 
 func nrand() int64 {
@@ -20,10 +27,13 @@ func MakeClerk(servers []*labrpc.ClientEnd) *Clerk {
 	ck := new(Clerk)
 	ck.servers = servers
 	// You'll have to add code here.
+	ck.clientId = nrand()
+	ck.leaderId = mathrand.Intn(len(ck.servers))
+	ck.requestId = 0
 	return ck
 }
 
-//
+// Get
 // fetch the current value for a key.
 // returns "" if the key does not exist.
 // keeps trying forever in the face of all other errors.
@@ -38,10 +48,38 @@ func MakeClerk(servers []*labrpc.ClientEnd) *Clerk {
 func (ck *Clerk) Get(key string) string {
 
 	// You will have to modify this function.
-	return ""
+	ck.requestId++
+	requestId := ck.requestId
+	args := GetArgs{
+		Key:       key,
+		ClientId:  ck.clientId,
+		RequestId: requestId,
+	}
+	log.Printf("Client[%d] Get starts, Key = %s ", ck.clientId, key)
+	leaderId := ck.getCurLeader()
+
+	for {
+		log.Printf("Client: %d Send LEADER ID: %d", ck.clientId, leaderId)
+		reply := GetReply{}
+
+		ok := ck.servers[leaderId].Call("KVServer.Get", &args, &reply)
+		if ok {
+			if reply.Err == ErrNoKey {
+				log.Printf("NO KEY FOUND")
+				return ""
+			} else if reply.Err == OK {
+				// request is sent successfully
+				log.Printf("GET THE VALUE SUCCEED! value; %v", reply.Value)
+				return reply.Value
+			} else {
+				log.Printf("WRONG LEADER!")
+			}
+		}
+		leaderId = ck.nextLeader()
+	}
 }
 
-//
+// PutAppend
 // shared by Put and Append.
 //
 // you can send an RPC with code like this:
@@ -53,11 +91,53 @@ func (ck *Clerk) Get(key string) string {
 //
 func (ck *Clerk) PutAppend(key string, value string, op string) {
 	// You will have to modify this function.
+	//requestId := ck.lastRequestId + 1
+	ck.requestId++
+	requestId := ck.requestId
+	leaderId := ck.getCurLeader()
+	for {
+		args := PutAppendArgs{
+			Key:       key,
+			Value:     value,
+			Op:        op,
+			ClientId:  ck.clientId,
+			RequestId: requestId,
+		}
+
+		log.Printf("Client[%d] PutAppend, Key = %s, Value = %s, leaderId: %d ", ck.clientId, key, value, leaderId)
+
+		reply := PutAppendReply{}
+		ok := ck.servers[leaderId].Call("KVServer.PutAppend", &args, &reply)
+		if ok && reply.Err == OK {
+			if op == "append" {
+				log.Printf("PUT SUCCEED! with leader: %d", leaderId)
+			} else if op == "put" {
+				log.Printf("PUT SUCCEED! with leader: %d", leaderId)
+			}
+
+			ck.leaderId = leaderId
+			break
+		}
+		//change to next leader keep asking
+		leaderId = ck.nextLeader()
+	}
+}
+
+//get current leader id
+func (ck *Clerk) getCurLeader() (leaderId int) {
+	leaderId = ck.leaderId
+	return leaderId
+}
+
+//if not the leader change find next server as leader
+func (ck *Clerk) nextLeader() (leaderId int) {
+	ck.leaderId = (ck.leaderId + 1) % len(ck.servers)
+	return ck.leaderId
 }
 
 func (ck *Clerk) Put(key string, value string) {
-	ck.PutAppend(key, value, "Put")
+	ck.PutAppend(key, value, "put")
 }
 func (ck *Clerk) Append(key string, value string) {
-	ck.PutAppend(key, value, "Append")
+	ck.PutAppend(key, value, "append")
 }

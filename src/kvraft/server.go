@@ -7,9 +7,12 @@ import (
 	"log"
 	"sync"
 	"sync/atomic"
+	"time"
 )
 
-const Debug = false
+const (
+	Debug = false
+)
 
 func DPrintf(format string, a ...interface{}) (n int, err error) {
 	if Debug {
@@ -22,6 +25,11 @@ type Op struct {
 	// Your definitions here.
 	// Field names must start with capital letters,
 	// otherwise RPC will break.
+	Command   string // "get" "put" "append"
+	Key       string
+	Value     string
+	ClientId  int64
+	RequestId int
 }
 
 type KVServer struct {
@@ -34,14 +42,156 @@ type KVServer struct {
 	maxraftstate int // snapshot if log grows this big
 
 	// Your definitions here.
+	kvDB          map[string]string // store client key/value
+	waitApplyCh   map[int]chan Op   // index(raft) -> chan, waiting to get the applied msg from raft
+	lastRequestId map[int64]int     // clientId -> requestID,//make sure operation only executed once
+
+	lastIncludedIndex int
 }
 
+// Get RPC Handler for request from clerk
 func (kv *KVServer) Get(args *GetArgs, reply *GetReply) {
-	// Your code here.
+	log.Printf("[GET Request]From Client %d (RequestId %d) To Server %d", args.ClientId, args.RequestId, kv.me)
+	if kv.killed() {
+		reply.Err = ErrWrongLeader
+		return
+	}
+	op := Op{
+		Command:   "get",
+		Key:       args.Key,
+		Value:     "",
+		ClientId:  args.ClientId,
+		RequestId: args.RequestId,
+	}
+
+	index, _, isLeader := kv.rf.Start(op)
+	if !isLeader {
+		reply.Err = ErrWrongLeader
+		log.Printf("[GET SendToWrongLeader]From Client %d, Request %d To Server %d",
+			args.ClientId, args.RequestId, kv.me)
+		return
+	}
+	log.Printf("GET From Client %d (Request %d) To Server %d, key %v, raftIndex %d",
+		args.ClientId, args.RequestId, kv.me, op.Key, index)
+
+	//create waitForCh if not find for raft index, then create new one
+	kv.mu.Lock()
+	waitCh, exist := kv.waitApplyCh[index]
+	if !exist {
+		kv.waitApplyCh[index] = make(chan Op, 1)
+		waitCh = kv.waitApplyCh[index]
+	}
+	kv.mu.Unlock()
+
+	// timeout
+	select {
+	case <-time.After(time.Millisecond * 200):
+		log.Printf("GET timeout From Client %d (Request %d) To Server %d, key %v, raftIndex %d",
+			args.ClientId, args.RequestId, kv.me, op.Key, index)
+
+		_, isLeader := kv.rf.GetState()
+
+		//find duplicate
+		if kv.checkDuplicateRequest(op.ClientId, op.RequestId) && isLeader {
+			value, exist := kv.ExecuteGet(op)
+			if exist {
+				reply.Err = OK
+				reply.Value = value
+			} else {
+				reply.Err = ErrNoKey
+				reply.Value = ""
+			}
+		} else {
+			reply.Err = ErrWrongLeader
+		}
+	case raftCommitOp := <-waitCh:
+		log.Printf("waitChannel Server %d, Index:%d , ClientId %d, RequestId %d, Command %v, Key :%v, Value :%v",
+			kv.me, index, op.ClientId, op.RequestId, op.Command, op.Key, op.Value)
+
+		if raftCommitOp.ClientId == op.ClientId && raftCommitOp.RequestId == op.RequestId {
+
+			value, exist := kv.ExecuteGet(op)
+
+			if exist {
+				reply.Err = OK
+				reply.Value = value
+			} else {
+				reply.Err = ErrNoKey
+				reply.Value = ""
+			}
+		} else {
+			reply.Err = ErrWrongLeader
+		}
+
+	}
+
+	kv.mu.Lock()
+	delete(kv.waitApplyCh, index)
+	kv.mu.Unlock()
+	return
+
 }
 
 func (kv *KVServer) PutAppend(args *PutAppendArgs, reply *PutAppendReply) {
-	// Your code here.
+	log.Printf("[PUTAPPEND Request]From Client %d (Request %d) To Server %d", args.ClientId, args.RequestId, kv.me)
+	if kv.killed() {
+		reply.Err = ErrWrongLeader
+		return
+	}
+
+	op := Op{
+		Command:   args.Op,
+		Key:       args.Key,
+		Value:     args.Value,
+		ClientId:  args.ClientId,
+		RequestId: args.RequestId,
+	}
+
+	raftIndex, _, isLeader := kv.rf.Start(op)
+
+	if !isLeader {
+		reply.Err = ErrWrongLeader
+		log.Printf("[PUTAPPEND SendToWrongLeader]From Client %d (Request %d) To Server %d", args.ClientId, args.RequestId, kv.me)
+		return
+	}
+	log.Printf("PutAppend From Client:%d, Request %d, To Server %d, key %v, raft"+
+		"Index %d",
+		args.ClientId, args.RequestId, kv.me, op.Key, raftIndex)
+
+	// create waitForCh
+	kv.mu.Lock()
+	ch, exist := kv.waitApplyCh[raftIndex]
+	if !exist {
+		kv.waitApplyCh[raftIndex] = make(chan Op, 1)
+		ch = kv.waitApplyCh[raftIndex]
+	}
+	kv.mu.Unlock()
+
+	select {
+	case <-time.After(time.Millisecond * 200):
+		log.Printf("[TIMEOUT PUTAPPEND]Server %d , Index:%d , ClientId %d, RequestId %d, Opreation %v, Key :%v, Value :%v",
+			kv.me, raftIndex, op.ClientId, op.RequestId, op.Command, op.Key, op.Value)
+
+		if kv.checkDuplicateRequest(op.ClientId, op.RequestId) {
+			reply.Err = OK
+		} else {
+			reply.Err = ErrWrongLeader
+		}
+
+	case raftCommitOp := <-ch:
+		log.Printf("WaitCha Server %d,Index:%d, ClientId %d, RequestId %d, Opreation %v, Key :%v, Value :%v",
+			kv.me, raftIndex, op.ClientId, op.RequestId, op.Command, op.Key, op.Value)
+		if raftCommitOp.ClientId == op.ClientId && raftCommitOp.RequestId == op.RequestId {
+			reply.Err = OK
+		} else {
+			reply.Err = ErrWrongLeader
+		}
+
+	}
+	kv.mu.Lock()
+	delete(kv.waitApplyCh, raftIndex)
+	kv.mu.Unlock()
+	return
 }
 
 //
@@ -65,8 +215,7 @@ func (kv *KVServer) killed() bool {
 	return z == 1
 }
 
-//
-// servers[] contains the ports of the set of
+// StartKVServer servers[] contains the ports of the set of
 // servers that will cooperate via Raft to
 // form the fault-tolerant key/value service.
 // me is the index of the current server in servers[].
@@ -80,6 +229,7 @@ func (kv *KVServer) killed() bool {
 // for any long-running work.
 //
 func StartKVServer(servers []*labrpc.ClientEnd, me int, persister *raft.Persister, maxraftstate int) *KVServer {
+	log.Printf("[InitKVServer---]Server %d", me)
 	// call labgob.Register on structures you want
 	// Go's RPC library to marshall/unmarshall.
 	labgob.Register(Op{})
@@ -89,11 +239,22 @@ func StartKVServer(servers []*labrpc.ClientEnd, me int, persister *raft.Persiste
 	kv.maxraftstate = maxraftstate
 
 	// You may need initialization code here.
+	kv.applyCh = make(chan raft.ApplyMsg, 5)
 
-	kv.applyCh = make(chan raft.ApplyMsg)
 	kv.rf = raft.Make(servers, me, persister, kv.applyCh)
 
 	// You may need initialization code here.
+	kv.kvDB = make(map[string]string)
+	kv.waitApplyCh = make(map[int]chan Op)
+	kv.lastRequestId = make(map[int64]int)
 
+	snapshot := persister.ReadSnapshot()
+
+	if len(snapshot) > 0 {
+		kv.DecodeSnapshot(snapshot)
+	}
+
+	go kv.ApplyLoop()
 	return kv
+
 }
