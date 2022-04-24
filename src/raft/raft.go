@@ -110,7 +110,7 @@ type Raft struct {
 	//check if server apply snapshot first after crash
 	//applyChecker bool
 
-	restart bool
+	getCommand bool
 }
 
 //get the size of log after snapshot (lastIncludeIndex + length of log)
@@ -299,29 +299,13 @@ func (rf *Raft) CondInstallSnapshot(lastIncludedTerm int, lastIncludedIndex int,
 		return false
 	}
 
-	DPrintf("CONDInstallSnapshot: raft %d, lastIncludedIndex: %d, commitIndex: %d, getSize: %d", rf.me, lastIncludedIndex, rf.commitIndex, rf.getSize())
-
-	//if lastIncludedIndex smaller than actual size, means just alive from crash,
-	//log still has entry, cannot set it to null
-	//DPrintf("rf:%d, term: %d, lastInTerm: %d", rf.me, rf.getEntry(lastIncludedIndex).Term, lastIncludedTerm)
-
-	//if lastIncludedIndex < rf.getSize() {
-	//	//DPrintf("rf:%d, term: %d, lastInTerm: %d", rf.me, rf.getEntry(lastIncludedIndex).Term, lastIncludedTerm)
-	//} else {
-	//	rf.log = nil
-	//}
-
-	if rf.restart {
-		rf.restart = false
-		return true
-	}
+	DPrintf("CONDInstallSnapshot: raft %d, lastIncludedIndex: %d, commitIndex: %d", rf.me, lastIncludedIndex, rf.commitIndex)
 
 	//rf: follower
 	if lastIncludedIndex <= rf.commitIndex {
-		DPrintf("raft : %d,  lastIncludeIndex %d, commitIndex %d, getSize %d", rf.me, lastIncludedIndex, rf.commitIndex, rf.getSize())
+		DPrintf("raft : %d,  lastIncludeIndex %d, commitIndex %d", rf.me, lastIncludedIndex, rf.commitIndex)
 		return false
 	}
-
 	rf.lastIncludedIndex = lastIncludedIndex
 	rf.lastIncludedTerm = lastIncludedTerm
 	rf.snapshot = snapshot
@@ -332,7 +316,6 @@ func (rf *Raft) CondInstallSnapshot(lastIncludedTerm int, lastIncludedIndex int,
 	DPrintf("CondInstallSnapshot rf.log : %v", rf.log)
 	DPrintf("lastInclude Index: %d, commitIndex: %d, lastApplied: %d", lastIncludedIndex, rf.commitIndex, rf.lastApplied)
 	rf.log = nil
-
 	DPrintf("CURRENT LOG!!!!! %v", rf.log)
 
 	//rf.applyCond.Broadcast()
@@ -756,6 +739,7 @@ func (rf *Raft) Start(command interface{}) (int, int, bool) {
 		DPrintf("LEADER LOG %v", rf.log)
 	}
 	rf.persist()
+	rf.getCommand = true
 	//DPrintf("CURRENT TIME IN START: %v", time.Now().UnixMilli())
 	//rf.mu.Unlock()
 
@@ -1176,7 +1160,6 @@ func Make(peers []*labrpc.ClientEnd, me int,
 
 	rf.applyChecker = false
 	rf.applyCond = sync.NewCond(&rf.mu)
-	rf.restart = false
 
 	// initialize from state persisted before a crash
 	rf.readPersist(persister.ReadRaftState())
@@ -1197,8 +1180,6 @@ func Make(peers []*labrpc.ClientEnd, me int,
 		rf.applyChan <- msg
 		rf.mu.Unlock()
 		rf.lastApplied = rf.lastIncludedIndex
-		rf.commitIndex = rf.lastIncludedIndex
-		rf.restart = true
 		//DPrintf("NextIndex[%d] : %d ", rf.me, rf.nextIndex[rf.me])
 	}
 
