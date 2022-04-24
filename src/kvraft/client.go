@@ -2,7 +2,6 @@ package kvraft
 
 import (
 	"6.824/labrpc"
-	"log"
 	mathrand "math/rand"
 )
 import "crypto/rand"
@@ -55,24 +54,24 @@ func (ck *Clerk) Get(key string) string {
 		ClientId:  ck.clientId,
 		RequestId: requestId,
 	}
-	log.Printf("Client[%d] Get starts, Key = %s ", ck.clientId, key)
+	DPrintf("Client[%d] Get starts, Key = %s ", ck.clientId, key)
 	leaderId := ck.getCurLeader()
 
 	for {
-		log.Printf("Client: %d Send LEADER ID: %d", ck.clientId, leaderId)
+		DPrintf("Client: %d Send LEADER ID: %d", ck.clientId, leaderId)
 		reply := GetReply{}
 
 		ok := ck.servers[leaderId].Call("KVServer.Get", &args, &reply)
 		if ok {
 			if reply.Err == ErrNoKey {
-				log.Printf("NO KEY FOUND")
+				DPrintf("NO KEY FOUND")
 				return ""
 			} else if reply.Err == OK {
 				// request is sent successfully
-				log.Printf("GET THE VALUE SUCCEED! value; %v", reply.Value)
+				DPrintf("GET THE VALUE SUCCEED! value; %v", reply.Value)
 				return reply.Value
 			} else {
-				log.Printf("WRONG LEADER!")
+				DPrintf("WRONG LEADER!")
 			}
 		}
 		leaderId = ck.nextLeader()
@@ -104,15 +103,15 @@ func (ck *Clerk) PutAppend(key string, value string, op string) {
 			RequestId: requestId,
 		}
 
-		log.Printf("Client[%d] PutAppend, Key = %s, Value = %s, leaderId: %d ", ck.clientId, key, value, leaderId)
+		DPrintf("Client[%d] PutAppend, Key = %s, Value = %s, leaderId: %d ", ck.clientId, key, value, leaderId)
 
 		reply := PutAppendReply{}
 		ok := ck.servers[leaderId].Call("KVServer.PutAppend", &args, &reply)
 		if ok && reply.Err == OK {
 			if op == "append" {
-				log.Printf("PUT SUCCEED! with leader: %d", leaderId)
+				DPrintf("PUT SUCCEED! with leader: %d", leaderId)
 			} else if op == "put" {
-				log.Printf("PUT SUCCEED! with leader: %d", leaderId)
+				DPrintf("PUT SUCCEED! with leader: %d", leaderId)
 			}
 
 			ck.leaderId = leaderId

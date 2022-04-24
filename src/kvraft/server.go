@@ -4,22 +4,11 @@ import (
 	"6.824/labgob"
 	"6.824/labrpc"
 	"6.824/raft"
-	"log"
 	"sync"
 	"sync/atomic"
 	"time"
 )
 
-const (
-	Debug = false
-)
-
-func DPrintf(format string, a ...interface{}) (n int, err error) {
-	if Debug {
-		log.Printf(format, a...)
-	}
-	return
-}
 
 type Op struct {
 	// Your definitions here.
@@ -51,7 +40,7 @@ type KVServer struct {
 
 // Get RPC Handler for request from clerk
 func (kv *KVServer) Get(args *GetArgs, reply *GetReply) {
-	log.Printf("[GET Request]From Client %d (RequestId %d) To Server %d", args.ClientId, args.RequestId, kv.me)
+	DPrintf("[GET Request]From Client %d (RequestId %d) To Server %d", args.ClientId, args.RequestId, kv.me)
 	if kv.killed() {
 		reply.Err = ErrWrongLeader
 		return
@@ -67,11 +56,11 @@ func (kv *KVServer) Get(args *GetArgs, reply *GetReply) {
 	index, _, isLeader := kv.rf.Start(op)
 	if !isLeader {
 		reply.Err = ErrWrongLeader
-		log.Printf("[GET SendToWrongLeader]From Client %d, Request %d To Server %d",
+		DPrintf("[GET SendToWrongLeader]From Client %d, Request %d To Server %d",
 			args.ClientId, args.RequestId, kv.me)
 		return
 	}
-	log.Printf("GET From Client %d (Request %d) To Server %d, key %v, raftIndex %d",
+	DPrintf("GET From Client %d (Request %d) To Server %d, key %v, raftIndex %d",
 		args.ClientId, args.RequestId, kv.me, op.Key, index)
 
 	//create waitForCh if not find for raft index, then create new one
@@ -86,7 +75,7 @@ func (kv *KVServer) Get(args *GetArgs, reply *GetReply) {
 	// timeout
 	select {
 	case <-time.After(time.Millisecond * 200):
-		log.Printf("GET timeout From Client %d (Request %d) To Server %d, key %v, raftIndex %d",
+		DPrintf("GET timeout From Client %d (Request %d) To Server %d, key %v, raftIndex %d",
 			args.ClientId, args.RequestId, kv.me, op.Key, index)
 
 		_, isLeader := kv.rf.GetState()
@@ -105,7 +94,7 @@ func (kv *KVServer) Get(args *GetArgs, reply *GetReply) {
 			reply.Err = ErrWrongLeader
 		}
 	case raftCommitOp := <-waitCh:
-		log.Printf("waitChannel Server %d, Index:%d , ClientId %d, RequestId %d, Command %v, Key :%v, Value :%v",
+		DPrintf("waitChannel Server %d, Index:%d , ClientId %d, RequestId %d, Command %v, Key :%v, Value :%v",
 			kv.me, index, op.ClientId, op.RequestId, op.Command, op.Key, op.Value)
 
 		if raftCommitOp.ClientId == op.ClientId && raftCommitOp.RequestId == op.RequestId {
@@ -133,7 +122,7 @@ func (kv *KVServer) Get(args *GetArgs, reply *GetReply) {
 }
 
 func (kv *KVServer) PutAppend(args *PutAppendArgs, reply *PutAppendReply) {
-	log.Printf("[PUTAPPEND Request]From Client %d (Request %d) To Server %d", args.ClientId, args.RequestId, kv.me)
+	DPrintf("[PUTAPPEND Request]From Client %d (Request %d) To Server %d", args.ClientId, args.RequestId, kv.me)
 	if kv.killed() {
 		reply.Err = ErrWrongLeader
 		return
@@ -151,10 +140,10 @@ func (kv *KVServer) PutAppend(args *PutAppendArgs, reply *PutAppendReply) {
 
 	if !isLeader {
 		reply.Err = ErrWrongLeader
-		log.Printf("[PUTAPPEND SendToWrongLeader]From Client %d (Request %d) To Server %d", args.ClientId, args.RequestId, kv.me)
+		DPrintf("[PUTAPPEND SendToWrongLeader]From Client %d (Request %d) To Server %d", args.ClientId, args.RequestId, kv.me)
 		return
 	}
-	log.Printf("PutAppend From Client:%d, Request %d, To Server %d, key %v, raft"+
+	DPrintf("PutAppend From Client:%d, Request %d, To Server %d, key %v, raft"+
 		"Index %d",
 		args.ClientId, args.RequestId, kv.me, op.Key, raftIndex)
 
@@ -169,7 +158,7 @@ func (kv *KVServer) PutAppend(args *PutAppendArgs, reply *PutAppendReply) {
 
 	select {
 	case <-time.After(time.Millisecond * 200):
-		log.Printf("[TIMEOUT PUTAPPEND]Server %d , Index:%d , ClientId %d, RequestId %d, Opreation %v, Key :%v, Value :%v",
+		DPrintf("[TIMEOUT PUTAPPEND]Server %d , Index:%d , ClientId %d, RequestId %d, Opreation %v, Key :%v, Value :%v",
 			kv.me, raftIndex, op.ClientId, op.RequestId, op.Command, op.Key, op.Value)
 
 		if kv.checkDuplicateRequest(op.ClientId, op.RequestId) {
@@ -179,7 +168,7 @@ func (kv *KVServer) PutAppend(args *PutAppendArgs, reply *PutAppendReply) {
 		}
 
 	case raftCommitOp := <-ch:
-		log.Printf("WaitCha Server %d,Index:%d, ClientId %d, RequestId %d, Opreation %v, Key :%v, Value :%v",
+		DPrintf("WaitCha Server %d,Index:%d, ClientId %d, RequestId %d, Opreation %v, Key :%v, Value :%v",
 			kv.me, raftIndex, op.ClientId, op.RequestId, op.Command, op.Key, op.Value)
 		if raftCommitOp.ClientId == op.ClientId && raftCommitOp.RequestId == op.RequestId {
 			reply.Err = OK
@@ -229,7 +218,7 @@ func (kv *KVServer) killed() bool {
 // for any long-running work.
 //
 func StartKVServer(servers []*labrpc.ClientEnd, me int, persister *raft.Persister, maxraftstate int) *KVServer {
-	log.Printf("[InitKVServer---]Server %d", me)
+	DPrintf("[InitKVServer---]Server %d", me)
 	// call labgob.Register on structures you want
 	// Go's RPC library to marshall/unmarshall.
 	labgob.Register(Op{})

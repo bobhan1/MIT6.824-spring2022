@@ -4,7 +4,6 @@ import (
 	"6.824/labgob"
 	"6.824/raft"
 	"bytes"
-	"log"
 )
 
 // ApplyLoop keep fetching command or snapshot from applyCha
@@ -34,7 +33,7 @@ func (kv *KVServer) ApplySnapShot(msg raft.ApplyMsg) {
 
 // DecodeSnapshot according to input
 func (kv *KVServer) DecodeSnapshot(snapshot []byte) {
-	log.Printf("KVserver %d, Reading Snapshot", kv.me)
+	DPrintf("KVserver %d, Reading Snapshot", kv.me)
 	if snapshot == nil || len(snapshot) < 1 { // bootstrap without any state?
 		return
 	}
@@ -45,11 +44,11 @@ func (kv *KVServer) DecodeSnapshot(snapshot []byte) {
 	var persistLastRequestId map[int64]int
 
 	if d.Decode(&persistKVDB) != nil || d.Decode(&persistLastRequestId) != nil {
-		log.Printf("kv server %d cannot decode", kv.me)
+		DPrintf("kv server %d cannot decode", kv.me)
 	} else {
 		kv.kvDB = persistKVDB
 		kv.lastRequestId = persistLastRequestId
-		log.Printf("KVserver: %d, KVDB: %v, lastRequestId: %d", kv.me, persistKVDB, persistLastRequestId)
+		DPrintf("KVserver: %d, KVDB: %v, lastRequestId: %d", kv.me, persistKVDB, persistLastRequestId)
 	}
 }
 
@@ -74,9 +73,9 @@ func (kv *KVServer) ExecuteGet(op Op) (string, bool) {
 	kv.mu.Unlock()
 
 	if exist {
-		log.Printf("GET ClientId :%d ,RequestID :%d ,Key : %v, value :%v", op.ClientId, op.RequestId, op.Key, value)
+		DPrintf("GET ClientId :%d ,RequestID :%d ,Key : %v, value :%v", op.ClientId, op.RequestId, op.Key, value)
 	} else {
-		log.Printf("GET ClientId :%d ,RequestID :%d ,Key : %v, key not found", op.ClientId, op.RequestId, op.Key)
+		DPrintf("GET ClientId :%d ,RequestID :%d ,Key : %v, key not found", op.ClientId, op.RequestId, op.Key)
 	}
 	return value, exist
 }
@@ -98,12 +97,12 @@ func (kv *KVServer) ApplyCommand(message raft.ApplyMsg) {
 
 	//ignore dummy command
 	if _, ok := message.Command.(int); ok {
-		log.Printf("I AM INT")
+		DPrintf("I AM INT")
 		return
 	}
 
 	op := message.Command.(Op)
-	log.Printf("[RaftApplyCommand]Server %d, Got Command -> Index:%d, ClientId %d, RequestId %d, Command %v, Key: %v, Value: %v",
+	DPrintf("[RaftApplyCommand]Server %d, Got Command -> Index:%d, ClientId %d, RequestId %d, Command %v, Key: %v, Value: %v",
 		kv.me, message.CommandIndex, op.ClientId, op.RequestId, op.Command, op.Key, op.Value)
 
 	if message.CommandIndex <= kv.lastIncludedIndex {
@@ -138,7 +137,7 @@ func (kv *KVServer) SendMsgToWaitChan(op Op, raftIndex int) bool {
 	defer kv.mu.Unlock()
 	ch, exist := kv.waitApplyCh[raftIndex]
 	if exist {
-		log.Printf("[RaftApplyMsgSendToWaitChan]Server %d, Send CommandIndex:%d, ClientId %d, RequestId %d, Opreation %v, Key :%v, Value :%v",
+		DPrintf("[RaftApplyMsgSendToWaitChan]Server %d, Send CommandIndex:%d, ClientId %d, RequestId %d, Opreation %v, Key :%v, Value :%v",
 			kv.me, raftIndex, op.ClientId, op.RequestId, op.Command, op.Key, op.Value)
 		ch <- op
 	}
@@ -152,7 +151,7 @@ func (kv *KVServer) Put(op Op) {
 	kv.kvDB[op.Key] = op.Value
 	kv.lastRequestId[op.ClientId] = op.RequestId
 	//kv.mu.Unlock()
-	log.Printf("[KVServerExePUT]ClientId :%d ,RequestID :%d ,Key: %v, value: %v", op.ClientId, op.RequestId, op.Key, op.Value)
+	DPrintf("[KVServerExePUT]ClientId :%d ,RequestID :%d ,Key: %v, value: %v", op.ClientId, op.RequestId, op.Key, op.Value)
 }
 
 // Append op to kvDB
@@ -168,5 +167,5 @@ func (kv *KVServer) Append(op Op) {
 	kv.lastRequestId[op.ClientId] = op.RequestId
 	//kv.mu.Unlock()
 
-	log.Printf("[KVServerExeAPPEND]ClientId :%d ,RequestID:%d ,Key: %v, value: %v", op.ClientId, op.RequestId, op.Key, op.Value)
+	DPrintf("[KVServerExeAPPEND]ClientId :%d ,RequestID:%d ,Key: %v, value: %v", op.ClientId, op.RequestId, op.Key, op.Value)
 }
