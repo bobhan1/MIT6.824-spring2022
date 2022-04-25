@@ -299,7 +299,7 @@ func (rf *Raft) CondInstallSnapshot(lastIncludedTerm int, lastIncludedIndex int,
 		return false
 	}
 
-	DPrintf("CONDInstallSnapshot: raft %d, lastIncludedIndex: %d, commitIndex: %d, getSize: %d", rf.me, lastIncludedIndex, rf.commitIndex, rf.getSize())
+	DPrintf("CONDInstallSnapshot: raft %d, lastIncludedIndex: %d, commitIndex: %d, getSize: %d, restart: %v", rf.me, lastIncludedIndex, rf.commitIndex, rf.getSize(), rf.restart)
 
 	//if lastIncludedIndex smaller than actual size, means just alive from crash,
 	//log still has entry, cannot set it to null
@@ -313,6 +313,7 @@ func (rf *Raft) CondInstallSnapshot(lastIncludedTerm int, lastIncludedIndex int,
 
 	if rf.restart {
 		rf.restart = false
+		rf.updateCommitIndex()
 		return true
 	}
 
@@ -1195,10 +1196,10 @@ func Make(peers []*labrpc.ClientEnd, me int,
 			SnapshotTerm:  rf.lastIncludedTerm,
 		}
 		rf.applyChan <- msg
-		rf.mu.Unlock()
 		rf.lastApplied = rf.lastIncludedIndex
 		rf.commitIndex = rf.lastIncludedIndex
 		rf.restart = true
+		rf.mu.Unlock()
 		//DPrintf("NextIndex[%d] : %d ", rf.me, rf.nextIndex[rf.me])
 	}
 
