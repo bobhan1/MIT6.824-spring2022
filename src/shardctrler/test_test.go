@@ -79,6 +79,8 @@ func check_same_config(t *testing.T, c1 Config, c2 Config) {
 }
 
 func TestBasic(t *testing.T) {
+	fmt.Printf("begin test")
+
 	const nservers = 3
 	cfg := make_config(t, nservers, false)
 	defer cfg.cleanup()

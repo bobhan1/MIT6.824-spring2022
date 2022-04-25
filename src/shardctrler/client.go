@@ -40,13 +40,17 @@ func (ck *Clerk) Query(num int) Config {
 	args.Num = num
 	args.ClientId = ck.clientId
 	args.RequestId = ck.requestId
+
+	DPrintf("len(ck.servers)=[%d]",len(ck.servers))
 	for {
 		// try each known server.
 		for _, srv := range ck.servers {
 			var reply QueryReply
+			DPrintf("client send a query request")
 			ok := srv.Call("ShardCtrler.Query", args, &reply)
 			if ok {
 				if reply.Err == OK{
+					DPrintf("client recieved response for Query() rpc")
 					return reply.Config
 				} else if reply.Err == ErrWrongLeader{
 					
@@ -69,6 +73,7 @@ func (ck *Clerk) Join(servers map[int][]string) {
 		// try each known server.
 		for _, srv := range ck.servers {
 			var reply JoinReply
+			DPrintf("client send a join request")
 			ok := srv.Call("ShardCtrler.Join", args, &reply)
 			if ok {
 				if reply.Err == OK{
@@ -95,6 +100,7 @@ func (ck *Clerk) Leave(gids []int) {
 		// try each known server.
 		for _, srv := range ck.servers {
 			var reply LeaveReply
+			DPrintf("client send a leave request")
 			ok := srv.Call("ShardCtrler.Leave", args, &reply)
 			if ok {
 				if reply.Err == OK{
@@ -122,6 +128,7 @@ func (ck *Clerk) Move(shard int, gid int) {
 		// try each known server.
 		for _, srv := range ck.servers {
 			var reply MoveReply
+			DPrintf("client send a move request")
 			ok := srv.Call("ShardCtrler.Move", args, &reply)
 			if ok {
 				if reply.Err == OK{

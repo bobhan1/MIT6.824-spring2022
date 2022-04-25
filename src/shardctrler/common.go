@@ -43,6 +43,7 @@ func (c *Config) Copy() Config {
 const (
 	OK = "OK"
 	ErrWrongLeader = "ErrWrongLeader"
+	ErrTimeOut = "ErrTimeOut"
 )
 
 type Err string

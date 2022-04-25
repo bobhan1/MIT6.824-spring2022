@@ -1,0 +1,2914 @@
+begin testTest: Basic leave/join ...
+23:43:41.324993 len(ck.servers)=[3]
+23:43:41.325153 client send a query request
+23:43:41.325261 apply a msg.command
+23:43:41.325297 I AM INT
+23:43:41.325424 recieved 'Query()'rpc from client, num:[-1]
+23:43:41.325564 apply a msg.command
+23:43:41.325905 I AM INT
+23:43:41.325710 apply a msg.command
+23:43:41.325995 I AM INT
+23:43:41.325838 client send a query request
+23:43:41.326185 recieved 'Query()'rpc from client, num:[-1]
+23:43:41.326316 client send a query request
+23:43:41.326439 recieved 'Query()'rpc from client, num:[-1]
+23:43:41.427464 client send a query request
+23:43:41.427721 recieved 'Query()'rpc from client, num:[-1]
+23:43:41.427799 client send a query request
+23:43:41.427876 recieved 'Query()'rpc from client, num:[-1]
+23:43:41.427932 client send a query request
+23:43:41.427985 recieved 'Query()'rpc from client, num:[-1]
+23:43:41.535164 client send a query request
+23:43:41.535322 recieved 'Query()'rpc from client, num:[-1]
+23:43:41.535379 client send a query request
+23:43:41.535434 recieved 'Query()'rpc from client, num:[-1]
+23:43:41.535475 client send a query request
+23:43:41.535512 recieved 'Query()'rpc from client, num:[-1]
+23:43:41.635981 client send a query request
+23:43:41.636142 recieved 'Query()'rpc from client, num:[-1]
+23:43:41.636219 client send a query request
+23:43:41.636279 recieved 'Query()'rpc from client, num:[-1]
+23:43:41.636328 client send a query request
+23:43:41.636371 recieved 'Query()'rpc from client, num:[-1]
+23:43:41.649340 apply a msg.command
+23:43:41.649377 Query() rpc get notify
+23:43:41.649428 client recieved response for Query() rpc
+23:43:41.649435 len(ck.servers)=[3]
+23:43:41.649438 client send a query request
+23:43:41.649495 recieved 'Query()'rpc from client, num:[-1]
+23:43:41.649538 client send a query request
+23:43:41.649592 recieved 'Query()'rpc from client, num:[-1]
+23:43:41.649635 client send a query request
+23:43:41.649686 recieved 'Query()'rpc from client, num:[-1]
+23:43:41.749998 apply a msg.command
+23:43:41.750033 Query() rpc get notify
+23:43:41.750088 client recieved response for Query() rpc
+23:43:41.750095 client send a join request
+23:43:41.750220 client send a join request
+23:43:41.750312 client send a join request
+23:43:41.750531 apply a msg.command
+23:43:41.750540 apply a msg.command
+23:43:41.750543 apply a msg.command
+23:43:41.762002 apply a msg.command
+23:43:41.762029 handle a join command
+23:43:41.762035 append for [1]
+23:43:41.762039 [0]:[0]
+23:43:41.762048 [1]:[0]
+23:43:41.762051 [2]:[0]
+23:43:41.762053 [3]:[0]
+23:43:41.762055 [4]:[0]
+23:43:41.762061 [5]:[0]
+23:43:41.762063 [6]:[0]
+23:43:41.762065 [7]:[0]
+23:43:41.762067 [8]:[0]
+23:43:41.762070 [9]:[0]
+23:43:41.762073 len(keys):[1]
+23:43:41.762076 minGid[1]
+23:43:41.762078 len(keys):[1]
+23:43:41.762080 minGid[1]
+23:43:41.762083 len(keys):[1]
+23:43:41.762085 minGid[1]
+23:43:41.762087 len(keys):[1]
+23:43:41.762090 minGid[1]
+23:43:41.762092 len(keys):[1]
+23:43:41.762094 minGid[1]
+23:43:41.762096 len(keys):[1]
+23:43:41.762099 minGid[1]
+23:43:41.762101 len(keys):[1]
+23:43:41.762103 minGid[1]
+23:43:41.762105 len(keys):[1]
+23:43:41.762108 minGid[1]
+23:43:41.762110 len(keys):[1]
+23:43:41.762112 minGid[1]
+23:43:41.762114 len(keys):[1]
+23:43:41.762117 minGid[1]
+23:43:41.762119 len(keys):[1]
+23:43:41.762121 minGid[1]
+23:43:41.762124 len(keys):[1]
+23:43:41.762126 minGid[1]
+23:43:41.762128 len(keys):[1]
+23:43:41.762130 minGid[1]
+23:43:41.762133 len(keys):[1]
+23:43:41.762135 minGid[1]
+23:43:41.762137 len(keys):[1]
+23:43:41.762139 minGid[1]
+23:43:41.762142 len(keys):[1]
+23:43:41.762144 minGid[1]
+23:43:41.762146 len(keys):[1]
+23:43:41.762148 minGid[1]
+23:43:41.762151 len(keys):[1]
+23:43:41.762153 minGid[1]
+23:43:41.762156 len(keys):[1]
+23:43:41.762158 minGid[1]
+23:43:41.762160 len(keys):[1]
+23:43:41.762162 minGid[1]
+23:43:41.762165 before shardRebalance
+23:43:41.762167 len(keys):[1]
+23:43:41.762170 len(keys):[1]
+23:43:41.762172 min:[10], max[10]
+23:43:41.762175 join command handled finished
+23:43:41.762182 waitChannel Server 2, Index:3 , ClientId 3030493666402028554, RequestId 3, Command Join, 
+23:43:41.762250 len(ck.servers)=[3]
+23:43:41.762254 client send a query request
+23:43:41.762324 recieved 'Query()'rpc from client, num:[-1]
+23:43:41.762410 client send a query request
+23:43:41.762466 recieved 'Query()'rpc from client, num:[-1]
+23:43:41.762509 client send a query request
+23:43:41.762555 recieved 'Query()'rpc from client, num:[-1]
+23:43:41.851178 apply a msg.command
+23:43:41.851219 Query() rpc get notify
+23:43:41.851283 client recieved response for Query() rpc
+23:43:41.851290 len(ck.servers)=[3]
+23:43:41.851293 client send a query request
+23:43:41.851358 recieved 'Query()'rpc from client, num:[-1]
+23:43:41.851396 client send a query request
+23:43:41.851440 recieved 'Query()'rpc from client, num:[-1]
+23:43:41.851485 client send a query request
+23:43:41.851537 recieved 'Query()'rpc from client, num:[-1]
+23:43:41.851729 apply a msg.command
+23:43:41.851740 apply a msg.command
+23:43:41.851742 handle a join command
+23:43:41.851746 append for [1]
+23:43:41.851749 [0]:[0]
+23:43:41.851755 [1]:[0]
+23:43:41.851757 [2]:[0]
+23:43:41.851760 [3]:[0]
+23:43:41.851762 [4]:[0]
+23:43:41.851764 [5]:[0]
+23:43:41.851766 [6]:[0]
+23:43:41.851768 [7]:[0]
+23:43:41.851770 [8]:[0]
+23:43:41.851773 [9]:[0]
+23:43:41.851775 len(keys):[1]
+23:43:41.851778 minGid[1]
+23:43:41.851780 len(keys):[1]
+23:43:41.851782 minGid[1]
+23:43:41.851785 len(keys):[1]
+23:43:41.851787 minGid[1]
+23:43:41.851789 len(keys):[1]
+23:43:41.851792 minGid[1]
+23:43:41.851794 len(keys):[1]
+23:43:41.851796 minGid[1]
+23:43:41.851798 len(keys):[1]
+23:43:41.851801 minGid[1]
+23:43:41.851803 len(keys):[1]
+23:43:41.851805 minGid[1]
+23:43:41.851808 len(keys):[1]
+23:43:41.851810 minGid[1]
+23:43:41.851813 len(keys):[1]
+23:43:41.851839 minGid[1]
+23:43:41.851845 len(keys):[1]
+23:43:41.851851 minGid[1]
+23:43:41.851855 len(keys):[1]
+23:43:41.851859 minGid[1]
+23:43:41.851862 len(keys):[1]
+23:43:41.851864 minGid[1]
+23:43:41.851866 len(keys):[1]
+23:43:41.851869 minGid[1]
+23:43:41.851871 len(keys):[1]
+23:43:41.851874 minGid[1]
+23:43:41.851876 len(keys):[1]
+23:43:41.851878 minGid[1]
+23:43:41.851881 len(keys):[1]
+23:43:41.851883 minGid[1]
+23:43:41.851885 len(keys):[1]
+23:43:41.851888 minGid[1]
+23:43:41.851890 len(keys):[1]
+23:43:41.851892 minGid[1]
+23:43:41.851895 len(keys):[1]
+23:43:41.851897 minGid[1]
+23:43:41.851899 len(keys):[1]
+23:43:41.851902 minGid[1]
+23:43:41.851904 before shardRebalance
+23:43:41.851906 len(keys):[1]
+23:43:41.851909 len(keys):[1]
+23:43:41.851912 min:[10], max[10]
+23:43:41.851915 join command handled finished
+23:43:41.851921 apply a msg.command
+23:43:41.851923 handle a join command
+23:43:41.851926 append for [1]
+23:43:41.851929 [0]:[0]
+23:43:41.851931 [1]:[0]
+23:43:41.851933 [2]:[0]
+23:43:41.851936 [3]:[0]
+23:43:41.851938 [4]:[0]
+23:43:41.851940 [5]:[0]
+23:43:41.851942 [6]:[0]
+23:43:41.851945 [7]:[0]
+23:43:41.851947 [8]:[0]
+23:43:41.851949 [9]:[0]
+23:43:41.851952 len(keys):[1]
+23:43:41.851954 minGid[1]
+23:43:41.851957 len(keys):[1]
+23:43:41.851959 minGid[1]
+23:43:41.851962 len(keys):[1]
+23:43:41.851964 minGid[1]
+23:43:41.851966 len(keys):[1]
+23:43:41.851968 minGid[1]
+23:43:41.851979 len(keys):[1]
+23:43:41.851982 minGid[1]
+23:43:41.851985 len(keys):[1]
+23:43:41.851987 minGid[1]
+23:43:41.851990 len(keys):[1]
+23:43:41.851992 minGid[1]
+23:43:41.851994 len(keys):[1]
+23:43:41.851996 minGid[1]
+23:43:41.851999 len(keys):[1]
+23:43:41.852001 minGid[1]
+23:43:41.852004 len(keys):[1]
+23:43:41.852007 minGid[1]
+23:43:41.852009 len(keys):[1]
+23:43:41.852012 minGid[1]
+23:43:41.852014 len(keys):[1]
+23:43:41.852017 minGid[1]
+23:43:41.852019 len(keys):[1]
+23:43:41.852021 minGid[1]
+23:43:41.852024 len(keys):[1]
+23:43:41.852026 minGid[1]
+23:43:41.852029 len(keys):[1]
+23:43:41.852031 minGid[1]
+23:43:41.852034 len(keys):[1]
+23:43:41.852036 minGid[1]
+23:43:41.852038 len(keys):[1]
+23:43:41.852040 minGid[1]
+23:43:41.852043 len(keys):[1]
+23:43:41.852046 minGid[1]
+23:43:41.852048 len(keys):[1]
+23:43:41.852050 minGid[1]
+23:43:41.852053 len(keys):[1]
+23:43:41.852055 minGid[1]
+23:43:41.852057 before shardRebalance
+23:43:41.852060 len(keys):[1]
+23:43:41.852062 len(keys):[1]
+23:43:41.852065 min:[10], max[10]
+23:43:41.852078 join command handled finished
+23:43:41.852080 apply a msg.command
+23:43:41.861266 apply a msg.command
+23:43:41.862160 Query() rpc get notify
+23:43:41.862378 client recieved response for Query() rpc
+23:43:41.862507 client send a join request
+23:43:41.862784 client send a join request
+23:43:41.863304 client send a join request
+23:43:41.951668 apply a msg.command
+23:43:41.951704 handle a join command
+23:43:41.951709 append for [2]
+23:43:41.951712 [0]:[1]
+23:43:41.951714 [1]:[1]
+23:43:41.951716 [2]:[1]
+23:43:41.951718 [3]:[1]
+23:43:41.951719 [4]:[1]
+23:43:41.951721 [5]:[1]
+23:43:41.951723 [6]:[1]
+23:43:41.951725 [7]:[1]
+23:43:41.951727 [8]:[1]
+23:43:41.951729 [9]:[1]
+23:43:41.951732 len(keys):[2]
+23:43:41.951734 minGid[2]
+23:43:41.951736 len(keys):[2]
+23:43:41.951738 minGid[2]
+23:43:41.951741 len(keys):[2]
+23:43:41.951743 minGid[2]
+23:43:41.951745 len(keys):[2]
+23:43:41.951747 minGid[2]
+23:43:41.951749 len(keys):[2]
+23:43:41.951751 minGid[2]
+23:43:41.951761 len(keys):[2]
+23:43:41.951765 minGid[2]
+23:43:41.951768 len(keys):[2]
+23:43:41.951770 minGid[2]
+23:43:41.951772 len(keys):[2]
+23:43:41.951829 minGid[2]
+23:43:41.951836 len(keys):[2]
+23:43:41.951838 minGid[2]
+23:43:41.951841 len(keys):[2]
+23:43:41.951843 minGid[2]
+23:43:41.951845 before shardRebalance
+23:43:41.951848 len(keys):[2]
+23:43:41.951850 len(keys):[2]
+23:43:41.951853 min:[1], max[9]
+23:43:41.951856 len(keys):[2]
+23:43:41.951863 len(keys):[2]
+23:43:41.951902 min:[2], max[8]
+23:43:41.951904 len(keys):[2]
+23:43:41.951907 len(keys):[2]
+23:43:41.951908 min:[3], max[7]
+23:43:41.951911 len(keys):[2]
+23:43:41.951913 len(keys):[2]
+23:43:41.951915 min:[4], max[6]
+23:43:41.951918 len(keys):[2]
+23:43:41.951920 len(keys):[2]
+23:43:41.951922 min:[5], max[5]
+23:43:41.951927 join command handled finished
+23:43:41.951932 waitChannel Server 2, Index:6 , ClientId 3030493666402028554, RequestId 6, Command Join, 
+23:43:41.951974 len(ck.servers)=[3]
+23:43:41.951979 client send a query request
+23:43:41.952034 recieved 'Query()'rpc from client, num:[-1]
+23:43:41.952074 client send a query request
+23:43:41.952115 recieved 'Query()'rpc from client, num:[-1]
+23:43:41.952154 client send a query request
+23:43:41.952188 recieved 'Query()'rpc from client, num:[-1]
+23:43:41.952368 apply a msg.command
+23:43:41.952375 apply a msg.command
+23:43:41.952379 apply a msg.command
+23:43:41.952381 apply a msg.command
+23:43:41.952383 handle a join command
+23:43:41.952386 append for [2]
+23:43:41.952388 [0]:[1]
+23:43:41.952390 [1]:[1]
+23:43:41.952392 [2]:[1]
+23:43:41.952394 [3]:[1]
+23:43:41.952396 [4]:[1]
+23:43:41.952398 [5]:[1]
+23:43:41.952400 [6]:[1]
+23:43:41.952402 [7]:[1]
+23:43:41.952404 [8]:[1]
+23:43:41.952406 [9]:[1]
+23:43:41.952408 len(keys):[2]
+23:43:41.952410 minGid[2]
+23:43:41.952413 len(keys):[2]
+23:43:41.952415 minGid[2]
+23:43:41.952417 len(keys):[2]
+23:43:41.952419 minGid[2]
+23:43:41.952421 len(keys):[2]
+23:43:41.952423 minGid[2]
+23:43:41.952426 len(keys):[2]
+23:43:41.952428 minGid[2]
+23:43:41.952430 len(keys):[2]
+23:43:41.952432 minGid[2]
+23:43:41.952434 len(keys):[2]
+23:43:41.952436 minGid[2]
+23:43:41.952439 len(keys):[2]
+23:43:41.952440 minGid[2]
+23:43:41.952443 len(keys):[2]
+23:43:41.952445 minGid[2]
+23:43:41.952447 len(keys):[2]
+23:43:41.952449 minGid[2]
+23:43:41.952451 before shardRebalance
+23:43:41.952453 len(keys):[2]
+23:43:41.952456 len(keys):[2]
+23:43:41.952458 min:[1], max[9]
+23:43:41.952462 len(keys):[2]
+23:43:41.952465 len(keys):[2]
+23:43:41.952467 min:[2], max[8]
+23:43:41.952469 len(keys):[2]
+23:43:41.952472 len(keys):[2]
+23:43:41.952473 min:[3], max[7]
+23:43:41.952476 len(keys):[2]
+23:43:41.952478 len(keys):[2]
+23:43:41.952480 min:[4], max[6]
+23:43:41.952483 len(keys):[2]
+23:43:41.952485 len(keys):[2]
+23:43:41.952487 min:[5], max[5]
+23:43:41.952489 join command handled finished
+23:43:41.961855 apply a msg.command
+23:43:41.961895 Query() rpc get notify
+23:43:41.962004 client recieved response for Query() rpc
+23:43:41.962017 len(ck.servers)=[3]
+23:43:41.962020 client send a query request
+23:43:41.962083 recieved 'Query()'rpc from client, num:[-1]
+23:43:41.962133 client send a query request
+23:43:41.962219 recieved 'Query()'rpc from client, num:[-1]
+23:43:41.962321 client send a query request
+23:43:41.962371 recieved 'Query()'rpc from client, num:[-1]
+23:43:42.051904 apply a msg.command
+23:43:42.051944 Query() rpc get notify
+23:43:42.051996 client recieved response for Query() rpc
+23:43:42.052001 len(ck.servers)=[3]
+23:43:42.052003 client send a query request
+23:43:42.052062 recieved 'Query()'rpc from client, num:[-1]
+23:43:42.052127 client send a query request
+23:43:42.052181 recieved 'Query()'rpc from client, num:[-1]
+23:43:42.052222 client send a query request
+23:43:42.052261 recieved 'Query()'rpc from client, num:[-1]
+23:43:42.052584 apply a msg.command
+23:43:42.052597 handle a join command
+23:43:42.052602 append for [2]
+23:43:42.052604 [0]:[1]
+23:43:42.052607 [1]:[1]
+23:43:42.052609 [2]:[1]
+23:43:42.052611 [3]:[1]
+23:43:42.052613 [4]:[1]
+23:43:42.052615 [5]:[1]
+23:43:42.052617 [6]:[1]
+23:43:42.052619 [7]:[1]
+23:43:42.052621 [8]:[1]
+23:43:42.052624 [9]:[1]
+23:43:42.052627 len(keys):[2]
+23:43:42.052629 minGid[2]
+23:43:42.052632 len(keys):[2]
+23:43:42.052634 minGid[2]
+23:43:42.052637 len(keys):[2]
+23:43:42.052639 minGid[2]
+23:43:42.052641 len(keys):[2]
+23:43:42.052644 minGid[2]
+23:43:42.052646 len(keys):[2]
+23:43:42.052649 minGid[2]
+23:43:42.052651 len(keys):[2]
+23:43:42.052653 minGid[2]
+23:43:42.052656 len(keys):[2]
+23:43:42.052658 minGid[2]
+23:43:42.052660 len(keys):[2]
+23:43:42.052663 minGid[2]
+23:43:42.052665 len(keys):[2]
+23:43:42.052667 minGid[2]
+23:43:42.052670 len(keys):[2]
+23:43:42.052672 minGid[2]
+23:43:42.052674 before shardRebalance
+23:43:42.052677 len(keys):[2]
+23:43:42.052679 len(keys):[2]
+23:43:42.052682 min:[1], max[9]
+23:43:42.052685 len(keys):[2]
+23:43:42.052691 len(keys):[2]
+23:43:42.052694 min:[2], max[8]
+23:43:42.052696 len(keys):[2]
+23:43:42.052699 len(keys):[2]
+23:43:42.052701 min:[3], max[7]
+23:43:42.052707 len(keys):[2]
+23:43:42.052710 len(keys):[2]
+23:43:42.052712 min:[4], max[6]
+23:43:42.052715 len(keys):[2]
+23:43:42.052717 len(keys):[2]
+23:43:42.052720 min:[5], max[5]
+23:43:42.052722 join command handled finished
+23:43:42.052725 apply a msg.command
+23:43:42.052729 apply a msg.command
+23:43:42.052731 apply a msg.command
+23:43:42.063109 apply a msg.command
+23:43:42.063151 Query() rpc get notify
+23:43:42.063265 client recieved response for Query() rpc
+23:43:42.063273 client send a leave request
+23:43:42.063445 client send a leave request
+23:43:42.063557 client send a leave request
+23:43:42.152524 apply a msg.command
+23:43:42.152571 len(keys):[1]
+23:43:42.152575 len(keys):[1]
+23:43:42.152578 len(keys):[1]
+23:43:42.152581 len(keys):[1]
+23:43:42.152585 len(keys):[1]
+23:43:42.152587 len(keys):[1]
+23:43:42.152590 len(keys):[1]
+23:43:42.152592 len(keys):[1]
+23:43:42.152595 min:[10], max[10]
+23:43:42.152685 len(ck.servers)=[3]
+23:43:42.152689 client send a query request
+23:43:42.152745 recieved 'Query()'rpc from client, num:[-1]
+23:43:42.152786 client send a query request
+23:43:42.152823 recieved 'Query()'rpc from client, num:[-1]
+23:43:42.152861 client send a query request
+23:43:42.152907 recieved 'Query()'rpc from client, num:[-1]
+23:43:42.153138 apply a msg.command
+23:43:42.153147 apply a msg.command
+23:43:42.153151 apply a msg.command
+23:43:42.153153 apply a msg.command
+23:43:42.153158 len(keys):[1]
+23:43:42.153160 len(keys):[1]
+23:43:42.153162 len(keys):[1]
+23:43:42.153165 len(keys):[1]
+23:43:42.153167 len(keys):[1]
+23:43:42.153169 len(keys):[1]
+23:43:42.153210 len(keys):[1]
+23:43:42.153213 len(keys):[1]
+23:43:42.153215 min:[10], max[10]
+23:43:42.163664 apply a msg.command
+23:43:42.163712 Query() rpc get notify
+23:43:42.163859 client recieved response for Query() rpc
+23:43:42.163874 len(ck.servers)=[3]
+23:43:42.163878 client send a query request
+23:43:42.163974 recieved 'Query()'rpc from client, num:[-1]
+23:43:42.164047 client send a query request
+23:43:42.164110 recieved 'Query()'rpc from client, num:[-1]
+23:43:42.164186 client send a query request
+23:43:42.164249 recieved 'Query()'rpc from client, num:[-1]
+23:43:42.254227 apply a msg.command
+23:43:42.254280 Query() rpc get notify
+23:43:42.254394 client recieved response for Query() rpc
+23:43:42.254410 client send a leave request
+23:43:42.254575 client send a leave request
+23:43:42.254712 client send a leave request
+23:43:42.254850 apply a msg.command
+23:43:42.255281 apply a msg.command
+23:43:42.255309 len(keys):[1]
+23:43:42.255313 len(keys):[1]
+23:43:42.255316 len(keys):[1]
+23:43:42.255318 len(keys):[1]
+23:43:42.255321 len(keys):[1]
+23:43:42.255323 len(keys):[1]
+23:43:42.255326 len(keys):[1]
+23:43:42.255329 len(keys):[1]
+23:43:42.255331 min:[10], max[10]
+23:43:42.255334 apply a msg.command
+23:43:42.354695 apply a msg.command
+23:43:42.354853 len(ck.servers)=[3]
+23:43:42.354868 client send a query request
+23:43:42.354996 recieved 'Query()'rpc from client, num:[-1]
+23:43:42.355091 client send a query request
+23:43:42.355159 recieved 'Query()'rpc from client, num:[-1]
+23:43:42.355207 client send a query request
+23:43:42.355261 recieved 'Query()'rpc from client, num:[-1]
+23:43:42.355479 apply a msg.command
+23:43:42.355490 apply a msg.command
+23:43:42.355492 apply a msg.command
+23:43:42.364983 apply a msg.command
+23:43:42.365100 Query() rpc get notify
+23:43:42.365217 client recieved response for Query() rpc
+  ... Passed
+Test: Historical queries ...
+23:43:42.365285 len(ck.servers)=[3]
+23:43:42.365303 client send a query request
+23:43:42.433845 client send a query request
+23:43:42.433991 recieved 'Query()'rpc from client, num:[0]
+23:43:42.433998 reply with config
+23:43:42.434051 client recieved response for Query() rpc
+--- FAIL: TestBasic (1.11s)
+    test_test.go:58: Num wrong
+Test: Multi-group join/leave ...
+23:43:42.434219 len(ck.servers)=[3]
+23:43:42.434222 client send a query request
+23:43:42.434249 apply a msg.command
+23:43:42.434256 I AM INT
+23:43:42.434320 recieved 'Query()'rpc from client, num:[-1]
+23:43:42.434340 apply a msg.command
+23:43:42.434346 I AM INT
+23:43:42.434350 apply a msg.command
+23:43:42.435287 I AM INT
+23:43:42.435164 client send a query request
+23:43:42.435410 recieved 'Query()'rpc from client, num:[-1]
+23:43:42.435479 client send a query request
+23:43:42.435545 recieved 'Query()'rpc from client, num:[-1]
+23:43:42.536413 client send a query request
+23:43:42.536630 recieved 'Query()'rpc from client, num:[-1]
+23:43:42.536688 client send a query request
+23:43:42.536756 recieved 'Query()'rpc from client, num:[-1]
+23:43:42.536797 client send a query request
+23:43:42.536841 recieved 'Query()'rpc from client, num:[-1]
+23:43:42.637244 client send a query request
+23:43:42.637567 recieved 'Query()'rpc from client, num:[-1]
+23:43:42.637649 client send a query request
+23:43:42.637770 recieved 'Query()'rpc from client, num:[-1]
+23:43:42.637889 client send a query request
+23:43:42.638036 recieved 'Query()'rpc from client, num:[-1]
+23:43:42.738213 client send a query request
+23:43:42.738396 recieved 'Query()'rpc from client, num:[-1]
+23:43:42.765315 apply a msg.command
+23:43:42.765462 Query() rpc get notify
+23:43:42.765572 client recieved response for Query() rpc
+23:43:42.765578 len(ck.servers)=[3]
+23:43:42.765580 client send a query request
+23:43:42.765627 recieved 'Query()'rpc from client, num:[-1]
+23:43:42.765780 apply a msg.command
+23:43:42.776508 apply a msg.command
+23:43:42.776599 Query() rpc get notify
+23:43:42.776931 client recieved response for Query() rpc
+23:43:42.776956 client send a join request
+23:43:42.865632 apply a msg.command
+23:43:42.865669 handle a join command
+23:43:42.865674 append for [2]
+23:43:42.865678 append for [1]
+23:43:42.865680 [0]:[0]
+23:43:42.865686 [1]:[0]
+23:43:42.865689 [2]:[0]
+23:43:42.865691 [3]:[0]
+23:43:42.865693 [4]:[0]
+23:43:42.865695 [5]:[0]
+23:43:42.865697 [6]:[0]
+23:43:42.865699 [7]:[0]
+23:43:42.865701 [8]:[0]
+23:43:42.865703 [9]:[0]
+23:43:42.865706 len(keys):[2]
+23:43:42.865709 minGid[1]
+23:43:42.865712 len(keys):[2]
+23:43:42.865714 minGid[2]
+23:43:42.865717 len(keys):[2]
+23:43:42.865719 minGid[1]
+23:43:42.865724 len(keys):[2]
+23:43:42.865727 minGid[2]
+23:43:42.865729 len(keys):[2]
+23:43:42.865732 minGid[1]
+23:43:42.865734 len(keys):[2]
+23:43:42.865736 minGid[2]
+23:43:42.865739 len(keys):[2]
+23:43:42.865749 minGid[1]
+23:43:42.865752 len(keys):[2]
+23:43:42.865754 minGid[2]
+23:43:42.865757 len(keys):[2]
+23:43:42.865759 minGid[1]
+23:43:42.865761 len(keys):[2]
+23:43:42.865763 minGid[2]
+23:43:42.865766 len(keys):[2]
+23:43:42.865768 minGid[1]
+23:43:42.865770 len(keys):[2]
+23:43:42.865772 minGid[2]
+23:43:42.865775 len(keys):[2]
+23:43:42.865777 minGid[1]
+23:43:42.865780 len(keys):[2]
+23:43:42.865782 minGid[2]
+23:43:42.865784 len(keys):[2]
+23:43:42.865786 minGid[1]
+23:43:42.865789 len(keys):[2]
+23:43:42.865792 minGid[2]
+23:43:42.865794 len(keys):[2]
+23:43:42.865796 minGid[1]
+23:43:42.865799 len(keys):[2]
+23:43:42.865801 minGid[2]
+23:43:42.865804 len(keys):[2]
+23:43:42.865806 minGid[1]
+23:43:42.865808 len(keys):[2]
+23:43:42.865811 minGid[2]
+23:43:42.865813 before shardRebalance
+23:43:42.865816 len(keys):[2]
+23:43:42.865819 len(keys):[2]
+23:43:42.865821 min:[5], max[5]
+23:43:42.865824 join command handled finished
+23:43:42.865829 waitChannel Server 2, Index:3 , ClientId 2437007664631181476, RequestId 3, Command Join, 
+23:43:42.866677 apply a msg.command
+23:43:42.866694 apply a msg.command
+23:43:42.866696 handle a join command
+23:43:42.866699 append for [1]
+23:43:42.866702 append for [2]
+23:43:42.866704 [0]:[0]
+23:43:42.866707 [1]:[0]
+23:43:42.866709 [2]:[0]
+23:43:42.866711 [3]:[0]
+23:43:42.866713 [4]:[0]
+23:43:42.866715 [5]:[0]
+23:43:42.866717 [6]:[0]
+23:43:42.866719 [7]:[0]
+23:43:42.866721 [8]:[0]
+23:43:42.866723 [9]:[0]
+23:43:42.866726 len(keys):[2]
+23:43:42.866728 minGid[1]
+23:43:42.866731 len(keys):[2]
+23:43:42.866733 minGid[2]
+23:43:42.866735 len(keys):[2]
+23:43:42.866738 minGid[1]
+23:43:42.866740 len(keys):[2]
+23:43:42.866742 minGid[2]
+23:43:42.866745 len(keys):[2]
+23:43:42.866747 minGid[1]
+23:43:42.866749 len(keys):[2]
+23:43:42.866751 minGid[2]
+23:43:42.866754 len(keys):[2]
+23:43:42.866756 minGid[1]
+23:43:42.866762 len(keys):[2]
+23:43:42.866764 minGid[2]
+23:43:42.866766 len(keys):[2]
+23:43:42.866769 minGid[1]
+23:43:42.866771 len(keys):[2]
+23:43:42.866773 minGid[2]
+23:43:42.866776 len(keys):[2]
+23:43:42.866778 minGid[1]
+23:43:42.866780 len(keys):[2]
+23:43:42.866782 minGid[2]
+23:43:42.866785 len(keys):[2]
+23:43:42.866787 minGid[1]
+23:43:42.866790 len(keys):[2]
+23:43:42.866792 minGid[2]
+23:43:42.866797 len(keys):[2]
+23:43:42.866800 minGid[1]
+23:43:42.866802 len(keys):[2]
+23:43:42.866804 minGid[2]
+23:43:42.866807 len(keys):[2]
+23:43:42.866809 minGid[1]
+23:43:42.866812 len(keys):[2]
+23:43:42.866814 minGid[2]
+23:43:42.866819 len(keys):[2]
+23:43:42.866821 minGid[1]
+23:43:42.866824 len(keys):[2]
+23:43:42.866826 minGid[2]
+23:43:42.866828 before shardRebalance
+23:43:42.866831 len(keys):[2]
+23:43:42.866834 len(keys):[2]
+23:43:42.866836 min:[5], max[5]
+23:43:42.866839 join command handled finished
+23:43:42.866843 apply a msg.command
+23:43:42.866846 apply a msg.command
+23:43:42.867045 len(ck.servers)=[3]
+23:43:42.867089 client send a query request
+23:43:42.867159 recieved 'Query()'rpc from client, num:[-1]
+23:43:42.965709 apply a msg.command
+23:43:42.965767 Query() rpc get notify
+23:43:42.965862 client recieved response for Query() rpc
+23:43:42.965870 len(ck.servers)=[3]
+23:43:42.965873 client send a query request
+23:43:42.965940 recieved 'Query()'rpc from client, num:[-1]
+23:43:42.966108 apply a msg.command
+23:43:42.966115 handle a join command
+23:43:42.966118 append for [2]
+23:43:42.966120 append for [1]
+23:43:42.966123 [0]:[0]
+23:43:42.966125 [1]:[0]
+23:43:42.966127 [2]:[0]
+23:43:42.966129 [3]:[0]
+23:43:42.966131 [4]:[0]
+23:43:42.966133 [5]:[0]
+23:43:42.966135 [6]:[0]
+23:43:42.966137 [7]:[0]
+23:43:42.966138 [8]:[0]
+23:43:42.966140 [9]:[0]
+23:43:42.966144 len(keys):[2]
+23:43:42.966146 minGid[1]
+23:43:42.966148 len(keys):[2]
+23:43:42.966150 minGid[2]
+23:43:42.966153 len(keys):[2]
+23:43:42.966155 minGid[1]
+23:43:42.966157 len(keys):[2]
+23:43:42.966159 minGid[2]
+23:43:42.966161 len(keys):[2]
+23:43:42.966163 minGid[1]
+23:43:42.966166 len(keys):[2]
+23:43:42.966168 minGid[2]
+23:43:42.966170 len(keys):[2]
+23:43:42.966172 minGid[1]
+23:43:42.966174 len(keys):[2]
+23:43:42.966176 minGid[2]
+23:43:42.966179 len(keys):[2]
+23:43:42.966189 minGid[1]
+23:43:42.966191 len(keys):[2]
+23:43:42.966194 minGid[2]
+23:43:42.966196 len(keys):[2]
+23:43:42.966198 minGid[1]
+23:43:42.966200 len(keys):[2]
+23:43:42.966202 minGid[2]
+23:43:42.966204 len(keys):[2]
+23:43:42.966206 minGid[1]
+23:43:42.966208 len(keys):[2]
+23:43:42.966210 minGid[2]
+23:43:42.966213 len(keys):[2]
+23:43:42.966215 minGid[1]
+23:43:42.966217 len(keys):[2]
+23:43:42.966219 minGid[2]
+23:43:42.966222 len(keys):[2]
+23:43:42.966224 minGid[1]
+23:43:42.966226 len(keys):[2]
+23:43:42.966228 minGid[2]
+23:43:42.966230 len(keys):[2]
+23:43:42.966232 minGid[1]
+23:43:42.966235 len(keys):[2]
+23:43:42.966237 minGid[2]
+23:43:42.966239 before shardRebalance
+23:43:42.966241 len(keys):[2]
+23:43:42.966244 len(keys):[2]
+23:43:42.966246 min:[5], max[5]
+23:43:42.966248 join command handled finished
+23:43:42.966252 apply a msg.command
+23:43:42.976172 apply a msg.command
+23:43:42.976239 Query() rpc get notify
+23:43:42.976462 client recieved response for Query() rpc
+23:43:42.976473 client send a join request
+23:43:43.066782 apply a msg.command
+23:43:43.066821 handle a join command
+23:43:43.066827 append for [3]
+23:43:43.066830 [0]:[1]
+23:43:43.066832 [1]:[2]
+23:43:43.066834 [2]:[1]
+23:43:43.066836 [3]:[2]
+23:43:43.066838 [4]:[1]
+23:43:43.066841 [5]:[2]
+23:43:43.066843 [6]:[1]
+23:43:43.066845 [7]:[2]
+23:43:43.066847 [8]:[1]
+23:43:43.066849 [9]:[2]
+23:43:43.066852 len(keys):[3]
+23:43:43.066855 minGid[3]
+23:43:43.066858 len(keys):[3]
+23:43:43.066860 minGid[3]
+23:43:43.066863 len(keys):[3]
+23:43:43.066865 minGid[3]
+23:43:43.066868 len(keys):[3]
+23:43:43.066870 minGid[3]
+23:43:43.066872 len(keys):[3]
+23:43:43.066875 minGid[3]
+23:43:43.066877 len(keys):[3]
+23:43:43.066879 minGid[3]
+23:43:43.066882 len(keys):[3]
+23:43:43.066884 minGid[3]
+23:43:43.066887 len(keys):[3]
+23:43:43.066889 minGid[3]
+23:43:43.066892 len(keys):[3]
+23:43:43.066894 minGid[3]
+23:43:43.066897 len(keys):[3]
+23:43:43.066899 minGid[3]
+23:43:43.066901 before shardRebalance
+23:43:43.066904 len(keys):[3]
+23:43:43.066907 len(keys):[3]
+23:43:43.066909 min:[1], max[5]
+23:43:43.066912 len(keys):[3]
+23:43:43.066915 len(keys):[3]
+23:43:43.066917 min:[2], max[4]
+23:43:43.066920 len(keys):[3]
+23:43:43.066923 len(keys):[3]
+23:43:43.066925 min:[3], max[4]
+23:43:43.066928 join command handled finished
+23:43:43.066933 waitChannel Server 2, Index:6 , ClientId 2437007664631181476, RequestId 6, Command Join, 
+23:43:43.066970 len(ck.servers)=[3]
+23:43:43.066974 client send a query request
+23:43:43.067035 recieved 'Query()'rpc from client, num:[-1]
+23:43:43.067207 apply a msg.command
+23:43:43.067213 apply a msg.command
+23:43:43.067217 apply a msg.command
+23:43:43.067219 apply a msg.command
+23:43:43.067222 handle a join command
+23:43:43.067225 append for [3]
+23:43:43.067227 [0]:[1]
+23:43:43.067230 [1]:[2]
+23:43:43.067232 [2]:[1]
+23:43:43.067234 [3]:[2]
+23:43:43.067236 [4]:[1]
+23:43:43.067238 [5]:[2]
+23:43:43.067240 [6]:[1]
+23:43:43.067242 [7]:[2]
+23:43:43.067244 [8]:[1]
+23:43:43.067246 [9]:[2]
+23:43:43.067249 len(keys):[3]
+23:43:43.067251 minGid[3]
+23:43:43.067254 len(keys):[3]
+23:43:43.067256 minGid[3]
+23:43:43.067259 len(keys):[3]
+23:43:43.067261 minGid[3]
+23:43:43.067264 len(keys):[3]
+23:43:43.067266 minGid[3]
+23:43:43.067269 len(keys):[3]
+23:43:43.067271 minGid[3]
+23:43:43.067273 len(keys):[3]
+23:43:43.067276 minGid[3]
+23:43:43.067278 len(keys):[3]
+23:43:43.067280 minGid[3]
+23:43:43.067283 len(keys):[3]
+23:43:43.067285 minGid[3]
+23:43:43.067288 len(keys):[3]
+23:43:43.067290 minGid[3]
+23:43:43.067293 len(keys):[3]
+23:43:43.067295 minGid[3]
+23:43:43.067297 before shardRebalance
+23:43:43.067299 len(keys):[3]
+23:43:43.067302 len(keys):[3]
+23:43:43.067304 min:[1], max[5]
+23:43:43.067307 len(keys):[3]
+23:43:43.067310 len(keys):[3]
+23:43:43.067312 min:[2], max[4]
+23:43:43.067315 len(keys):[3]
+23:43:43.067318 len(keys):[3]
+23:43:43.067320 min:[3], max[4]
+23:43:43.067322 join command handled finished
+23:43:43.076945 apply a msg.command
+23:43:43.077077 Query() rpc get notify
+23:43:43.077192 client recieved response for Query() rpc
+23:43:43.077223 len(ck.servers)=[3]
+23:43:43.077241 client send a query request
+23:43:43.077324 recieved 'Query()'rpc from client, num:[-1]
+23:43:43.167312 apply a msg.command
+23:43:43.169691 Query() rpc get notify
+23:43:43.169807 client recieved response for Query() rpc
+23:43:43.169815 len(ck.servers)=[3]
+23:43:43.169818 client send a query request
+23:43:43.169897 recieved 'Query()'rpc from client, num:[-1]
+23:43:43.168416 apply a msg.command
+23:43:43.169946 handle a join command
+23:43:43.169950 append for [3]
+23:43:43.169953 [0]:[1]
+23:43:43.169955 [1]:[2]
+23:43:43.169957 [2]:[1]
+23:43:43.169959 [3]:[2]
+23:43:43.169961 [4]:[1]
+23:43:43.169963 [5]:[2]
+23:43:43.170584 [6]:[1]
+23:43:43.170595 [7]:[2]
+23:43:43.170597 [8]:[1]
+23:43:43.170599 [9]:[2]
+23:43:43.170604 len(keys):[3]
+23:43:43.170606 minGid[3]
+23:43:43.170609 len(keys):[3]
+23:43:43.170612 minGid[3]
+23:43:43.170615 len(keys):[3]
+23:43:43.170617 minGid[3]
+23:43:43.170619 len(keys):[3]
+23:43:43.170621 minGid[3]
+23:43:43.170624 len(keys):[3]
+23:43:43.170626 minGid[3]
+23:43:43.170629 len(keys):[3]
+23:43:43.170631 minGid[3]
+23:43:43.170635 len(keys):[3]
+23:43:43.170640 minGid[3]
+23:43:43.170643 len(keys):[3]
+23:43:43.170645 minGid[3]
+23:43:43.170648 len(keys):[3]
+23:43:43.170650 minGid[3]
+23:43:43.170652 len(keys):[3]
+23:43:43.170655 minGid[3]
+23:43:43.170657 before shardRebalance
+23:43:43.170660 len(keys):[3]
+23:43:43.170662 len(keys):[3]
+23:43:43.170665 min:[1], max[5]
+23:43:43.170668 len(keys):[3]
+23:43:43.170670 len(keys):[3]
+23:43:43.170673 min:[2], max[4]
+23:43:43.170675 len(keys):[3]
+23:43:43.170678 len(keys):[3]
+23:43:43.170680 min:[3], max[4]
+23:43:43.170684 join command handled finished
+23:43:43.170686 apply a msg.command
+23:43:43.170570 apply a msg.command
+23:43:43.170691 apply a msg.command
+23:43:43.267378 apply a msg.command
+23:43:43.267414 Query() rpc get notify
+23:43:43.267464 client recieved response for Query() rpc
+23:43:43.267469 client send a leave request
+23:43:43.267686 apply a msg.command
+23:43:43.267692 apply a msg.command
+23:43:43.277642 apply a msg.command
+23:43:43.278355 len(keys):[1]
+23:43:43.278376 len(keys):[1]
+23:43:43.278380 len(keys):[1]
+23:43:43.278383 len(keys):[1]
+23:43:43.278386 len(keys):[1]
+23:43:43.278389 len(keys):[1]
+23:43:43.278391 len(keys):[1]
+23:43:43.278394 len(keys):[1]
+23:43:43.278399 len(keys):[1]
+23:43:43.278402 len(keys):[1]
+23:43:43.278405 min:[10], max[10]
+23:43:43.279098 len(ck.servers)=[3]
+23:43:43.279122 client send a query request
+23:43:43.279533 recieved 'Query()'rpc from client, num:[-1]
+23:43:43.368101 apply a msg.command
+23:43:43.368140 Query() rpc get notify
+23:43:43.368197 client recieved response for Query() rpc
+23:43:43.368203 len(ck.servers)=[3]
+23:43:43.368206 client send a query request
+23:43:43.368260 recieved 'Query()'rpc from client, num:[-1]
+23:43:43.368440 apply a msg.command
+23:43:43.368445 apply a msg.command
+23:43:43.368465 len(keys):[1]
+23:43:43.368474 len(keys):[1]
+23:43:43.368477 len(keys):[1]
+23:43:43.368480 len(keys):[1]
+23:43:43.368482 len(keys):[1]
+23:43:43.368485 len(keys):[1]
+23:43:43.368487 len(keys):[1]
+23:43:43.368490 len(keys):[1]
+23:43:43.368492 len(keys):[1]
+23:43:43.368495 len(keys):[1]
+23:43:43.368497 min:[10], max[10]
+23:43:43.368503 apply a msg.command
+23:43:43.368508 len(keys):[1]
+23:43:43.368511 len(keys):[1]
+23:43:43.368513 len(keys):[1]
+23:43:43.368516 len(keys):[1]
+23:43:43.368518 len(keys):[1]
+23:43:43.368521 len(keys):[1]
+23:43:43.368523 len(keys):[1]
+23:43:43.368526 len(keys):[1]
+23:43:43.368529 len(keys):[1]
+23:43:43.368532 len(keys):[1]
+23:43:43.368534 min:[10], max[10]
+23:43:43.368536 apply a msg.command
+23:43:43.378605 apply a msg.command
+23:43:43.378651 Query() rpc get notify
+23:43:43.378926 client recieved response for Query() rpc
+23:43:43.378963 len(ck.servers)=[3]
+23:43:43.378969 client send a query request
+23:43:43.379064 recieved 'Query()'rpc from client, num:[-1]
+23:43:43.468619 apply a msg.command
+23:43:43.468664 Query() rpc get notify
+23:43:43.468734 client recieved response for Query() rpc
+23:43:43.468740 client send a leave request
+23:43:43.469029 apply a msg.command
+23:43:43.469040 apply a msg.command
+23:43:43.469054 apply a msg.command
+23:43:43.469057 apply a msg.command
+23:43:43.479250 apply a msg.command
+  ... Passed
+Test: Concurrent multi leave/join ...
+23:43:43.479498 client send a join request
+23:43:43.479640 client send a join request
+23:43:43.479713 client send a join request
+23:43:43.479837 client send a join request
+23:43:43.479940 client send a join request
+23:43:43.480022 client send a join request
+23:43:43.480116 client send a join request
+23:43:43.480224 client send a join request
+23:43:43.480332 client send a join request
+23:43:43.480435 client send a join request
+23:43:43.480537 client send a join request
+23:43:43.480625 client send a join request
+23:43:43.480705 client send a join request
+23:43:43.480806 client send a join request
+23:43:43.480897 client send a join request
+23:43:43.480976 client send a join request
+23:43:43.481072 client send a join request
+23:43:43.481166 client send a join request
+23:43:43.481258 client send a join request
+23:43:43.481342 client send a join request
+23:43:43.481404 client send a join request
+23:43:43.568929 apply a msg.command
+23:43:43.568964 handle a join command
+23:43:43.568970 append for [1009]
+23:43:43.568973 append for [2009]
+23:43:43.568975 append for [3009]
+23:43:43.568978 [0]:[0]
+23:43:43.568981 [1]:[0]
+23:43:43.568983 [2]:[0]
+23:43:43.568985 [3]:[0]
+23:43:43.569004 [4]:[0]
+23:43:43.569006 [5]:[0]
+23:43:43.569008 [6]:[0]
+23:43:43.569010 [7]:[0]
+23:43:43.569012 [8]:[0]
+23:43:43.569014 [9]:[0]
+23:43:43.569018 len(keys):[3]
+23:43:43.569020 minGid[1009]
+23:43:43.569023 len(keys):[3]
+23:43:43.569026 minGid[2009]
+23:43:43.569028 len(keys):[3]
+23:43:43.569030 minGid[1009]
+23:43:43.569033 len(keys):[3]
+23:43:43.569035 minGid[2009]
+23:43:43.569037 len(keys):[3]
+23:43:43.569040 minGid[1009]
+23:43:43.569042 len(keys):[3]
+23:43:43.569045 minGid[2009]
+23:43:43.569047 len(keys):[3]
+23:43:43.569049 minGid[1009]
+23:43:43.569052 len(keys):[3]
+23:43:43.569054 minGid[2009]
+23:43:43.569056 len(keys):[3]
+23:43:43.569058 minGid[1009]
+23:43:43.569061 len(keys):[3]
+23:43:43.569063 minGid[2009]
+23:43:43.569066 len(keys):[3]
+23:43:43.569068 minGid[1009]
+23:43:43.569071 len(keys):[3]
+23:43:43.569073 minGid[2009]
+23:43:43.569075 len(keys):[3]
+23:43:43.569078 minGid[3009]
+23:43:43.569080 len(keys):[3]
+23:43:43.569083 minGid[1009]
+23:43:43.569085 len(keys):[3]
+23:43:43.569087 minGid[2009]
+23:43:43.569090 len(keys):[3]
+23:43:43.569092 minGid[3009]
+23:43:43.569096 len(keys):[3]
+23:43:43.569098 minGid[1009]
+23:43:43.569101 len(keys):[3]
+23:43:43.569103 minGid[2009]
+23:43:43.569106 len(keys):[3]
+23:43:43.569108 minGid[3009]
+23:43:43.569111 len(keys):[3]
+23:43:43.569113 minGid[1009]
+23:43:43.569115 before shardRebalance
+23:43:43.569128 len(keys):[3]
+23:43:43.569135 len(keys):[3]
+23:43:43.569137 min:[3], max[4]
+23:43:43.569140 join command handled finished
+23:43:43.569144 apply a msg.command
+23:43:43.569146 handle a join command
+23:43:43.569150 append for [1000]
+23:43:43.569152 append for [2000]
+23:43:43.569155 append for [3000]
+23:43:43.569157 [0]:[1009]
+23:43:43.569160 [1]:[2009]
+23:43:43.569162 [2]:[3009]
+23:43:43.569164 [3]:[1009]
+23:43:43.569166 [4]:[2009]
+23:43:43.569168 [5]:[3009]
+23:43:43.569170 [6]:[1009]
+23:43:43.569173 [7]:[2009]
+23:43:43.569175 [8]:[3009]
+23:43:43.569177 [9]:[1009]
+23:43:43.569181 len(keys):[6]
+23:43:43.569183 minGid[1000]
+23:43:43.569187 len(keys):[6]
+23:43:43.569189 minGid[2000]
+23:43:43.569193 len(keys):[6]
+23:43:43.569196 minGid[1000]
+23:43:43.569199 len(keys):[6]
+23:43:43.569201 minGid[2000]
+23:43:43.569205 len(keys):[6]
+23:43:43.569207 minGid[1000]
+23:43:43.569211 len(keys):[6]
+23:43:43.569213 minGid[2000]
+23:43:43.569217 len(keys):[6]
+23:43:43.569219 minGid[1000]
+23:43:43.569222 len(keys):[6]
+23:43:43.569225 minGid[2000]
+23:43:43.569228 len(keys):[6]
+23:43:43.569230 minGid[1000]
+23:43:43.569233 len(keys):[6]
+23:43:43.569236 minGid[2000]
+23:43:43.569238 before shardRebalance
+23:43:43.569241 len(keys):[6]
+23:43:43.569244 len(keys):[6]
+23:43:43.569247 min:[0], max[3]
+23:43:43.569250 len(keys):[6]
+23:43:43.569253 len(keys):[6]
+23:43:43.569256 min:[0], max[3]
+23:43:43.569270 len(keys):[6]
+23:43:43.569274 len(keys):[6]
+23:43:43.569277 min:[1], max[3]
+23:43:43.569280 len(keys):[6]
+23:43:43.569284 len(keys):[6]
+23:43:43.569286 min:[1], max[2]
+23:43:43.569289 join command handled finished
+23:43:43.569292 apply a msg.command
+23:43:43.569294 handle a join command
+23:43:43.569302 append for [1001]
+23:43:43.569306 append for [2001]
+23:43:43.569308 append for [3001]
+23:43:43.569312 [0]:[2000]
+23:43:43.569315 [1]:[3000]
+23:43:43.569317 [2]:[1000]
+23:43:43.569320 [3]:[1000]
+23:43:43.569322 [4]:[2009]
+23:43:43.569325 [5]:[3009]
+23:43:43.569327 [6]:[1009]
+23:43:43.569331 [7]:[2009]
+23:43:43.569333 [8]:[3009]
+23:43:43.569335 [9]:[1009]
+23:43:43.569341 len(keys):[9]
+23:43:43.569343 minGid[1001]
+23:43:43.569347 len(keys):[9]
+23:43:43.569350 minGid[2000]
+23:43:43.569354 len(keys):[9]
+23:43:43.569357 minGid[1001]
+23:43:43.569362 len(keys):[9]
+23:43:43.569365 minGid[2000]
+23:43:43.569368 len(keys):[9]
+23:43:43.569371 minGid[1001]
+23:43:43.569375 len(keys):[9]
+23:43:43.569378 minGid[2000]
+23:43:43.569383 len(keys):[9]
+23:43:43.569386 minGid[1001]
+23:43:43.569390 len(keys):[9]
+23:43:43.569392 minGid[2000]
+23:43:43.569396 len(keys):[9]
+23:43:43.569399 minGid[1001]
+23:43:43.569403 len(keys):[9]
+23:43:43.569406 minGid[2000]
+23:43:43.569408 before shardRebalance
+23:43:43.569412 len(keys):[9]
+23:43:43.569417 len(keys):[9]
+23:43:43.569420 min:[0], max[2]
+23:43:43.569425 len(keys):[9]
+23:43:43.569438 len(keys):[9]
+23:43:43.569446 min:[0], max[2]
+23:43:43.569451 len(keys):[9]
+23:43:43.569456 len(keys):[9]
+23:43:43.569458 min:[0], max[2]
+23:43:43.569462 len(keys):[9]
+23:43:43.569466 len(keys):[9]
+23:43:43.569469 min:[1], max[2]
+23:43:43.569471 join command handled finished
+23:43:43.569475 apply a msg.command
+23:43:43.569477 handle a join command
+23:43:43.569484 append for [1002]
+23:43:43.569487 append for [2002]
+23:43:43.569490 append for [3002]
+23:43:43.569493 [0]:[2000]
+23:43:43.569495 [1]:[3000]
+23:43:43.569497 [2]:[1001]
+23:43:43.569499 [3]:[1000]
+23:43:43.569502 [4]:[3001]
+23:43:43.569504 [5]:[3009]
+23:43:43.569506 [6]:[2001]
+23:43:43.569508 [7]:[2009]
+23:43:43.569510 [8]:[3009]
+23:43:43.569512 [9]:[1009]
+23:43:43.569523 len(keys):[12]
+23:43:43.569527 minGid[1002]
+23:43:43.569531 len(keys):[12]
+23:43:43.569535 minGid[2000]
+23:43:43.569539 len(keys):[12]
+23:43:43.569542 minGid[1002]
+23:43:43.569546 len(keys):[12]
+23:43:43.569550 minGid[2000]
+23:43:43.569555 len(keys):[12]
+23:43:43.569558 minGid[1002]
+23:43:43.569564 len(keys):[12]
+23:43:43.569569 minGid[2000]
+23:43:43.569573 len(keys):[12]
+23:43:43.569575 minGid[1002]
+23:43:43.569580 len(keys):[12]
+23:43:43.569583 minGid[2000]
+23:43:43.569589 len(keys):[12]
+23:43:43.569593 minGid[1002]
+23:43:43.569606 len(keys):[12]
+23:43:43.569614 minGid[2000]
+23:43:43.569617 before shardRebalance
+23:43:43.569621 len(keys):[12]
+23:43:43.570250 waitChannel Server 2, Index:15 , ClientId 876255051067235554, RequestId 1, Command Join, 
+23:43:43.570642 apply a msg.command
+23:43:43.570655 apply a msg.command
+23:43:43.570673 apply a msg.command
+23:43:43.570678 apply a msg.command
+23:43:43.570680 handle a join command
+23:43:43.570683 append for [3009]
+23:43:43.570685 append for [1009]
+23:43:43.570688 append for [2009]
+23:43:43.570690 [0]:[0]
+23:43:43.570693 [1]:[0]
+23:43:43.570695 [2]:[0]
+23:43:43.570697 [3]:[0]
+23:43:43.570700 [4]:[0]
+23:43:43.570702 [5]:[0]
+23:43:43.570704 [6]:[0]
+23:43:43.570706 [7]:[0]
+23:43:43.570708 [8]:[0]
+23:43:43.570710 [9]:[0]
+23:43:43.570713 len(keys):[3]
+23:43:43.570716 minGid[1009]
+23:43:43.570718 len(keys):[3]
+23:43:43.570720 minGid[2009]
+23:43:43.570723 len(keys):[3]
+23:43:43.570725 minGid[1009]
+23:43:43.570728 len(keys):[3]
+23:43:43.570730 minGid[2009]
+23:43:43.570733 len(keys):[3]
+23:43:43.570735 minGid[1009]
+23:43:43.570737 len(keys):[3]
+23:43:43.570739 minGid[2009]
+23:43:43.570742 len(keys):[3]
+23:43:43.570744 minGid[1009]
+23:43:43.570747 len(keys):[3]
+23:43:43.570749 minGid[2009]
+23:43:43.570751 len(keys):[3]
+23:43:43.570753 minGid[1009]
+23:43:43.570756 len(keys):[3]
+23:43:43.570758 minGid[2009]
+23:43:43.570760 len(keys):[3]
+23:43:43.570763 minGid[1009]
+23:43:43.570773 len(keys):[3]
+23:43:43.570775 minGid[2009]
+23:43:43.570778 len(keys):[3]
+23:43:43.570780 minGid[3009]
+23:43:43.570783 len(keys):[3]
+23:43:43.570785 minGid[1009]
+23:43:43.570787 len(keys):[3]
+23:43:43.570790 minGid[2009]
+23:43:43.570792 len(keys):[3]
+23:43:43.570794 minGid[3009]
+23:43:43.570797 len(keys):[3]
+23:43:43.570799 minGid[1009]
+23:43:43.570802 len(keys):[3]
+23:43:43.570804 minGid[2009]
+23:43:43.570806 len(keys):[3]
+23:43:43.570809 minGid[3009]
+23:43:43.570811 len(keys):[3]
+23:43:43.570814 minGid[1009]
+23:43:43.570816 before shardRebalance
+23:43:43.570818 len(keys):[3]
+23:43:43.570821 len(keys):[3]
+23:43:43.570823 min:[3], max[4]
+23:43:43.570825 join command handled finished
+23:43:43.570828 apply a msg.command
+23:43:43.570830 handle a join command
+23:43:43.570832 append for [1000]
+23:43:43.570835 append for [2000]
+23:43:43.570837 append for [3000]
+23:43:43.570839 [0]:[1009]
+23:43:43.570841 [1]:[2009]
+23:43:43.570843 [2]:[3009]
+23:43:43.570846 [3]:[1009]
+23:43:43.570848 [4]:[2009]
+23:43:43.570850 [5]:[3009]
+23:43:43.570852 [6]:[1009]
+23:43:43.570854 [7]:[2009]
+23:43:43.570856 [8]:[3009]
+23:43:43.570858 [9]:[1009]
+23:43:43.570861 len(keys):[6]
+23:43:43.570863 minGid[1000]
+23:43:43.570867 len(keys):[6]
+23:43:43.570869 minGid[2000]
+23:43:43.570872 len(keys):[6]
+23:43:43.570874 minGid[1000]
+23:43:43.570877 len(keys):[6]
+23:43:43.570879 minGid[2000]
+23:43:43.570882 len(keys):[6]
+23:43:43.570884 minGid[1000]
+23:43:43.570887 len(keys):[6]
+23:43:43.570889 minGid[2000]
+23:43:43.570892 len(keys):[6]
+23:43:43.570894 minGid[1000]
+23:43:43.570897 len(keys):[6]
+23:43:43.570899 minGid[2000]
+23:43:43.570902 len(keys):[6]
+23:43:43.570904 minGid[1000]
+23:43:43.570907 len(keys):[6]
+23:43:43.570910 minGid[2000]
+23:43:43.570912 before shardRebalance
+23:43:43.570915 len(keys):[6]
+23:43:43.570918 len(keys):[6]
+23:43:43.570920 min:[0], max[3]
+23:43:43.570925 len(keys):[6]
+23:43:43.570928 len(keys):[6]
+23:43:43.570931 min:[0], max[3]
+23:43:43.570933 len(keys):[6]
+23:43:43.570936 len(keys):[6]
+23:43:43.570939 min:[1], max[3]
+23:43:43.570942 len(keys):[6]
+23:43:43.570945 len(keys):[6]
+23:43:43.570947 min:[1], max[2]
+23:43:43.570949 join command handled finished
+23:43:43.570951 apply a msg.command
+23:43:43.570953 handle a join command
+23:43:43.570956 append for [2001]
+23:43:43.570958 append for [3001]
+23:43:43.570961 append for [1001]
+23:43:43.570964 [0]:[2000]
+23:43:43.570966 [1]:[3000]
+23:43:43.570968 [2]:[1000]
+23:43:43.570970 [3]:[1000]
+23:43:43.570973 [4]:[2009]
+23:43:43.570975 [5]:[3009]
+23:43:43.570977 [6]:[1009]
+23:43:43.570979 [7]:[2009]
+23:43:43.570981 [8]:[3009]
+23:43:43.570983 [9]:[1009]
+23:43:43.570988 len(keys):[9]
+23:43:43.570990 minGid[1001]
+23:43:43.570994 len(keys):[9]
+23:43:43.570996 minGid[2000]
+23:43:43.571000 len(keys):[9]
+23:43:43.571002 minGid[1001]
+23:43:43.571006 len(keys):[9]
+23:43:43.571008 minGid[2000]
+23:43:43.571012 len(keys):[9]
+23:43:43.571014 minGid[1001]
+23:43:43.571018 len(keys):[9]
+23:43:43.571020 minGid[2000]
+23:43:43.571024 len(keys):[9]
+23:43:43.571026 minGid[1001]
+23:43:43.571030 len(keys):[9]
+23:43:43.571032 minGid[2000]
+23:43:43.571036 len(keys):[9]
+23:43:43.571038 minGid[1001]
+23:43:43.571043 len(keys):[9]
+23:43:43.571046 minGid[2000]
+23:43:43.571048 before shardRebalance
+23:43:43.571051 len(keys):[9]
+23:43:43.571055 len(keys):[9]
+23:43:43.571075 min:[0], max[2]
+23:43:43.571083 len(keys):[9]
+23:43:43.571088 len(keys):[9]
+23:43:43.571090 min:[0], max[2]
+23:43:43.571094 len(keys):[9]
+23:43:43.571098 len(keys):[9]
+23:43:43.571100 min:[0], max[2]
+23:43:43.571103 len(keys):[9]
+23:43:43.571107 len(keys):[9]
+23:43:43.571110 min:[1], max[2]
+23:43:43.571112 join command handled finished
+23:43:43.571115 apply a msg.command
+23:43:43.571117 handle a join command
+23:43:43.571121 append for [1002]
+23:43:43.571123 append for [2002]
+23:43:43.571125 append for [3002]
+23:43:43.571127 [0]:[2000]
+23:43:43.571130 [1]:[3000]
+23:43:43.571132 [2]:[1001]
+23:43:43.571134 [3]:[1000]
+23:43:43.571136 [4]:[3001]
+23:43:43.571138 [5]:[3009]
+23:43:43.571140 [6]:[2001]
+23:43:43.571142 [7]:[2009]
+23:43:43.571148 [8]:[3009]
+23:43:43.571150 [9]:[1009]
+23:43:43.571155 len(keys):[12]
+23:43:43.571157 minGid[1002]
+23:43:43.571163 len(keys):[12]
+23:43:43.571166 minGid[2000]
+23:43:43.571170 len(keys):[12]
+23:43:43.571172 minGid[1002]
+23:43:43.571176 len(keys):[12]
+23:43:43.571179 minGid[2000]
+23:43:43.571182 len(keys):[12]
+23:43:43.571185 minGid[1002]
+23:43:43.571189 len(keys):[12]
+23:43:43.571191 minGid[2000]
+23:43:43.571195 len(keys):[12]
+23:43:43.571197 minGid[1002]
+23:43:43.571201 len(keys):[12]
+23:43:43.571204 minGid[2000]
+23:43:43.571207 len(keys):[12]
+23:43:43.571210 minGid[1002]
+23:43:43.571213 len(keys):[12]
+23:43:43.571216 minGid[2000]
+23:43:43.571218 before shardRebalance
+23:43:43.571223 len(keys):[12]
+23:43:43.571228 len(keys):[12]
+23:43:43.571230 min:[0], max[2]
+23:43:43.571234 len(keys):[12]
+23:43:43.571238 len(keys):[12]
+23:43:43.571241 min:[0], max[1]
+23:43:43.571244 join command handled finished
+23:43:43.571246 apply a msg.command
+23:43:43.571249 handle a join command
+23:43:43.571254 append for [1003]
+23:43:43.571257 append for [2003]
+23:43:43.571260 append for [3003]
+23:43:43.571262 [0]:[2000]
+23:43:43.571264 [1]:[3000]
+23:43:43.571266 [2]:[1001]
+23:43:43.571268 [3]:[1000]
+23:43:43.571270 [4]:[3001]
+23:43:43.571273 [5]:[1002]
+23:43:43.571275 [6]:[2001]
+23:43:43.571277 [7]:[2009]
+23:43:43.571279 [8]:[3009]
+23:43:43.571281 [9]:[1009]
+23:43:43.571287 len(keys):[15]
+23:43:43.571290 minGid[1003]
+23:43:43.571294 len(keys):[15]
+23:43:43.571297 minGid[2000]
+23:43:43.571302 len(keys):[15]
+23:43:43.571304 minGid[1003]
+23:43:43.571309 len(keys):[15]
+23:43:43.571312 minGid[2000]
+23:43:43.571316 len(keys):[15]
+23:43:43.571319 minGid[1003]
+23:43:43.571324 len(keys):[15]
+23:43:43.571326 minGid[2000]
+23:43:43.571331 len(keys):[15]
+23:43:43.571334 minGid[1003]
+23:43:43.571338 len(keys):[15]
+23:43:43.571341 minGid[2000]
+23:43:43.571345 len(keys):[15]
+23:43:43.571348 minGid[1003]
+23:43:43.571352 len(keys):[15]
+23:43:43.571355 minGid[2000]
+23:43:43.571357 before shardRebalance
+23:43:43.571362 len(keys):[15]
+23:43:43.571366 len(keys):[15]
+23:43:43.571369 min:[0], max[1]
+23:43:43.571371 join command handled finished
+23:43:43.571373 apply a msg.command
+23:43:43.571375 handle a join command
+23:43:43.571380 append for [2004]
+23:43:43.571383 append for [3004]
+23:43:43.571385 append for [1004]
+23:43:43.571387 [0]:[2000]
+23:43:43.571389 [1]:[3000]
+23:43:43.571391 [2]:[1001]
+23:43:43.571393 [3]:[1000]
+23:43:43.571395 [4]:[3001]
+23:43:43.571397 [5]:[1002]
+23:43:43.571400 [6]:[2001]
+23:43:43.571402 [7]:[2009]
+23:43:43.571404 [8]:[3009]
+23:43:43.571406 [9]:[1009]
+23:43:43.571412 len(keys):[18]
+23:43:43.571414 minGid[1003]
+23:43:43.571420 len(keys):[18]
+23:43:43.571422 minGid[1004]
+23:43:43.571433 len(keys):[18]
+23:43:43.571436 minGid[1003]
+23:43:43.571441 len(keys):[18]
+23:43:43.571443 minGid[1004]
+23:43:43.571448 len(keys):[18]
+23:43:43.571451 minGid[1003]
+23:43:43.571457 len(keys):[18]
+23:43:43.571459 minGid[1004]
+23:43:43.571464 len(keys):[18]
+23:43:43.571467 minGid[1003]
+23:43:43.571472 len(keys):[18]
+23:43:43.571474 minGid[1004]
+23:43:43.571479 len(keys):[18]
+23:43:43.571482 minGid[1003]
+23:43:43.571487 len(keys):[18]
+23:43:43.571490 minGid[1004]
+23:43:43.571492 before shardRebalance
+23:43:43.571497 len(keys):[18]
+23:43:43.571502 len(keys):[18]
+23:43:43.571504 min:[0], max[1]
+23:43:43.571506 join command handled finished
+23:43:43.571511 apply a msg.command
+23:43:43.571513 handle a join command
+23:43:43.571519 append for [3005]
+23:43:43.571521 append for [1005]
+23:43:43.571524 append for [2005]
+23:43:43.571526 [0]:[1004]
+23:43:43.571528 [1]:[3000]
+23:43:43.571530 [2]:[1001]
+23:43:43.571532 [3]:[1000]
+23:43:43.571535 [4]:[3001]
+23:43:43.571537 [5]:[1002]
+23:43:43.571539 [6]:[2001]
+23:43:43.571541 [7]:[2009]
+23:43:43.571543 [8]:[3009]
+23:43:43.571545 [9]:[1009]
+23:43:43.571553 len(keys):[21]
+23:43:43.571556 minGid[1003]
+23:43:43.571561 len(keys):[21]
+23:43:43.571564 minGid[1004]
+23:43:43.571569 len(keys):[21]
+23:43:43.571572 minGid[1003]
+23:43:43.571577 len(keys):[21]
+23:43:43.571580 minGid[1004]
+23:43:43.571595 len(keys):[21]
+23:43:43.571602 minGid[1003]
+23:43:43.571609 len(keys):[21]
+23:43:43.571612 minGid[1004]
+23:43:43.571617 len(keys):[21]
+23:43:43.571620 minGid[1003]
+23:43:43.571625 len(keys):[21]
+23:43:43.571627 minGid[1004]
+23:43:43.571633 len(keys):[21]
+23:43:43.571636 minGid[1003]
+23:43:43.571641 len(keys):[21]
+23:43:43.571644 minGid[1004]
+23:43:43.571646 before shardRebalance
+23:43:43.571651 len(keys):[21]
+23:43:43.571657 len(keys):[21]
+23:43:43.571659 min:[0], max[1]
+23:43:43.571661 join command handled finished
+23:43:43.571664 apply a msg.command
+23:43:43.571666 handle a join command
+23:43:43.571672 append for [3006]
+23:43:43.571674 append for [1006]
+23:43:43.571676 append for [2006]
+23:43:43.571679 [0]:[1004]
+23:43:43.571681 [1]:[3000]
+23:43:43.571683 [2]:[1001]
+23:43:43.571685 [3]:[1000]
+23:43:43.571687 [4]:[3001]
+23:43:43.571690 [5]:[1002]
+23:43:43.571692 [6]:[2001]
+23:43:43.571694 [7]:[2009]
+23:43:43.571696 [8]:[3009]
+23:43:43.571698 [9]:[1009]
+23:43:43.571703 len(keys):[24]
+23:43:43.571706 minGid[1003]
+23:43:43.571712 len(keys):[24]
+23:43:43.571714 minGid[1004]
+23:43:43.571720 len(keys):[24]
+23:43:43.571722 minGid[1003]
+23:43:43.571728 len(keys):[24]
+23:43:43.571730 minGid[1004]
+23:43:43.571736 len(keys):[24]
+23:43:43.571739 minGid[1003]
+23:43:43.571744 len(keys):[24]
+23:43:43.571747 minGid[1004]
+23:43:43.571754 len(keys):[24]
+23:43:43.571756 minGid[1003]
+23:43:43.571762 len(keys):[24]
+23:43:43.571764 minGid[1004]
+23:43:43.571770 len(keys):[24]
+23:43:43.571773 minGid[1003]
+23:43:43.571778 len(keys):[24]
+23:43:43.571781 minGid[1004]
+23:43:43.571783 before shardRebalance
+23:43:43.571789 len(keys):[24]
+23:43:43.571795 len(keys):[24]
+23:43:43.571797 min:[0], max[1]
+23:43:43.571800 join command handled finished
+23:43:43.571802 apply a msg.command
+23:43:43.571804 handle a join command
+23:43:43.571810 append for [2007]
+23:43:43.571813 append for [3007]
+23:43:43.571815 append for [1007]
+23:43:43.571818 [0]:[1004]
+23:43:43.571820 [1]:[3000]
+23:43:43.571822 [2]:[1001]
+23:43:43.571824 [3]:[1000]
+23:43:43.571827 [4]:[3001]
+23:43:43.571829 [5]:[1002]
+23:43:43.571831 [6]:[2001]
+23:43:43.571833 [7]:[2009]
+23:43:43.571835 [8]:[3009]
+23:43:43.571837 [9]:[1009]
+23:43:43.571845 len(keys):[27]
+23:43:43.571847 minGid[1003]
+23:43:43.571855 len(keys):[27]
+23:43:43.571857 minGid[1004]
+23:43:43.571865 len(keys):[27]
+23:43:43.571867 minGid[1003]
+23:43:43.571876 len(keys):[27]
+23:43:43.571879 minGid[1004]
+23:43:43.571886 len(keys):[27]
+23:43:43.571889 minGid[1003]
+23:43:43.571900 len(keys):[27]
+23:43:43.571903 minGid[1004]
+23:43:43.571911 len(keys):[27]
+23:43:43.571914 minGid[1003]
+23:43:43.571921 len(keys):[27]
+23:43:43.571924 minGid[1004]
+23:43:43.571932 len(keys):[27]
+23:43:43.571935 minGid[1003]
+23:43:43.571941 len(keys):[27]
+23:43:43.571944 minGid[1004]
+23:43:43.571946 before shardRebalance
+23:43:43.571953 len(keys):[27]
+23:43:43.571960 len(keys):[27]
+23:43:43.571963 min:[0], max[1]
+23:43:43.571965 join command handled finished
+23:43:43.571967 apply a msg.command
+23:43:43.571969 handle a join command
+23:43:43.571986 append for [2008]
+23:43:43.571991 append for [3008]
+23:43:43.571993 append for [1008]
+23:43:43.571996 [0]:[1004]
+23:43:43.571998 [1]:[3000]
+23:43:43.572000 [2]:[1001]
+23:43:43.572002 [3]:[1000]
+23:43:43.572004 [4]:[3001]
+23:43:43.572006 [5]:[1002]
+23:43:43.572008 [6]:[2001]
+23:43:43.572010 [7]:[2009]
+23:43:43.572012 [8]:[3009]
+23:43:43.572014 [9]:[1009]
+23:43:43.572025 len(keys):[30]
+23:43:43.572042 minGid[1003]
+23:43:43.572054 len(keys):[30]
+23:43:43.572057 minGid[1004]
+23:43:43.572064 len(keys):[30]
+23:43:43.572067 minGid[1003]
+23:43:43.572074 len(keys):[30]
+23:43:43.572077 minGid[1004]
+23:43:43.572083 len(keys):[30]
+23:43:43.572086 minGid[1003]
+23:43:43.572093 len(keys):[30]
+23:43:43.572096 minGid[1004]
+23:43:43.572103 len(keys):[30]
+23:43:43.572105 minGid[1003]
+23:43:43.572114 len(keys):[30]
+23:43:43.572117 minGid[1004]
+23:43:43.572123 len(keys):[30]
+23:43:43.572126 minGid[1003]
+23:43:43.572133 len(keys):[30]
+23:43:43.572136 minGid[1004]
+23:43:43.572138 before shardRebalance
+23:43:43.572146 len(keys):[30]
+23:43:43.572154 len(keys):[30]
+23:43:43.572161 min:[0], max[1]
+23:43:43.572163 join command handled finished
+23:43:43.572170 waitChannel Server 2, Index:16 , ClientId 46358073140891948, RequestId 1, Command Join, 
+23:43:43.572271 len(keys):[12]
+23:43:43.572295 min:[0], max[2]
+23:43:43.572316 len(keys):[12]
+23:43:43.572336 len(keys):[12]
+23:43:43.572354 min:[0], max[1]
+23:43:43.572375 join command handled finished
+23:43:43.572394 apply a msg.command
+23:43:43.572411 handle a join command
+23:43:43.572431 append for [3003]
+23:43:43.572449 append for [1003]
+23:43:43.572469 append for [2003]
+23:43:43.572486 [0]:[2000]
+23:43:43.572504 [1]:[3000]
+23:43:43.572521 [2]:[1001]
+23:43:43.572538 [3]:[1000]
+23:43:43.572555 [4]:[3001]
+23:43:43.572572 [5]:[1002]
+23:43:43.572589 [6]:[2001]
+23:43:43.572606 [7]:[2009]
+23:43:43.572623 [8]:[3009]
+23:43:43.572640 [9]:[1009]
+23:43:43.572662 len(keys):[15]
+23:43:43.572680 minGid[1003]
+23:43:43.572700 len(keys):[15]
+23:43:43.572718 minGid[2000]
+23:43:43.572738 len(keys):[15]
+23:43:43.572755 minGid[1003]
+23:43:43.572775 len(keys):[15]
+23:43:43.572793 minGid[2000]
+23:43:43.572813 len(keys):[15]
+23:43:43.572830 minGid[1003]
+23:43:43.572850 len(keys):[15]
+23:43:43.572868 minGid[2000]
+23:43:43.572887 len(keys):[15]
+23:43:43.572905 minGid[1003]
+23:43:43.572925 len(keys):[15]
+23:43:43.572942 minGid[2000]
+23:43:43.572962 len(keys):[15]
+23:43:43.572979 minGid[1003]
+23:43:43.572999 len(keys):[15]
+23:43:43.573042 minGid[2000]
+23:43:43.573099 before shardRebalance
+23:43:43.573119 len(keys):[15]
+23:43:43.573138 len(keys):[15]
+23:43:43.573155 min:[0], max[1]
+23:43:43.573171 join command handled finished
+23:43:43.573187 apply a msg.command
+23:43:43.573203 handle a join command
+23:43:43.573223 append for [3004]
+23:43:43.573239 append for [1004]
+23:43:43.573255 append for [2004]
+23:43:43.573271 [0]:[2000]
+23:43:43.573286 [1]:[3000]
+23:43:43.573302 [2]:[1001]
+23:43:43.573317 [3]:[1000]
+23:43:43.573333 [4]:[3001]
+23:43:43.573348 [5]:[1002]
+23:43:43.573364 [6]:[2001]
+23:43:43.573419 [7]:[2009]
+23:43:43.573435 [8]:[3009]
+23:43:43.573453 [9]:[1009]
+23:43:43.573474 len(keys):[18]
+23:43:43.573492 minGid[1003]
+23:43:43.573512 len(keys):[18]
+23:43:43.573530 minGid[1004]
+23:43:43.573552 len(keys):[18]
+23:43:43.573572 minGid[1003]
+23:43:43.573595 len(keys):[18]
+23:43:43.573614 minGid[1004]
+23:43:43.573636 len(keys):[18]
+23:43:43.573656 minGid[1003]
+23:43:43.573682 len(keys):[18]
+23:43:43.573707 minGid[1004]
+23:43:43.573771 len(keys):[18]
+23:43:43.573802 minGid[1003]
+23:43:43.573830 len(keys):[18]
+23:43:43.573853 minGid[1004]
+23:43:43.573889 len(keys):[18]
+23:43:43.573914 minGid[1003]
+23:43:43.573955 len(keys):[18]
+23:43:43.574021 minGid[1004]
+23:43:43.574064 before shardRebalance
+23:43:43.574099 len(keys):[18]
+23:43:43.574136 len(keys):[18]
+23:43:43.574169 min:[0], max[1]
+23:43:43.574198 join command handled finished
+23:43:43.574226 apply a msg.command
+23:43:43.574250 handle a join command
+23:43:43.574278 append for [1005]
+23:43:43.574307 append for [2005]
+23:43:43.574334 append for [3005]
+23:43:43.574366 [0]:[1004]
+23:43:43.574394 [1]:[3000]
+23:43:43.574418 [2]:[1001]
+23:43:43.574446 [3]:[1000]
+23:43:43.574473 [4]:[3001]
+23:43:43.574508 [5]:[1002]
+23:43:43.574525 [6]:[2001]
+23:43:43.574544 [7]:[2009]
+23:43:43.574561 [8]:[3009]
+23:43:43.574577 [9]:[1009]
+23:43:43.574599 len(keys):[21]
+23:43:43.574620 minGid[1003]
+23:43:43.574644 len(keys):[21]
+23:43:43.574666 minGid[1004]
+23:43:43.574687 len(keys):[21]
+23:43:43.574705 minGid[1003]
+23:43:43.574725 len(keys):[21]
+23:43:43.574744 minGid[1004]
+23:43:43.574766 len(keys):[21]
+23:43:43.574787 minGid[1003]
+23:43:43.574810 len(keys):[21]
+23:43:43.574831 minGid[1004]
+23:43:43.574853 len(keys):[21]
+23:43:43.574874 minGid[1003]
+23:43:43.574895 len(keys):[21]
+23:43:43.574915 minGid[1004]
+23:43:43.574936 len(keys):[21]
+23:43:43.574973 minGid[1003]
+23:43:43.575029 len(keys):[21]
+23:43:43.575114 minGid[1004]
+23:43:43.575140 before shardRebalance
+23:43:43.575165 len(keys):[21]
+23:43:43.575191 len(keys):[21]
+23:43:43.575215 min:[0], max[1]
+23:43:43.575236 join command handled finished
+23:43:43.575259 apply a msg.command
+23:43:43.575307 handle a join command
+23:43:43.575341 append for [2006]
+23:43:43.575363 append for [3006]
+23:43:43.575381 append for [1006]
+23:43:43.575401 [0]:[1004]
+23:43:43.575419 [1]:[3000]
+23:43:43.575460 [2]:[1001]
+23:43:43.575486 [3]:[1000]
+23:43:43.575508 [4]:[3001]
+23:43:43.575545 [5]:[1002]
+23:43:43.575564 [6]:[2001]
+23:43:43.575603 [7]:[2009]
+23:43:43.575639 [8]:[3009]
+23:43:43.575658 [9]:[1009]
+23:43:43.575694 len(keys):[24]
+23:43:43.575714 minGid[1003]
+23:43:43.575736 len(keys):[24]
+23:43:43.575755 minGid[1004]
+23:43:43.575794 len(keys):[24]
+23:43:43.575815 minGid[1003]
+23:43:43.575838 len(keys):[24]
+23:43:43.575858 minGid[1004]
+23:43:43.575881 len(keys):[24]
+23:43:43.575905 minGid[1003]
+23:43:43.575983 len(keys):[24]
+23:43:43.576055 minGid[1004]
+23:43:43.576122 len(keys):[24]
+23:43:43.576145 minGid[1003]
+23:43:43.576192 len(keys):[24]
+23:43:43.576214 minGid[1004]
+23:43:43.576252 len(keys):[24]
+23:43:43.576288 minGid[1003]
+23:43:43.576328 len(keys):[24]
+23:43:43.576363 minGid[1004]
+23:43:43.576381 before shardRebalance
+23:43:43.576403 len(keys):[24]
+23:43:43.576425 len(keys):[24]
+23:43:43.576468 min:[0], max[1]
+23:43:43.576489 join command handled finished
+23:43:43.576541 apply a msg.command
+23:43:43.576562 handle a join command
+23:43:43.576588 append for [1007]
+23:43:43.576609 append for [2007]
+23:43:43.576650 append for [3007]
+23:43:43.576686 [0]:[1004]
+23:43:43.576728 [1]:[3000]
+23:43:43.576750 [2]:[1001]
+23:43:43.576774 [3]:[1000]
+23:43:43.576797 [4]:[3001]
+23:43:43.576820 [5]:[1002]
+23:43:43.576847 [6]:[2001]
+23:43:43.576872 [7]:[2009]
+23:43:43.576937 [8]:[3009]
+23:43:43.577151 [9]:[1009]
+23:43:43.577218 len(keys):[27]
+23:43:43.577242 minGid[1003]
+23:43:43.577273 len(keys):[27]
+23:43:43.577295 minGid[1004]
+23:43:43.577821 len(keys):[27]
+23:43:43.577860 minGid[1003]
+23:43:43.577884 len(keys):[27]
+23:43:43.577903 minGid[1004]
+23:43:43.577992 len(keys):[27]
+23:43:43.578016 minGid[1003]
+23:43:43.578041 len(keys):[27]
+23:43:43.578060 minGid[1004]
+23:43:43.578083 len(keys):[27]
+23:43:43.578113 minGid[1003]
+23:43:43.578139 len(keys):[27]
+23:43:43.578158 minGid[1004]
+23:43:43.578184 len(keys):[27]
+23:43:43.578205 minGid[1003]
+23:43:43.578229 len(keys):[27]
+23:43:43.578250 minGid[1004]
+23:43:43.578269 before shardRebalance
+23:43:43.578293 len(keys):[27]
+23:43:43.578318 len(keys):[27]
+23:43:43.578339 min:[0], max[1]
+23:43:43.578359 join command handled finished
+23:43:43.578381 apply a msg.command
+23:43:43.578401 handle a join command
+23:43:43.578429 append for [3008]
+23:43:43.578450 append for [1008]
+23:43:43.578470 append for [2008]
+23:43:43.578490 [0]:[1004]
+23:43:43.578509 [1]:[3000]
+23:43:43.578529 [2]:[1001]
+23:43:43.578548 [3]:[1000]
+23:43:43.578567 [4]:[3001]
+23:43:43.578587 [5]:[1002]
+23:43:43.578606 [6]:[2001]
+23:43:43.578625 [7]:[2009]
+23:43:43.578644 [8]:[3009]
+23:43:43.578664 [9]:[1009]
+23:43:43.578688 len(keys):[30]
+23:43:43.578708 minGid[1003]
+23:43:43.578732 len(keys):[30]
+23:43:43.578753 minGid[1004]
+23:43:43.578777 len(keys):[30]
+23:43:43.578798 minGid[1003]
+23:43:43.578822 len(keys):[30]
+23:43:43.578843 minGid[1004]
+23:43:43.578866 len(keys):[30]
+23:43:43.578886 minGid[1003]
+23:43:43.578971 len(keys):[30]
+23:43:43.578996 minGid[1004]
+23:43:43.579022 len(keys):[30]
+23:43:43.579043 minGid[1003]
+23:43:43.579067 len(keys):[30]
+23:43:43.579088 minGid[1004]
+23:43:43.579112 len(keys):[30]
+23:43:43.579133 minGid[1003]
+23:43:43.579159 len(keys):[30]
+23:43:43.579179 minGid[1004]
+23:43:43.579199 before shardRebalance
+23:43:43.579223 len(keys):[30]
+23:43:43.579249 len(keys):[30]
+23:43:43.579270 min:[0], max[1]
+23:43:43.579290 join command handled finished
+23:43:43.579314 waitChannel Server 2, Index:24 , ClientId 3020352818375089921, RequestId 1, Command Join, 
+23:43:43.579393 client send a leave request
+23:43:43.579506 client send a leave request
+23:43:43.579603 client send a leave request
+23:43:43.579732 waitChannel Server 2, Index:17 , ClientId 3215926322296975294, RequestId 1, Command Join, 
+23:43:43.579782 client send a leave request
+23:43:43.579859 client send a leave request
+23:43:43.580314 waitChannel Server 2, Index:19 , ClientId 1931035503956801646, RequestId 1, Command Join, 
+23:43:43.580388 client send a leave request
+23:43:43.580536 client send a leave request
+23:43:43.580600 client send a leave request
+23:43:43.580680 client send a leave request
+23:43:43.580720 waitChannel Server 2, Index:18 , ClientId 4193936082916871653, RequestId 1, Command Join, 
+23:43:43.580747 client send a leave request
+23:43:43.580821 client send a leave request
+23:43:43.580980 client send a leave request
+23:43:43.581079 client send a leave request
+23:43:43.581121 waitChannel Server 2, Index:21 , ClientId 3979031301967103622, RequestId 1, Command Join, 
+23:43:43.581151 client send a leave request
+23:43:43.581211 client send a leave request
+23:43:43.581277 client send a leave request
+23:43:43.581319 waitChannel Server 2, Index:20 , ClientId 2291027622983640258, RequestId 1, Command Join, 
+23:43:43.581351 client send a leave request
+23:43:43.581454 waitChannel Server 2, Index:22 , ClientId 3963246249481427373, RequestId 1, Command Join, 
+23:43:43.581505 client send a leave request
+23:43:43.581563 client send a leave request
+23:43:43.581629 client send a leave request
+23:43:43.581677 waitChannel Server 2, Index:23 , ClientId 3101894078920523716, RequestId 1, Command Join, 
+23:43:43.581713 client send a leave request
+23:43:43.669736 apply a msg.command
+23:43:43.669814 len(keys):[28]
+23:43:43.669827 len(keys):[28]
+23:43:43.669835 len(keys):[28]
+23:43:43.669843 len(keys):[28]
+23:43:43.669846 min:[0], max[1]
+23:43:43.669850 apply a msg.command
+23:43:43.669865 len(keys):[26]
+23:43:43.669872 len(keys):[26]
+23:43:43.669880 len(keys):[26]
+23:43:43.669887 len(keys):[26]
+23:43:43.669893 len(keys):[26]
+23:43:43.669900 len(keys):[26]
+23:43:43.669902 min:[0], max[1]
+23:43:43.669908 apply a msg.command
+23:43:43.669922 len(keys):[24]
+23:43:43.669931 len(keys):[24]
+23:43:43.669955 len(keys):[24]
+23:43:43.669964 len(keys):[24]
+23:43:43.669967 min:[0], max[1]
+23:43:43.669970 apply a msg.command
+23:43:43.669980 len(keys):[22]
+23:43:43.669987 len(keys):[22]
+23:43:43.669993 len(keys):[22]
+23:43:43.669999 len(keys):[22]
+23:43:43.670005 len(keys):[22]
+23:43:43.670794 apply a msg.command
+23:43:43.670809 handle a join command
+23:43:43.670812 append for [2009]
+23:43:43.670816 append for [3009]
+23:43:43.670818 append for [1009]
+23:43:43.670821 [0]:[0]
+23:43:43.670823 [1]:[0]
+23:43:43.670824 [2]:[0]
+23:43:43.670826 [3]:[0]
+23:43:43.670828 [4]:[0]
+23:43:43.670830 [5]:[0]
+23:43:43.670832 [6]:[0]
+23:43:43.670834 [7]:[0]
+23:43:43.670836 [8]:[0]
+23:43:43.670838 [9]:[0]
+23:43:43.670840 len(keys):[3]
+23:43:43.670842 minGid[1009]
+23:43:43.670845 len(keys):[3]
+23:43:43.670847 minGid[2009]
+23:43:43.670850 len(keys):[3]
+23:43:43.670851 minGid[1009]
+23:43:43.670854 len(keys):[3]
+23:43:43.670856 minGid[2009]
+23:43:43.670858 len(keys):[3]
+23:43:43.670860 minGid[1009]
+23:43:43.670862 len(keys):[3]
+23:43:43.670864 minGid[2009]
+23:43:43.670867 len(keys):[3]
+23:43:43.670868 minGid[1009]
+23:43:43.670871 len(keys):[3]
+23:43:43.670873 minGid[2009]
+23:43:43.670875 len(keys):[3]
+23:43:43.670877 minGid[1009]
+23:43:43.670879 len(keys):[3]
+23:43:43.670881 minGid[2009]
+23:43:43.670883 len(keys):[3]
+23:43:43.670885 minGid[1009]
+23:43:43.670888 len(keys):[3]
+23:43:43.670889 minGid[2009]
+23:43:43.670892 len(keys):[3]
+23:43:43.670894 minGid[3009]
+23:43:43.670896 len(keys):[3]
+23:43:43.670898 minGid[1009]
+23:43:43.670901 len(keys):[3]
+23:43:43.670903 minGid[2009]
+23:43:43.670905 len(keys):[3]
+23:43:43.670907 minGid[3009]
+23:43:43.670909 len(keys):[3]
+23:43:43.670911 minGid[1009]
+23:43:43.670914 len(keys):[3]
+23:43:43.670916 minGid[2009]
+23:43:43.670918 len(keys):[3]
+23:43:43.670920 minGid[3009]
+23:43:43.670923 len(keys):[3]
+23:43:43.670925 minGid[1009]
+23:43:43.670927 before shardRebalance
+23:43:43.670929 len(keys):[3]
+23:43:43.670932 len(keys):[3]
+23:43:43.670934 min:[3], max[4]
+23:43:43.670936 join command handled finished
+23:43:43.670938 apply a msg.command
+23:43:43.670940 handle a join command
+23:43:43.670943 append for [1000]
+23:43:43.670945 append for [2000]
+23:43:43.670947 append for [3000]
+23:43:43.670957 [0]:[1009]
+23:43:43.670960 [1]:[2009]
+23:43:43.670962 [2]:[3009]
+23:43:43.670963 [3]:[1009]
+23:43:43.670965 [4]:[2009]
+23:43:43.670967 [5]:[3009]
+23:43:43.670969 [6]:[1009]
+23:43:43.670971 [7]:[2009]
+23:43:43.670973 [8]:[3009]
+23:43:43.670975 [9]:[1009]
+23:43:43.670978 len(keys):[6]
+23:43:43.670980 minGid[1000]
+23:43:43.670984 len(keys):[6]
+23:43:43.670986 minGid[2000]
+23:43:43.670989 len(keys):[6]
+23:43:43.670991 minGid[1000]
+23:43:43.670994 len(keys):[6]
+23:43:43.670996 minGid[2000]
+23:43:43.670998 len(keys):[6]
+23:43:43.671000 minGid[1000]
+23:43:43.671003 len(keys):[6]
+23:43:43.671005 minGid[2000]
+23:43:43.671008 len(keys):[6]
+23:43:43.671009 minGid[1000]
+23:43:43.671013 len(keys):[6]
+23:43:43.671015 minGid[2000]
+23:43:43.671018 len(keys):[6]
+23:43:43.671020 minGid[1000]
+23:43:43.671022 len(keys):[6]
+23:43:43.671024 minGid[2000]
+23:43:43.671026 before shardRebalance
+23:43:43.671029 len(keys):[6]
+23:43:43.671032 len(keys):[6]
+23:43:43.671034 min:[0], max[3]
+23:43:43.671037 len(keys):[6]
+23:43:43.671039 len(keys):[6]
+23:43:43.671041 min:[0], max[3]
+23:43:43.671044 len(keys):[6]
+23:43:43.671047 len(keys):[6]
+23:43:43.671049 min:[1], max[3]
+23:43:43.671051 len(keys):[6]
+23:43:43.671054 len(keys):[6]
+23:43:43.671056 min:[1], max[2]
+23:43:43.671058 join command handled finished
+23:43:43.671060 apply a msg.command
+23:43:43.671062 handle a join command
+23:43:43.671065 append for [3001]
+23:43:43.671067 append for [1001]
+23:43:43.671069 append for [2001]
+23:43:43.671072 [0]:[2000]
+23:43:43.671074 [1]:[3000]
+23:43:43.671076 [2]:[1000]
+23:43:43.671078 [3]:[1000]
+23:43:43.671080 [4]:[2009]
+23:43:43.671082 [5]:[3009]
+23:43:43.671083 [6]:[1009]
+23:43:43.671085 [7]:[2009]
+23:43:43.671088 [8]:[3009]
+23:43:43.671089 [9]:[1009]
+23:43:43.671093 len(keys):[9]
+23:43:43.671095 minGid[1001]
+23:43:43.671099 len(keys):[9]
+23:43:43.671101 minGid[2000]
+23:43:43.671104 len(keys):[9]
+23:43:43.671106 minGid[1001]
+23:43:43.671110 len(keys):[9]
+23:43:43.671112 minGid[2000]
+23:43:43.671115 len(keys):[9]
+23:43:43.671117 minGid[1001]
+23:43:43.671121 len(keys):[9]
+23:43:43.671124 minGid[2000]
+23:43:43.671130 len(keys):[9]
+23:43:43.671149 minGid[1001]
+23:43:43.671226 len(keys):[9]
+23:43:43.671232 minGid[2000]
+23:43:43.671237 len(keys):[9]
+23:43:43.671239 minGid[1001]
+23:43:43.671242 len(keys):[9]
+23:43:43.671245 minGid[2000]
+23:43:43.671247 before shardRebalance
+23:43:43.671250 len(keys):[9]
+23:43:43.671255 len(keys):[9]
+23:43:43.671257 min:[0], max[2]
+23:43:43.671260 len(keys):[9]
+23:43:43.671264 len(keys):[9]
+23:43:43.671300 min:[0], max[2]
+23:43:43.671303 len(keys):[9]
+23:43:43.671306 len(keys):[9]
+23:43:43.671308 min:[0], max[2]
+23:43:43.671312 len(keys):[9]
+23:43:43.671315 len(keys):[9]
+23:43:43.671317 min:[1], max[2]
+23:43:43.671319 join command handled finished
+23:43:43.671321 apply a msg.command
+23:43:43.671323 handle a join command
+23:43:43.671327 append for [3002]
+23:43:43.671329 append for [1002]
+23:43:43.671331 append for [2002]
+23:43:43.671334 [0]:[2000]
+23:43:43.671336 [1]:[3000]
+23:43:43.671337 [2]:[1001]
+23:43:43.671339 [3]:[1000]
+23:43:43.671341 [4]:[3001]
+23:43:43.671343 [5]:[3009]
+23:43:43.671345 [6]:[2001]
+23:43:43.671347 [7]:[2009]
+23:43:43.671349 [8]:[3009]
+23:43:43.671351 [9]:[1009]
+23:43:43.671355 len(keys):[12]
+23:43:43.671357 minGid[1002]
+23:43:43.671360 len(keys):[12]
+23:43:43.671363 minGid[2000]
+23:43:43.671366 len(keys):[12]
+23:43:43.671368 minGid[1002]
+23:43:43.671372 len(keys):[12]
+23:43:43.671374 minGid[2000]
+23:43:43.671378 len(keys):[12]
+23:43:43.671380 minGid[1002]
+23:43:43.671383 len(keys):[12]
+23:43:43.671385 minGid[2000]
+23:43:43.671389 len(keys):[12]
+23:43:43.671391 minGid[1002]
+23:43:43.671395 len(keys):[12]
+23:43:43.671397 minGid[2000]
+23:43:43.671400 len(keys):[12]
+23:43:43.671403 minGid[1002]
+23:43:43.671406 len(keys):[12]
+23:43:43.671408 minGid[2000]
+23:43:43.671410 before shardRebalance
+23:43:43.671414 len(keys):[12]
+23:43:43.671418 len(keys):[12]
+23:43:43.671421 min:[0], max[2]
+23:43:43.671424 len(keys):[12]
+23:43:43.671428 len(keys):[12]
+23:43:43.671430 min:[0], max[1]
+23:43:43.671432 join command handled finished
+23:43:43.671439 apply a msg.command
+23:43:43.671441 handle a join command
+23:43:43.671445 append for [1003]
+23:43:43.671447 append for [2003]
+23:43:43.671462 append for [3003]
+23:43:43.671468 [0]:[2000]
+23:43:43.671469 [1]:[3000]
+23:43:43.671471 [2]:[1001]
+23:43:43.671473 [3]:[1000]
+23:43:43.671476 [4]:[3001]
+23:43:43.671478 [5]:[1002]
+23:43:43.671479 [6]:[2001]
+23:43:43.671481 [7]:[2009]
+23:43:43.671483 [8]:[3009]
+23:43:43.671485 [9]:[1009]
+23:43:43.671490 len(keys):[15]
+23:43:43.671493 minGid[1003]
+23:43:43.671497 len(keys):[15]
+23:43:43.671499 minGid[2000]
+23:43:43.671503 len(keys):[15]
+23:43:43.671505 minGid[1003]
+23:43:43.671512 len(keys):[15]
+23:43:43.671514 minGid[2000]
+23:43:43.671518 len(keys):[15]
+23:43:43.671520 minGid[1003]
+23:43:43.671525 len(keys):[15]
+23:43:43.671527 minGid[2000]
+23:43:43.671532 len(keys):[15]
+23:43:43.671534 minGid[1003]
+23:43:43.671538 len(keys):[15]
+23:43:43.671541 minGid[2000]
+23:43:43.671545 len(keys):[15]
+23:43:43.671547 minGid[1003]
+23:43:43.671552 len(keys):[15]
+23:43:43.671554 minGid[2000]
+23:43:43.671556 before shardRebalance
+23:43:43.671559 len(keys):[15]
+23:43:43.671565 len(keys):[15]
+23:43:43.671567 min:[0], max[1]
+23:43:43.671569 join command handled finished
+23:43:43.671571 apply a msg.command
+23:43:43.671573 handle a join command
+23:43:43.671578 append for [1004]
+23:43:43.671580 append for [2004]
+23:43:43.671582 append for [3004]
+23:43:43.671584 [0]:[2000]
+23:43:43.671586 [1]:[3000]
+23:43:43.671588 [2]:[1001]
+23:43:43.671590 [3]:[1000]
+23:43:43.671592 [4]:[3001]
+23:43:43.671594 [5]:[1002]
+23:43:43.671596 [6]:[2001]
+23:43:43.671598 [7]:[2009]
+23:43:43.671600 [8]:[3009]
+23:43:43.671602 [9]:[1009]
+23:43:43.671606 len(keys):[18]
+23:43:43.671608 minGid[1003]
+23:43:43.671613 len(keys):[18]
+23:43:43.671616 minGid[1004]
+23:43:43.671620 len(keys):[18]
+23:43:43.671622 minGid[1003]
+23:43:43.671627 len(keys):[18]
+23:43:43.671629 minGid[1004]
+23:43:43.671634 len(keys):[18]
+23:43:43.671636 minGid[1003]
+23:43:43.671641 len(keys):[18]
+23:43:43.671643 minGid[1004]
+23:43:43.671648 len(keys):[18]
+23:43:43.671650 minGid[1003]
+23:43:43.671654 len(keys):[18]
+23:43:43.671657 minGid[1004]
+23:43:43.671661 len(keys):[18]
+23:43:43.671663 minGid[1003]
+23:43:43.671668 len(keys):[18]
+23:43:43.671670 minGid[1004]
+23:43:43.671672 before shardRebalance
+23:43:43.671676 len(keys):[18]
+23:43:43.671680 len(keys):[18]
+23:43:43.671683 min:[0], max[1]
+23:43:43.671685 join command handled finished
+23:43:43.671687 apply a msg.command
+23:43:43.671689 handle a join command
+23:43:43.671693 append for [3005]
+23:43:43.671695 append for [1005]
+23:43:43.671697 append for [2005]
+23:43:43.671699 [0]:[1004]
+23:43:43.671701 [1]:[3000]
+23:43:43.671703 [2]:[1001]
+23:43:43.671705 [3]:[1000]
+23:43:43.671707 [4]:[3001]
+23:43:43.671709 [5]:[1002]
+23:43:43.671711 [6]:[2001]
+23:43:43.671713 [7]:[2009]
+23:43:43.671715 [8]:[3009]
+23:43:43.671717 [9]:[1009]
+23:43:43.671722 len(keys):[21]
+23:43:43.671724 minGid[1003]
+23:43:43.671730 len(keys):[21]
+23:43:43.671732 minGid[1004]
+23:43:43.671736 len(keys):[21]
+23:43:43.671739 minGid[1003]
+23:43:43.671745 len(keys):[21]
+23:43:43.671747 minGid[1004]
+23:43:43.671752 len(keys):[21]
+23:43:43.671755 minGid[1003]
+23:43:43.671760 len(keys):[21]
+23:43:43.671762 minGid[1004]
+23:43:43.671767 len(keys):[21]
+23:43:43.671769 minGid[1003]
+23:43:43.671775 len(keys):[21]
+23:43:43.671778 minGid[1004]
+23:43:43.671782 len(keys):[21]
+23:43:43.671785 minGid[1003]
+23:43:43.671790 len(keys):[21]
+23:43:43.671792 minGid[1004]
+23:43:43.671794 before shardRebalance
+23:43:43.671798 len(keys):[21]
+23:43:43.671803 len(keys):[21]
+23:43:43.671806 min:[0], max[1]
+23:43:43.671808 join command handled finished
+23:43:43.671814 apply a msg.command
+23:43:43.671816 handle a join command
+23:43:43.671823 append for [1006]
+23:43:43.671825 append for [2006]
+23:43:43.671827 append for [3006]
+23:43:43.671829 [0]:[1004]
+23:43:43.671831 [1]:[3000]
+23:43:43.671833 [2]:[1001]
+23:43:43.671835 [3]:[1000]
+23:43:43.671837 [4]:[3001]
+23:43:43.671839 [5]:[1002]
+23:43:43.671841 [6]:[2001]
+23:43:43.671843 [7]:[2009]
+23:43:43.671845 [8]:[3009]
+23:43:43.671850 [9]:[1009]
+23:43:43.671856 len(keys):[24]
+23:43:43.671858 minGid[1003]
+23:43:43.671863 len(keys):[24]
+23:43:43.671866 minGid[1004]
+23:43:43.671871 len(keys):[24]
+23:43:43.671874 minGid[1003]
+23:43:43.671880 len(keys):[24]
+23:43:43.671883 minGid[1004]
+23:43:43.671888 len(keys):[24]
+23:43:43.671890 minGid[1003]
+23:43:43.671896 len(keys):[24]
+23:43:43.671898 minGid[1004]
+23:43:43.671903 len(keys):[24]
+23:43:43.671906 minGid[1003]
+23:43:43.671912 len(keys):[24]
+23:43:43.671915 minGid[1004]
+23:43:43.671920 len(keys):[24]
+23:43:43.671922 minGid[1003]
+23:43:43.671927 len(keys):[24]
+23:43:43.671930 minGid[1004]
+23:43:43.671932 before shardRebalance
+23:43:43.671937 len(keys):[24]
+23:43:43.671942 len(keys):[24]
+23:43:43.671944 min:[0], max[1]
+23:43:43.671946 join command handled finished
+23:43:43.671948 apply a msg.command
+23:43:43.671950 handle a join command
+23:43:43.671955 append for [1007]
+23:43:43.671958 append for [2007]
+23:43:43.671960 append for [3007]
+23:43:43.671963 [0]:[1004]
+23:43:43.672003 [1]:[3000]
+23:43:43.672005 [2]:[1001]
+23:43:43.672007 [3]:[1000]
+23:43:43.672009 [4]:[3001]
+23:43:43.672011 [5]:[1002]
+23:43:43.672014 [6]:[2001]
+23:43:43.672016 [7]:[2009]
+23:43:43.672018 [8]:[3009]
+23:43:43.672020 [9]:[1009]
+23:43:43.672028 len(keys):[27]
+23:43:43.672031 minGid[1003]
+23:43:43.672038 len(keys):[27]
+23:43:43.672042 minGid[1004]
+23:43:43.672051 len(keys):[27]
+23:43:43.672054 minGid[1003]
+23:43:43.672061 len(keys):[27]
+23:43:43.672064 minGid[1004]
+23:43:43.672071 len(keys):[27]
+23:43:43.672075 minGid[1003]
+23:43:43.672089 len(keys):[27]
+23:43:43.672093 minGid[1004]
+23:43:43.672102 len(keys):[27]
+23:43:43.672106 minGid[1003]
+23:43:43.672138 len(keys):[27]
+23:43:43.672144 minGid[1004]
+23:43:43.672156 len(keys):[27]
+23:43:43.672164 minGid[1003]
+23:43:43.672182 len(keys):[27]
+23:43:43.672187 minGid[1004]
+23:43:43.672189 before shardRebalance
+23:43:43.672201 len(keys):[27]
+23:43:43.672214 len(keys):[27]
+23:43:43.672218 min:[0], max[1]
+23:43:43.672221 join command handled finished
+23:43:43.672223 apply a msg.command
+23:43:43.672226 handle a join command
+23:43:43.672241 append for [3008]
+23:43:43.672248 append for [1008]
+23:43:43.672252 append for [2008]
+23:43:43.672254 [0]:[1004]
+23:43:43.672257 [1]:[3000]
+23:43:43.672259 [2]:[1001]
+23:43:43.672261 [3]:[1000]
+23:43:43.672264 [4]:[3001]
+23:43:43.672267 [5]:[1002]
+23:43:43.672269 [6]:[2001]
+23:43:43.672272 [7]:[2009]
+23:43:43.672274 [8]:[3009]
+23:43:43.672276 [9]:[1009]
+23:43:43.672285 len(keys):[30]
+23:43:43.672289 minGid[1003]
+23:43:43.672296 len(keys):[30]
+23:43:43.672300 minGid[1004]
+23:43:43.672309 len(keys):[30]
+23:43:43.672312 minGid[1003]
+23:43:43.672320 len(keys):[30]
+23:43:43.672323 minGid[1004]
+23:43:43.672335 len(keys):[30]
+23:43:43.672339 minGid[1003]
+23:43:43.672349 len(keys):[30]
+23:43:43.672353 minGid[1004]
+23:43:43.672360 len(keys):[30]
+23:43:43.672364 minGid[1003]
+23:43:43.672377 len(keys):[30]
+23:43:43.672380 minGid[1004]
+23:43:43.672387 len(keys):[30]
+23:43:43.672391 minGid[1003]
+23:43:43.672398 len(keys):[30]
+23:43:43.672401 minGid[1004]
+23:43:43.672403 before shardRebalance
+23:43:43.672410 len(keys):[30]
+23:43:43.672421 len(keys):[30]
+23:43:43.672424 min:[0], max[1]
+23:43:43.672426 join command handled finished
+23:43:43.672515 apply a msg.command
+23:43:43.672536 len(keys):[28]
+23:43:43.672544 len(keys):[28]
+23:43:43.672556 len(keys):[28]
+23:43:43.672563 len(keys):[28]
+23:43:43.672566 min:[0], max[1]
+23:43:43.672568 apply a msg.command
+23:43:43.672598 len(keys):[26]
+23:43:43.672608 len(keys):[26]
+23:43:43.672614 len(keys):[26]
+23:43:43.672621 len(keys):[26]
+23:43:43.672627 len(keys):[26]
+23:43:43.672638 len(keys):[26]
+23:43:43.672642 min:[0], max[1]
+23:43:43.672653 apply a msg.command
+23:43:43.672663 len(keys):[24]
+23:43:43.672669 len(keys):[24]
+23:43:43.672675 len(keys):[24]
+23:43:43.672681 len(keys):[24]
+23:43:43.672684 min:[0], max[1]
+23:43:43.672686 apply a msg.command
+23:43:43.672700 len(keys):[22]
+23:43:43.672706 len(keys):[22]
+23:43:43.672712 len(keys):[22]
+23:43:43.672717 len(keys):[22]
+23:43:43.672723 len(keys):[22]
+23:43:43.672738 len(keys):[22]
+23:43:43.672741 min:[0], max[1]
+23:43:43.672743 apply a msg.command
+23:43:43.672752 len(keys):[20]
+23:43:43.672757 len(keys):[20]
+23:43:43.672763 len(keys):[20]
+23:43:43.672772 len(keys):[20]
+23:43:43.672775 min:[0], max[1]
+23:43:43.672777 apply a msg.command
+23:43:43.672785 len(keys):[18]
+23:43:43.672791 len(keys):[18]
+23:43:43.672796 len(keys):[18]
+23:43:43.672802 len(keys):[18]
+23:43:43.672808 len(keys):[18]
+23:43:43.672811 min:[0], max[1]
+23:43:43.672813 apply a msg.command
+23:43:43.672822 len(keys):[16]
+23:43:43.672831 len(keys):[16]
+23:43:43.672838 len(keys):[16]
+23:43:43.672843 len(keys):[16]
+23:43:43.672846 min:[0], max[1]
+23:43:43.672850 apply a msg.command
+23:43:43.672863 len(keys):[14]
+23:43:43.672870 len(keys):[14]
+23:43:43.672875 len(keys):[14]
+23:43:43.672881 len(keys):[14]
+23:43:43.672883 min:[0], max[1]
+23:43:43.672885 apply a msg.command
+23:43:43.672893 len(keys):[12]
+23:43:43.672898 len(keys):[12]
+23:43:43.672903 len(keys):[12]
+23:43:43.672908 len(keys):[12]
+23:43:43.672911 min:[0], max[1]
+23:43:43.672913 apply a msg.command
+23:43:43.672924 len(keys):[10]
+23:43:43.672933 len(keys):[10]
+23:43:43.672943 len(keys):[10]
+23:43:43.672948 len(keys):[10]
+23:43:43.672951 min:[1], max[1]
+23:43:43.673112 len(keys):[22]
+23:43:43.673196 min:[0], max[1]
+23:43:43.673223 apply a msg.command
+23:43:43.673256 len(keys):[20]
+23:43:43.673281 len(keys):[20]
+23:43:43.673307 len(keys):[20]
+23:43:43.673335 len(keys):[20]
+23:43:43.673359 min:[0], max[1]
+23:43:43.673403 apply a msg.command
+23:43:43.673479 len(keys):[18]
+23:43:43.673555 len(keys):[18]
+23:43:43.673615 len(keys):[18]
+23:43:43.673657 len(keys):[18]
+23:43:43.673697 len(keys):[18]
+23:43:43.673737 min:[0], max[1]
+23:43:43.673778 apply a msg.command
+23:43:43.673826 len(keys):[16]
+23:43:43.673865 len(keys):[16]
+23:43:43.673906 len(keys):[16]
+23:43:43.673946 len(keys):[16]
+23:43:43.673982 min:[0], max[1]
+23:43:43.674023 apply a msg.command
+23:43:43.674083 len(keys):[14]
+23:43:43.674187 len(keys):[14]
+23:43:43.674280 len(keys):[14]
+23:43:43.674326 len(keys):[14]
+23:43:43.674359 min:[0], max[1]
+23:43:43.674393 apply a msg.command
+23:43:43.674445 len(keys):[12]
+23:43:43.674535 len(keys):[12]
+23:43:43.674598 len(keys):[12]
+23:43:43.674645 len(keys):[12]
+23:43:43.674710 min:[0], max[1]
+23:43:43.674758 apply a msg.command
+23:43:43.674799 len(keys):[10]
+23:43:43.675946 len(keys):[10]
+23:43:43.676115 len(keys):[10]
+23:43:43.676221 len(keys):[10]
+23:43:43.676266 min:[1], max[1]
+23:43:43.677286 len(ck.servers)=[3]
+23:43:43.678780 client send a query request
+23:43:43.679010 recieved 'Query()'rpc from client, num:[-1]
+23:43:43.770049 apply a msg.command
+23:43:43.770097 Query() rpc get notify
+23:43:43.770201 client recieved response for Query() rpc
+  ... Passed
+Test: Minimal transfers after multijoins ...
+23:43:43.770224 len(ck.servers)=[3]
+23:43:43.770228 client send a query request
+23:43:43.770316 recieved 'Query()'rpc from client, num:[-1]
+23:43:43.770836 apply a msg.command
+23:43:43.770883 len(keys):[28]
+23:43:43.770896 len(keys):[28]
+23:43:43.770917 len(keys):[28]
+23:43:43.770929 len(keys):[28]
+23:43:43.770934 min:[0], max[1]
+23:43:43.770938 apply a msg.command
+23:43:43.770957 len(keys):[26]
+23:43:43.770966 len(keys):[26]
+23:43:43.770976 len(keys):[26]
+23:43:43.770985 len(keys):[26]
+23:43:43.770994 len(keys):[26]
+23:43:43.771005 len(keys):[26]
+23:43:43.771009 min:[0], max[1]
+23:43:43.771013 apply a msg.command
+23:43:43.771034 len(keys):[24]
+23:43:43.771042 len(keys):[24]
+23:43:43.771050 len(keys):[24]
+23:43:43.771059 len(keys):[24]
+23:43:43.771063 min:[0], max[1]
+23:43:43.771066 apply a msg.command
+23:43:43.771079 len(keys):[22]
+23:43:43.771093 len(keys):[22]
+23:43:43.771110 len(keys):[22]
+23:43:43.771122 len(keys):[22]
+23:43:43.771131 len(keys):[22]
+23:43:43.771139 len(keys):[22]
+23:43:43.771143 min:[0], max[1]
+23:43:43.771147 apply a msg.command
+23:43:43.771166 len(keys):[20]
+23:43:43.771175 len(keys):[20]
+23:43:43.771190 len(keys):[20]
+23:43:43.771198 len(keys):[20]
+23:43:43.771203 min:[0], max[1]
+23:43:43.771206 apply a msg.command
+23:43:43.771219 len(keys):[18]
+23:43:43.771239 len(keys):[18]
+23:43:43.771248 len(keys):[18]
+23:43:43.771256 len(keys):[18]
+23:43:43.771263 len(keys):[18]
+23:43:43.771267 min:[0], max[1]
+23:43:43.771270 apply a msg.command
+23:43:43.771287 len(keys):[16]
+23:43:43.771299 len(keys):[16]
+23:43:43.771306 len(keys):[16]
+23:43:43.771313 len(keys):[16]
+23:43:43.771317 min:[0], max[1]
+23:43:43.771323 apply a msg.command
+23:43:43.771334 len(keys):[14]
+23:43:43.771341 len(keys):[14]
+23:43:43.771349 len(keys):[14]
+23:43:43.771447 len(keys):[14]
+23:43:43.771458 min:[0], max[1]
+23:43:43.771462 apply a msg.command
+23:43:43.771933 apply a msg.command
+23:43:43.772076 len(keys):[12]
+23:43:43.772125 len(keys):[12]
+23:43:43.772158 len(keys):[12]
+23:43:43.772189 len(keys):[12]
+23:43:43.772216 min:[0], max[1]
+23:43:43.772244 apply a msg.command
+23:43:43.772279 len(keys):[10]
+23:43:43.772313 len(keys):[10]
+23:43:43.772444 len(keys):[10]
+23:43:43.772501 len(keys):[10]
+23:43:43.772554 min:[1], max[1]
+23:43:43.781099 apply a msg.command
+23:43:43.781144 Query() rpc get notify
+23:43:43.781307 client recieved response for Query() rpc
+23:43:43.781412 client send a join request
+23:43:43.870620 apply a msg.command
+23:43:43.870654 handle a join command
+23:43:43.871141 append for [11]
+23:43:43.871159 append for [12]
+23:43:43.871161 append for [13]
+23:43:43.871163 append for [14]
+23:43:43.871178 append for [15]
+23:43:43.871181 [0]:[1004]
+23:43:43.871183 [1]:[1008]
+23:43:43.871186 [2]:[1001]
+23:43:43.871191 [3]:[1000]
+23:43:43.871193 [4]:[1005]
+23:43:43.871195 [5]:[1002]
+23:43:43.871197 [6]:[1003]
+23:43:43.871199 [7]:[1006]
+23:43:43.871201 [8]:[1007]
+23:43:43.871203 [9]:[1009]
+23:43:43.871216 len(keys):[15]
+23:43:43.871218 minGid[11]
+23:43:43.871227 len(keys):[15]
+23:43:43.871229 minGid[12]
+23:43:43.871234 len(keys):[15]
+23:43:43.871236 minGid[11]
+23:43:43.871241 len(keys):[15]
+23:43:43.871243 minGid[12]
+23:43:43.871252 len(keys):[15]
+23:43:43.871254 minGid[11]
+23:43:43.871259 len(keys):[15]
+23:43:43.871262 minGid[12]
+23:43:43.871266 len(keys):[15]
+23:43:43.871269 minGid[11]
+23:43:43.871276 len(keys):[15]
+23:43:43.871278 minGid[12]
+23:43:43.871285 len(keys):[15]
+23:43:43.871287 minGid[11]
+23:43:43.871292 len(keys):[15]
+23:43:43.871295 minGid[12]
+23:43:43.871299 before shardRebalance
+23:43:43.871303 len(keys):[15]
+23:43:43.871308 len(keys):[15]
+23:43:43.871311 min:[0], max[1]
+23:43:43.871314 join command handled finished
+23:43:43.871743 apply a msg.command
+23:43:43.871753 apply a msg.command
+23:43:43.874781 waitChannel Server 2, Index:37 , ClientId 2437007664631181476, RequestId 17, Command Join, 
+23:43:43.874894 len(ck.servers)=[3]
+23:43:43.874900 client send a query request
+23:43:43.874965 recieved 'Query()'rpc from client, num:[-1]
+23:43:43.875061 apply a msg.command
+23:43:43.875068 apply a msg.command
+23:43:43.875071 handle a join command
+23:43:43.875080 append for [11]
+23:43:43.875083 append for [12]
+23:43:43.875086 append for [13]
+23:43:43.875089 append for [14]
+23:43:43.875094 append for [15]
+23:43:43.875097 [0]:[1004]
+23:43:43.875099 [1]:[1008]
+23:43:43.875101 [2]:[1001]
+23:43:43.875103 [3]:[1000]
+23:43:43.875106 [4]:[1005]
+23:43:43.875108 [5]:[1002]
+23:43:43.875111 [6]:[1003]
+23:43:43.875113 [7]:[1006]
+23:43:43.875115 [8]:[1007]
+23:43:43.875117 [9]:[1009]
+23:43:43.875130 len(keys):[15]
+23:43:43.875134 minGid[11]
+23:43:43.875140 len(keys):[15]
+23:43:43.875143 minGid[12]
+23:43:43.875172 len(keys):[15]
+23:43:43.875177 minGid[11]
+23:43:43.875183 len(keys):[15]
+23:43:43.875186 minGid[12]
+23:43:43.875191 len(keys):[15]
+23:43:43.875194 minGid[11]
+23:43:43.875199 len(keys):[15]
+23:43:43.875202 minGid[12]
+23:43:43.875208 len(keys):[15]
+23:43:43.875211 minGid[11]
+23:43:43.875215 len(keys):[15]
+23:43:43.875218 minGid[12]
+23:43:43.875223 len(keys):[15]
+23:43:43.875227 minGid[11]
+23:43:43.875233 len(keys):[15]
+23:43:43.875235 minGid[12]
+23:43:43.875237 before shardRebalance
+23:43:43.875244 len(keys):[15]
+23:43:43.875249 len(keys):[15]
+23:43:43.875253 min:[0], max[1]
+23:43:43.875256 join command handled finished
+23:43:43.971013 apply a msg.command
+23:43:43.971432 Query() rpc get notify
+23:43:43.971539 client recieved response for Query() rpc
+  ... Passed
+Test: Minimal transfers after multileaves ...
+23:43:43.971596 client send a leave request
+23:43:43.971358 apply a msg.command
+23:43:43.971361 apply a msg.command
+23:43:43.971746 handle a join command
+23:43:43.971766 append for [15]
+23:43:43.971782 append for [11]
+23:43:43.971798 append for [12]
+23:43:43.971813 append for [13]
+23:43:43.971931 append for [14]
+23:43:43.971969 [0]:[1004]
+23:43:43.971988 [1]:[1008]
+23:43:43.972005 [2]:[1001]
+23:43:43.972022 [3]:[1000]
+23:43:43.972063 [4]:[1005]
+23:43:43.972078 [5]:[1002]
+23:43:43.972133 [6]:[1003]
+23:43:43.972150 [7]:[1006]
+23:43:43.972203 [8]:[1007]
+23:43:43.972218 [9]:[1009]
+23:43:43.972241 len(keys):[15]
+23:43:43.972258 minGid[11]
+23:43:43.972277 len(keys):[15]
+23:43:43.972293 minGid[12]
+23:43:43.972311 len(keys):[15]
+23:43:43.972327 minGid[11]
+23:43:43.972345 len(keys):[15]
+23:43:43.972362 minGid[12]
+23:43:43.972380 len(keys):[15]
+23:43:43.972396 minGid[11]
+23:43:43.972414 len(keys):[15]
+23:43:43.972430 minGid[12]
+23:43:43.972448 len(keys):[15]
+23:43:43.972464 minGid[11]
+23:43:43.972482 len(keys):[15]
+23:43:43.972498 minGid[12]
+23:43:43.972516 len(keys):[15]
+23:43:43.972532 minGid[11]
+23:43:43.972550 len(keys):[15]
+23:43:43.972566 minGid[12]
+23:43:43.972582 before shardRebalance
+23:43:43.972600 len(keys):[15]
+23:43:43.972618 len(keys):[15]
+23:43:43.972634 min:[0], max[1]
+23:43:43.972650 join command handled finished
+23:43:44.071862 apply a msg.command
+23:43:44.071964 apply a msg.command
+23:43:44.072070 len(keys):[10]
+23:43:44.072091 len(keys):[10]
+23:43:44.072109 len(keys):[10]
+23:43:44.072127 len(keys):[10]
+23:43:44.072145 len(keys):[10]
+23:43:44.072163 len(keys):[10]
+23:43:44.072180 len(keys):[10]
+23:43:44.072198 len(keys):[10]
+23:43:44.072223 min:[0], max[2]
+23:43:44.072240 len(keys):[10]
+23:43:44.072258 len(keys):[10]
+23:43:44.072274 min:[1], max[1]
+23:43:44.072323 len(ck.servers)=[3]
+23:43:44.072360 client send a query request
+23:43:44.072522 recieved 'Query()'rpc from client, num:[-1]
+23:43:44.071967 apply a msg.command
+23:43:44.072648 len(keys):[10]
+23:43:44.072667 len(keys):[10]
+23:43:44.072684 len(keys):[10]
+23:43:44.072702 len(keys):[10]
+23:43:44.072719 len(keys):[10]
+23:43:44.072743 len(keys):[10]
+23:43:44.072767 len(keys):[10]
+23:43:44.072785 len(keys):[10]
+23:43:44.072801 min:[0], max[2]
+23:43:44.072818 len(keys):[10]
+23:43:44.072836 len(keys):[10]
+23:43:44.072852 min:[1], max[1]
+23:43:44.179764 apply a msg.command
+23:43:44.179799 Query() rpc get notify
+23:43:44.179856 client recieved response for Query() rpc
+  ... Passed
+Test: Check Same config on servers ...
+23:43:44.179865 len(ck.servers)=[3]
+23:43:44.179867 client send a query request
+23:43:44.179911 recieved 'Query()'rpc from client, num:[-1]
+23:43:44.180155 apply a msg.command
+23:43:44.180180 len(keys):[10]
+23:43:44.180187 len(keys):[10]
+23:43:44.180191 len(keys):[10]
+23:43:44.180195 len(keys):[10]
+23:43:44.180199 len(keys):[10]
+23:43:44.180202 len(keys):[10]
+23:43:44.180206 len(keys):[10]
+23:43:44.180210 len(keys):[10]
+23:43:44.180212 min:[0], max[2]
+23:43:44.180216 len(keys):[10]
+23:43:44.180220 len(keys):[10]
+23:43:44.180222 min:[1], max[1]
+23:43:44.180226 apply a msg.command
+23:43:44.192519 apply a msg.command
+23:43:44.192555 Query() rpc get notify
+23:43:44.192654 client recieved response for Query() rpc
+23:43:44.192662 len(ck.servers)=[3]
+23:43:44.192664 client send a query request
+23:43:44.287388 client send a query request
+23:43:44.287576 recieved 'Query()'rpc from client, num:[-1]
+23:43:44.287671 client send a query request
+23:43:44.287759 recieved 'Query()'rpc from client, num:[-1]
+23:43:44.388172 client send a query request
+23:43:44.399457 client send a query request
+23:43:44.399585 recieved 'Query()'rpc from client, num:[-1]
+23:43:44.399639 client send a query request
+23:43:44.399701 recieved 'Query()'rpc from client, num:[-1]
+23:43:44.500271 client send a query request
+23:43:44.543655 client send a query request
+23:43:44.543885 recieved 'Query()'rpc from client, num:[-1]
+23:43:44.543940 client send a query request
+23:43:44.543994 recieved 'Query()'rpc from client, num:[-1]
+23:43:44.644640 client send a query request
+23:43:44.686253 client send a query request
+23:43:44.686381 recieved 'Query()'rpc from client, num:[-1]
+23:43:44.686429 client send a query request
+23:43:44.686468 recieved 'Query()'rpc from client, num:[-1]
+23:43:44.787352 client send a query request
+23:43:44.819114 client send a query request
+23:43:44.819278 recieved 'Query()'rpc from client, num:[-1]
+23:43:44.819350 client send a query request
+23:43:44.819439 recieved 'Query()'rpc from client, num:[-1]
+23:43:44.920090 client send a query request
+23:43:44.938375 client send a query request
+23:43:44.938520 recieved 'Query()'rpc from client, num:[-1]
+23:43:44.938573 client send a query request
+23:43:44.938612 recieved 'Query()'rpc from client, num:[-1]
+23:43:45.038927 client send a query request
+23:43:45.071834 client send a query request
+23:43:45.071981 recieved 'Query()'rpc from client, num:[-1]
+23:43:45.072031 client send a query request
+23:43:45.072072 recieved 'Query()'rpc from client, num:[-1]
+23:43:45.172626 client send a query request
+23:43:45.188132 client send a query request
+23:43:45.188346 recieved 'Query()'rpc from client, num:[-1]
+23:43:45.188443 client send a query request
+23:43:45.188508 recieved 'Query()'rpc from client, num:[-1]
+23:43:45.288690 client send a query request
+23:43:45.288778 client send a query request
+23:43:45.288857 recieved 'Query()'rpc from client, num:[-1]
+23:43:45.288904 client send a query request
+23:43:45.288945 recieved 'Query()'rpc from client, num:[-1]
+23:43:45.389201 client send a query request
+23:43:45.460560 client send a query request
+23:43:45.460692 recieved 'Query()'rpc from client, num:[-1]
+23:43:45.460751 client send a query request
+23:43:45.460797 recieved 'Query()'rpc from client, num:[-1]
+23:43:45.561391 client send a query request
+23:43:45.619682 client send a query request
+23:43:45.619817 recieved 'Query()'rpc from client, num:[-1]
+23:43:45.619866 client send a query request
+23:43:45.619912 recieved 'Query()'rpc from client, num:[-1]
+23:43:45.720297 client send a query request
+23:43:45.785798 client send a query request
+23:43:45.785933 recieved 'Query()'rpc from client, num:[-1]
+23:43:45.785979 client send a query request
+23:43:45.786026 recieved 'Query()'rpc from client, num:[-1]
+23:43:45.886918 client send a query request
+23:43:45.937789 client send a query request
+23:43:45.937921 recieved 'Query()'rpc from client, num:[-1]
+23:43:45.937970 client send a query request
+23:43:45.938009 recieved 'Query()'rpc from client, num:[-1]
+23:43:46.038206 client send a query request
+23:43:46.117354 client send a query request
+23:43:46.118394 recieved 'Query()'rpc from client, num:[-1]
+23:43:46.118635 client send a query request
+23:43:46.118726 recieved 'Query()'rpc from client, num:[-1]
+23:43:46.219120 client send a query request
+23:43:46.297490 client send a query request
+23:43:46.297608 recieved 'Query()'rpc from client, num:[-1]
+23:43:46.297651 client send a query request
+23:43:46.297695 recieved 'Query()'rpc from client, num:[-1]
+23:43:46.398120 client send a query request
+23:43:46.486403 client send a query request
+23:43:46.486618 recieved 'Query()'rpc from client, num:[-1]
+23:43:46.486720 client send a query request
+23:43:46.486777 recieved 'Query()'rpc from client, num:[-1]
+23:43:46.587307 client send a query request
+23:43:46.686634 client send a query request
+23:43:46.686780 recieved 'Query()'rpc from client, num:[-1]
+23:43:46.686826 client send a query request
+23:43:46.686865 recieved 'Query()'rpc from client, num:[-1]
+23:43:46.787282 client send a query request
+23:43:46.831405 client send a query request
+23:43:46.831563 recieved 'Query()'rpc from client, num:[-1]
+23:43:46.831612 client send a query request
+23:43:46.831649 recieved 'Query()'rpc from client, num:[-1]
+23:43:46.932015 client send a query request
+23:43:46.954442 client send a query request
+23:43:46.954610 recieved 'Query()'rpc from client, num:[-1]
+23:43:46.954661 client send a query request
+23:43:46.954703 recieved 'Query()'rpc from client, num:[-1]
+23:43:47.055113 client send a query request
+23:43:47.155074 client send a query request
+23:43:47.155253 recieved 'Query()'rpc from client, num:[-1]
+23:43:47.155298 client send a query request
+23:43:47.155340 recieved 'Query()'rpc from client, num:[-1]
+23:43:47.255940 client send a query request
+23:43:47.262550 client send a query request
+23:43:47.262685 recieved 'Query()'rpc from client, num:[-1]
+23:43:47.262754 client send a query request
+23:43:47.262837 recieved 'Query()'rpc from client, num:[-1]
+23:43:47.364036 client send a query request
+23:43:47.461167 client send a query request
+23:43:47.461314 recieved 'Query()'rpc from client, num:[-1]
+23:43:47.461372 client send a query request
+23:43:47.461416 recieved 'Query()'rpc from client, num:[-1]
+23:43:47.562076 client send a query request
+23:43:47.591611 client send a query request
+23:43:47.591753 recieved 'Query()'rpc from client, num:[-1]
+23:43:47.591806 client send a query request
+23:43:47.591844 recieved 'Query()'rpc from client, num:[-1]
+23:43:47.692565 client send a query request
+23:43:47.730993 client send a query request
+23:43:47.731176 recieved 'Query()'rpc from client, num:[-1]
+23:43:47.731241 client send a query request
+23:43:47.731303 recieved 'Query()'rpc from client, num:[-1]
+23:43:47.832292 client send a query request
+23:43:47.892423 client send a query request
+23:43:47.892566 recieved 'Query()'rpc from client, num:[-1]
+23:43:47.892656 client send a query request
+23:43:47.892774 recieved 'Query()'rpc from client, num:[-1]
+23:43:47.994042 client send a query request
+23:43:48.053098 client send a query request
+23:43:48.053265 recieved 'Query()'rpc from client, num:[-1]
+23:43:48.053335 client send a query request
+23:43:48.053410 recieved 'Query()'rpc from client, num:[-1]
+23:43:48.154025 client send a query request
+23:43:48.193721 client send a query request
+23:43:48.193849 recieved 'Query()'rpc from client, num:[-1]
+23:43:48.193898 client send a query request
+23:43:48.193945 recieved 'Query()'rpc from client, num:[-1]
+23:43:48.294665 client send a query request
+23:43:48.392959 client send a query request
+23:43:48.393167 recieved 'Query()'rpc from client, num:[-1]
+23:43:48.393211 client send a query request
+23:43:48.393259 recieved 'Query()'rpc from client, num:[-1]
+23:43:48.455810 apply a msg.command
+23:43:48.455845 apply a msg.command
+23:43:48.455883 Query() rpc get notify
+23:43:48.455940 client recieved response for Query() rpc
+  ... Passed
+FAIL
+exit status 1
+FAIL	6.824/shardctrler	7.134s
