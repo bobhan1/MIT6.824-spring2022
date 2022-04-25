@@ -3,9 +3,14 @@ package kvraft
 import (
 	"6.824/labrpc"
 	mathrand "math/rand"
+	"time"
 )
 import "crypto/rand"
 import "math/big"
+
+const (
+	waitIntervals = time.Millisecond * 20
+)
 
 type Clerk struct {
 	servers []*labrpc.ClientEnd
@@ -74,6 +79,7 @@ func (ck *Clerk) Get(key string) string {
 				DPrintf("WRONG LEADER!")
 			}
 		}
+		time.Sleep(waitIntervals)
 		leaderId = ck.nextLeader()
 	}
 }
@@ -118,6 +124,7 @@ func (ck *Clerk) PutAppend(key string, value string, op string) {
 			break
 		}
 		//change to next leader keep asking
+		time.Sleep(waitIntervals)
 		leaderId = ck.nextLeader()
 	}
 }

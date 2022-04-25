@@ -56,7 +56,7 @@ type LeaveArgs struct {
 }
 
 type LeaveReply struct {
-	WrongLeader bool
+	// WrongLeader bool
 	Err         Err
 }
 

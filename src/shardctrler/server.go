@@ -175,17 +175,3 @@ func StartServer(servers []*labrpc.ClientEnd, me int, persister *raft.Persister)
 
 	return sc
 }
-
-
-// return true if message is duplicate
-func (sc *ShardCtrler) checkDuplicateRequest(newClientId int64, newRequestId int) bool {
-	
-	sc.mu.Lock()	
-	lastRequestId, ifClientInRecord := sc.lastRequestId[newClientId]
-	sc.mu.Unlock()
-	
-	if !ifClientInRecord {
-		return false
-	}
-	return newRequestId <= lastRequestId
-}

@@ -6,6 +6,7 @@ const (
 	ErrWrongLeader = "ErrWrongLeader"
 )
 
+
 type Err string
 
 // Put or Append

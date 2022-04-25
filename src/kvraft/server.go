@@ -10,6 +10,10 @@ import (
 )
 
 
+const (
+	timeoutIntervals = time.Millisecond * 200
+)
+
 type Op struct {
 	// Your definitions here.
 	// Field names must start with capital letters,
@@ -74,25 +78,26 @@ func (kv *KVServer) Get(args *GetArgs, reply *GetReply) {
 
 	// timeout
 	select {
-	case <-time.After(time.Millisecond * 200):
-		DPrintf("GET timeout From Client %d (Request %d) To Server %d, key %v, raftIndex %d",
-			args.ClientId, args.RequestId, kv.me, op.Key, index)
+	case <-time.After(timeoutIntervals):
+		// DPrintf("GET timeout From Client %d (Request %d) To Server %d, key %v, raftIndex %d", args.ClientId, args.RequestId, kv.me, op.Key, index)
 
-		_, isLeader := kv.rf.GetState()
+		reply.Err = ErrWrongLeader
 
-		//find duplicate
-		if kv.checkDuplicateRequest(op.ClientId, op.RequestId) && isLeader {
-			value, exist := kv.ExecuteGet(op)
-			if exist {
-				reply.Err = OK
-				reply.Value = value
-			} else {
-				reply.Err = ErrNoKey
-				reply.Value = ""
-			}
-		} else {
-			reply.Err = ErrWrongLeader
-		}
+		// _, isLeader := kv.rf.GetState()
+
+		// //find duplicate
+		// if kv.checkDuplicateRequest(op.ClientId, op.RequestId) && isLeader {
+		// 	value, exist := kv.ExecuteGet(op)
+		// 	if exist {
+		// 		reply.Err = OK
+		// 		reply.Value = value
+		// 	} else {
+		// 		reply.Err = ErrNoKey
+		// 		reply.Value = ""
+		// 	}
+		// } else {
+		// 	reply.Err = ErrWrongLeader
+		// }
 	case raftCommitOp := <-waitCh:
 		DPrintf("waitChannel Server %d, Index:%d , ClientId %d, RequestId %d, Command %v, Key :%v, Value :%v",
 			kv.me, index, op.ClientId, op.RequestId, op.Command, op.Key, op.Value)
@@ -157,15 +162,16 @@ func (kv *KVServer) PutAppend(args *PutAppendArgs, reply *PutAppendReply) {
 	kv.mu.Unlock()
 
 	select {
-	case <-time.After(time.Millisecond * 200):
-		DPrintf("[TIMEOUT PUTAPPEND]Server %d , Index:%d , ClientId %d, RequestId %d, Opreation %v, Key :%v, Value :%v",
-			kv.me, raftIndex, op.ClientId, op.RequestId, op.Command, op.Key, op.Value)
+	case <-time.After(timeoutIntervals):
+		// DPrintf("[TIMEOUT PUTAPPEND]Server %d , Index:%d , ClientId %d, RequestId %d, Opreation %v, Key :%v, Value :%v", kv.me, raftIndex, op.ClientId, op.RequestId, op.Command, op.Key, op.Value)
 
-		if kv.checkDuplicateRequest(op.ClientId, op.RequestId) {
-			reply.Err = OK
-		} else {
-			reply.Err = ErrWrongLeader
-		}
+		reply.Err = ErrWrongLeader
+
+		// if kv.checkDuplicateRequest(op.ClientId, op.RequestId) {
+		// 	reply.Err = OK
+		// } else {
+		// 	reply.Err = ErrWrongLeader
+		// }
 
 	case raftCommitOp := <-ch:
 		DPrintf("WaitCha Server %d,Index:%d, ClientId %d, RequestId %d, Opreation %v, Key :%v, Value :%v",
@@ -215,7 +221,8 @@ func (kv *KVServer) killed() bool {
 // in order to allow Raft to garbage-collect its log. if maxraftstate is -1,
 // you don't need to snapshot.
 // StartKVServer() must return quickly, so it should start goroutines
-// for any long-running work.
+// for any long-running work.//t.lenovo.cn/3EzqQn
+
 //
 func StartKVServer(servers []*labrpc.ClientEnd, me int, persister *raft.Persister, maxraftstate int) *KVServer {
 	DPrintf("[InitKVServer---]Server %d", me)
