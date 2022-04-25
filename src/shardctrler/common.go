@@ -30,11 +30,18 @@ type Config struct {
 
 const (
 	OK = "OK"
+	ErrWrongLeader = "ErrWrongLeader"
 )
 
 type Err string
 
+type CommonArgsFields struct {
+	ClientId  int64
+	RequestId int
+}
+
 type JoinArgs struct {
+	CommonArgsFields
 	Servers map[int][]string // new GID -> servers mappings
 }
 
@@ -44,6 +51,7 @@ type JoinReply struct {
 }
 
 type LeaveArgs struct {
+	CommonArgsFields
 	GIDs []int
 }
 
@@ -53,6 +61,7 @@ type LeaveReply struct {
 }
 
 type MoveArgs struct {
+	CommonArgsFields
 	Shard int
 	GID   int
 }
@@ -63,6 +72,7 @@ type MoveReply struct {
 }
 
 type QueryArgs struct {
+	CommonArgsFields
 	Num int // desired config number
 }
 
