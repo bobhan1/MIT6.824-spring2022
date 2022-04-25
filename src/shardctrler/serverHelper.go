@@ -85,7 +85,7 @@ func (sc *ShardCtrler) SendMsgToWaitChan(op Op, raftIndex int) bool {
 }
 
 func (sc *ShardCtrler) getConfig(num int) Config {
-	if num <= 0 || num > len(sc.configs) {
+	if num < 0 || num >= len(sc.configs) {
 		return sc.configs[len(sc.configs)-1].Copy()
 	} else{
 		return sc.configs[num].Copy()

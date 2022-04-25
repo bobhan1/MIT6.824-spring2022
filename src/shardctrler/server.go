@@ -198,7 +198,7 @@ func (sc *ShardCtrler) Query(args *QueryArgs, reply *QueryReply) {
 	}
 
 	Num := args.Num
-	if Num >= 0 && Num <= len(sc.configs) {
+	if Num >= 0 && Num < len(sc.configs) {
 		DPrintf("reply with config")
 		reply.Err = OK
 		reply.Config = sc.getConfig(Num)
@@ -289,7 +289,7 @@ func StartServer(servers []*labrpc.ClientEnd, me int, persister *raft.Persister)
 	sc.configs[0].Groups = map[int][]string{}
 
 	labgob.Register(Op{})
-	sc.applyCh = make(chan raft.ApplyMsg, 5)
+	sc.applyCh = make(chan raft.ApplyMsg, 10)
 	sc.rf = raft.Make(servers, me, persister, sc.applyCh)
 
 	// Your code here.
