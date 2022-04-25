@@ -73,8 +73,78 @@ func (sc *ShardCtrler) SendMsgToWaitChan(op Op, raftIndex int) bool {
 
 func (sc *ShardCtrler) getConfig(num int) Config {
 	if num <= 0 || num > len(sc.configs) {
-		return sc.configs[len(sc.configs)-1].copy()
+		return sc.configs[len(sc.configs)-1].Copy()
 	} else{
-		return sc.configs[num].copy()
+		return sc.configs[num].Copy()
 	}
+}
+
+
+// get the largest group currently 
+func (config *Config) getMaxGroup() (int, int){
+	maxGid, maxSize := -1, 0
+	count := map[int]int{}
+	num := len(config.Shards) - 1
+	for shard, gid := range config.Shards{
+		if _, ok := count[gid];!ok{
+			count[gid] = 1
+		} else{
+			count[gid] = count[gid] + 1
+		}
+	}
+	for gid, val := range count{
+		if val > maxSize {
+			maxSize = val
+			maxGid = gid
+		}
+	}
+	return maxGid, maxSize
+}
+
+func (config *Config) getMinGroup() (int, int){
+	minGid, minSize := -1, 0
+	count := map[int]int{}
+	num := len(config.Shards) - 1
+	for shard, gid := range config.Shards{
+		if _, ok := count[gid];!ok{
+			count[gid] = 1
+		} else{
+			count[gid] = count[gid] + 1
+		}
+	}
+	for gid, val := range count{
+		if val < minSize {
+			minSize = val
+			minGid = gid
+		}
+	}
+	return minGid, minSize
+}
+
+
+// migrate a shard from srcGroup to dstGroup
+func (config *Config) shardMigration(srcGroup int, dstGroup int){
+	for shard, gid := range config.Shards{
+		if gid == srcGroup {
+			config.Shards[shard] = dstGroup
+			return 
+		}
+	}	
+}
+
+
+// balance the shards between groups until maxSize <= minSize + 1
+func (sc *ShardCtrler) shardRebalance(){
+	num := len(sc.configs) - 1
+	newConfig := sc.configs[num].Copy()
+	for {
+		
+		maxGid, maxSize := newConfig.getMaxGroup()
+		minGid, minSize := newConfig.getMinGroup()
+		if maxSize <= minSize + 1 {
+			return 
+		} 
+		newConfig.shardMigration(maxGid, minGid)
+	}
+	sc.configs=append(sc.configs, newConfig)
 }
