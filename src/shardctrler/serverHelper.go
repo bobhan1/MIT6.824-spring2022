@@ -2,6 +2,7 @@ package shardctrler
 
 import (
 	"6.824/raft"
+	"sort"
 )
 
 // ApplyLoop keep fetching command or snapshot from applyCha
@@ -79,20 +80,29 @@ func (sc *ShardCtrler) getConfig(num int) Config {
 	}
 }
 
-
-// get the largest group currently 
-func (config *Config) getMaxGroup() (int, int){
-	maxGid, maxSize := -1, 0
+func (config *Config) getGIDCountMap() ([]int, map[int]int){
 	count := map[int]int{}
-	num := len(config.Shards) - 1
+	keys := []int{}
 	for shard, gid := range config.Shards{
 		if _, ok := count[gid];!ok{
 			count[gid] = 1
+			keys = append(keys, gid)
 		} else{
 			count[gid] = count[gid] + 1
 		}
 	}
-	for gid, val := range count{
+	sort.Ints(keys)
+	// ensure that the operations executed the same results on every raft node
+	return keys, count
+}
+
+
+// get the largest group currently 
+func (config *Config) getMaxGroup() (int, int){
+	maxGid, maxSize := -1, 0
+	keys, count := config.getGIDCountMap()
+	for _, gid := range count{
+		val := count[gid]
 		if val > maxSize {
 			maxSize = val
 			maxGid = gid
@@ -103,16 +113,9 @@ func (config *Config) getMaxGroup() (int, int){
 
 func (config *Config) getMinGroup() (int, int){
 	minGid, minSize := -1, 0
-	count := map[int]int{}
-	num := len(config.Shards) - 1
-	for shard, gid := range config.Shards{
-		if _, ok := count[gid];!ok{
-			count[gid] = 1
-		} else{
-			count[gid] = count[gid] + 1
-		}
-	}
-	for gid, val := range count{
+	keys, count := config.getGIDCountMap()
+	for _, gid := range count{
+		val := count[gid]
 		if val < minSize {
 			minSize = val
 			minGid = gid
@@ -132,19 +135,60 @@ func (config *Config) shardMigration(srcGroup int, dstGroup int){
 	}	
 }
 
-
 // balance the shards between groups until maxSize <= minSize + 1
-func (sc *ShardCtrler) shardRebalance(){
-	num := len(sc.configs) - 1
-	newConfig := sc.configs[num].Copy()
+func (config *Config) shardRebalance(){
+	if len(config.Groups) == 0 {
+		return 
+	}
 	for {
-		
-		maxGid, maxSize := newConfig.getMaxGroup()
-		minGid, minSize := newConfig.getMinGroup()
+		// migrate a shard from a largest group to a smallest group
+		maxGid, maxSize := config.getMaxGroup()
+		minGid, minSize := config.getMinGroup()
 		if maxSize <= minSize + 1 {
 			return 
 		} 
-		newConfig.shardMigration(maxGid, minGid)
+		config.shardMigration(maxGid, minGid)
 	}
-	sc.configs=append(sc.configs, newConfig)
+}
+
+
+func (sc *ShardCtrler) join(servers map[int][]string) {
+	newConfig := sc.getConfig(-1)
+	newConfig.Num++
+	for k, v := range servers {
+		newConfig.Groups[k] = append([]string{}, v...)
+	}
+	newConfig.shardRebalance()
+	sc.configs = append(sc.configs, newConfig)
+}
+
+func (sc *ShardCtrler) leave(GIDs []int) {
+	newConfig := sc.getConfig(-1)
+	newConfig.Num++
+	newShards := make([]int, len(GIDs))
+	for _, gid := range GIDs {
+		delete(newConfig.Groups, gid)
+		for shard, gid_ := range newConfig.Shards {
+			if gid_ == gid {
+				newConfig.Shards[shard] = 0
+				newShards = append(newShards, shard)
+			}
+		}
+	}
+	if len(newConfig.Groups) > 0{
+		for _, shard := range newShards {
+			minGid, _ := newConfig.getMinGroup()
+			newConfig.Shards[shard] = minGid
+		} 
+	}
+	newConfig.shardRebalance()
+	sc.configs = append(sc.configs, newConfig)
+}
+
+func (sc *ShardCtrler) move(shard int, GID int) {
+	newConfig := sc.getConfig(-1)
+	newConfig.Num++
+	newConfig.Shards[shard] = GID
+	newConfig.shardRebalance()
+	sc.configs = append(sc.configs, newConfig)
 }

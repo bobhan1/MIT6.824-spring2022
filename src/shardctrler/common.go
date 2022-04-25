@@ -58,7 +58,7 @@ type JoinArgs struct {
 }
 
 type JoinReply struct {
-	WrongLeader bool
+	// WrongLeader bool
 	Err         Err
 }
 
@@ -79,7 +79,7 @@ type MoveArgs struct {
 }
 
 type MoveReply struct {
-	WrongLeader bool
+	// WrongLeader bool
 	Err         Err
 }
 
@@ -89,7 +89,7 @@ type QueryArgs struct {
 }
 
 type QueryReply struct {
-	WrongLeader bool
+	// WrongLeader bool
 	Err         Err
 	Config      Config
 }
