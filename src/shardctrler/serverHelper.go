@@ -43,30 +43,31 @@ func (sc *ShardCtrler) ApplyCommand(message raft.ApplyMsg) {
 	}
 
 	op := message.Command.(Op)
-
 	// duplicate command will not be executed
 	if !sc.checkDuplicateRequest(op.ClientId, op.RequestId) {
 		// execute command
+		sc.mu.Lock()
 		switch op.Command {
 		case "Join":
 			DPrintf("handle a join command")
-			sc.mu.Lock()
+			
 			sc.join(op.Servers)
 			sc.lastRequestId[op.ClientId] = op.RequestId
-			sc.mu.Unlock()
+			//sc.mu.Unlock()
 			DPrintf("join command handled finished")
 		case "Leave":
-			sc.mu.Lock()
+			//sc.mu.Lock()
 			sc.leave(op.GIDs)
 			sc.lastRequestId[op.ClientId] = op.RequestId
-			sc.mu.Unlock()
+			//sc.mu.Unlock()
 		case "Move":
-			sc.mu.Lock()
+			//sc.mu.Lock()
 			sc.move(op.Shard, op.GID)
 			sc.lastRequestId[op.ClientId] = op.RequestId
-			sc.mu.Unlock()
+			//sc.mu.Unlock()
 		case "Query":
 		}
+		sc.mu.Unlock()
 	}
 	// Send message to the chan of op.ClientId
 	sc.SendMsgToWaitChan(op, message.CommandIndex)

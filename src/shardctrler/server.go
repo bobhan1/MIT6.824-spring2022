@@ -198,10 +198,16 @@ func (sc *ShardCtrler) Query(args *QueryArgs, reply *QueryReply) {
 	}
 
 	Num := args.Num
-	if Num >= 0 && Num < len(sc.configs) {
+	sc.mu.Lock()
+	curLen := len(sc.configs)
+	sc.mu.Unlock()
+	
+	if Num >= 0 && Num <  curLen{
 		DPrintf("reply with config")
 		reply.Err = OK
+		sc.mu.Lock()
 		reply.Config = sc.getConfig(Num)
+		sc.mu.Unlock()
 		return 
 	}
 	_, isLeader := sc.rf.GetState()
@@ -238,7 +244,9 @@ func (sc *ShardCtrler) Query(args *QueryArgs, reply *QueryReply) {
 		DPrintf("Query() rpc get notify")
 		if raftCommitOp.ClientId == op.ClientId && raftCommitOp.RequestId == op.RequestId {
 			reply.Err = OK
+			sc.mu.Lock()
 			reply.Config = sc.getConfig(Num)
+			sc.mu.Unlock()
 		} else {
 			reply.Err = ErrWrongLeader
 		}
