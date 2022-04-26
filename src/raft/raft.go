@@ -1143,6 +1143,8 @@ func (rf *Raft) applyLogMessage() {
 //
 func Make(peers []*labrpc.ClientEnd, me int,
 	persister *Persister, applyCh chan ApplyMsg) *Raft {
+	DPrintf("make new raft node")
+
 	rf := &Raft{}
 	rf.peers = peers
 	rf.persister = persister
@@ -1174,11 +1176,10 @@ func Make(peers []*labrpc.ClientEnd, me int,
 		CommandIndex: 0,
 	}
 	rf.applyChan <- msg
-
 	rf.applyChecker = false
 	rf.applyCond = sync.NewCond(&rf.mu)
 	rf.restart = false
-
+	DPrintf("===============")
 	// initialize from state persisted before a crash
 	rf.readPersist(persister.ReadRaftState())
 	rf.snapshot = persister.ReadSnapshot()
@@ -1206,6 +1207,6 @@ func Make(peers []*labrpc.ClientEnd, me int,
 	// start ticker goroutine to start elections
 	go rf.ticker()
 	go rf.applyLogMessage()
-
+	DPrintf("finished")
 	return rf
 }

@@ -83,9 +83,9 @@ func (kv *KVServer) ExecuteGet(op Op) (string, bool) {
 //check if request is duplicated, if yes return true
 func (kv *KVServer) checkDuplicateRequest(newClientId int64, newRequestId int) bool {
 	kv.mu.Lock()
-	defer kv.mu.Unlock()
 	// return true if message is duplicate
 	lastRequestId, ifClientInRecord := kv.lastRequestId[newClientId]
+	kv.mu.Unlock()
 	if !ifClientInRecord {
 		return false
 	}

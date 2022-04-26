@@ -67,20 +67,22 @@ func (ck *Clerk) Get(key string) string {
 		reply := GetReply{}
 
 		ok := ck.servers[leaderId].Call("KVServer.Get", &args, &reply)
-		if ok {
-			if reply.Err == ErrNoKey {
-				DPrintf("NO KEY FOUND")
-				return ""
-			} else if reply.Err == OK {
-				// request is sent successfully
-				DPrintf("GET THE VALUE SUCCEED! value; %v", reply.Value)
-				return reply.Value
-			} else {
-				DPrintf("WRONG LEADER!")
-			}
+		if !ok {
+			time.Sleep(waitIntervals)
+			leaderId = ck.nextLeader()
 		}
-		time.Sleep(waitIntervals)
-		leaderId = ck.nextLeader()
+
+		if reply.Err == ErrNoKey {
+			// DPrintf("NO KEY FOUND")
+			return ""
+		} else if reply.Err == OK {
+			// request is sent successfully
+			DPrintf("GET THE VALUE SUCCEED! value; %v", reply.Value)
+			return reply.Value
+		} else{
+			time.Sleep(waitIntervals)
+			leaderId = ck.nextLeader()
+		}
 	}
 }
 
@@ -113,19 +115,20 @@ func (ck *Clerk) PutAppend(key string, value string, op string) {
 
 		reply := PutAppendReply{}
 		ok := ck.servers[leaderId].Call("KVServer.PutAppend", &args, &reply)
-		if ok && reply.Err == OK {
-			if op == "append" {
-				DPrintf("PUT SUCCEED! with leader: %d", leaderId)
-			} else if op == "put" {
-				DPrintf("PUT SUCCEED! with leader: %d", leaderId)
-			}
 
+		if !ok {
+			time.Sleep(waitIntervals)
+			leaderId = ck.nextLeader()
+			continue
+		}
+
+		if reply.Err == OK {
 			ck.leaderId = leaderId
 			break
+		} else {
+			time.Sleep(waitIntervals)
+			leaderId = ck.nextLeader()
 		}
-		//change to next leader keep asking
-		time.Sleep(waitIntervals)
-		leaderId = ck.nextLeader()
 	}
 }
 

@@ -49,6 +49,13 @@ func (kv *KVServer) Get(args *GetArgs, reply *GetReply) {
 		reply.Err = ErrWrongLeader
 		return
 	}
+
+	_, isLeader := kv.rf.GetState()
+	if !isLeader {
+		reply.Err = ErrWrongLeader
+		// DPrintf("[GET SendToWrongLeader]From Client %d, Request %d To Server %d", args.ClientId, args.RequestId, kv.me)
+		return
+	}
 	op := Op{
 		Command:   "get",
 		Key:       args.Key,
@@ -60,8 +67,7 @@ func (kv *KVServer) Get(args *GetArgs, reply *GetReply) {
 	index, _, isLeader := kv.rf.Start(op)
 	if !isLeader {
 		reply.Err = ErrWrongLeader
-		DPrintf("[GET SendToWrongLeader]From Client %d, Request %d To Server %d",
-			args.ClientId, args.RequestId, kv.me)
+		// DPrintf("[GET SendToWrongLeader]From Client %d, Request %d To Server %d", args.ClientId, args.RequestId, kv.me)
 		return
 	}
 	DPrintf("GET From Client %d (Request %d) To Server %d, key %v, raftIndex %d",
@@ -80,24 +86,8 @@ func (kv *KVServer) Get(args *GetArgs, reply *GetReply) {
 	select {
 	case <-time.After(timeoutIntervals):
 		// DPrintf("GET timeout From Client %d (Request %d) To Server %d, key %v, raftIndex %d", args.ClientId, args.RequestId, kv.me, op.Key, index)
+		reply.Err = ErrTimeOut
 
-		reply.Err = ErrWrongLeader
-
-		// _, isLeader := kv.rf.GetState()
-
-		// //find duplicate
-		// if kv.checkDuplicateRequest(op.ClientId, op.RequestId) && isLeader {
-		// 	value, exist := kv.ExecuteGet(op)
-		// 	if exist {
-		// 		reply.Err = OK
-		// 		reply.Value = value
-		// 	} else {
-		// 		reply.Err = ErrNoKey
-		// 		reply.Value = ""
-		// 	}
-		// } else {
-		// 	reply.Err = ErrWrongLeader
-		// }
 	case raftCommitOp := <-waitCh:
 		DPrintf("waitChannel Server %d, Index:%d , ClientId %d, RequestId %d, Command %v, Key :%v, Value :%v",
 			kv.me, index, op.ClientId, op.RequestId, op.Command, op.Key, op.Value)
@@ -132,7 +122,11 @@ func (kv *KVServer) PutAppend(args *PutAppendArgs, reply *PutAppendReply) {
 		reply.Err = ErrWrongLeader
 		return
 	}
-
+	_, isLeader := kv.rf.GetState()
+	if !isLeader {
+		reply.Err = ErrWrongLeader
+		return
+	}
 	op := Op{
 		Command:   args.Op,
 		Key:       args.Key,
@@ -163,15 +157,7 @@ func (kv *KVServer) PutAppend(args *PutAppendArgs, reply *PutAppendReply) {
 
 	select {
 	case <-time.After(timeoutIntervals):
-		// DPrintf("[TIMEOUT PUTAPPEND]Server %d , Index:%d , ClientId %d, RequestId %d, Opreation %v, Key :%v, Value :%v", kv.me, raftIndex, op.ClientId, op.RequestId, op.Command, op.Key, op.Value)
-
-		reply.Err = ErrWrongLeader
-
-		// if kv.checkDuplicateRequest(op.ClientId, op.RequestId) {
-		// 	reply.Err = OK
-		// } else {
-		// 	reply.Err = ErrWrongLeader
-		// }
+		reply.Err = ErrTimeOut
 
 	case raftCommitOp := <-ch:
 		DPrintf("WaitCha Server %d,Index:%d, ClientId %d, RequestId %d, Opreation %v, Key :%v, Value :%v",
