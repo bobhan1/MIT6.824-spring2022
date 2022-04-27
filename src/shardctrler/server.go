@@ -21,6 +21,7 @@ type ShardCtrler struct {
 	lastRequestId map[int64]int     // clientId -> requestID,//make sure operation only executed once
 
 	configs []Config // indexed by config num
+	
 }
 
 
@@ -289,6 +290,11 @@ func (sc *ShardCtrler) Raft() *raft.Raft {
 // form the fault-tolerant shardctrler service.
 // me is the index of the current server in servers[].
 //
+
+func init(){
+	
+}
+
 func StartServer(servers []*labrpc.ClientEnd, me int, persister *raft.Persister) *ShardCtrler {
 	sc := new(ShardCtrler)
 	sc.me = me
