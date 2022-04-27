@@ -13,6 +13,8 @@ import "crypto/rand"
 import "math/big"
 import "6.824/shardctrler"
 import "time"
+import mathrand "math/rand"
+
 
 //
 // which shard is a key in?
@@ -40,6 +42,9 @@ type Clerk struct {
 	config   shardctrler.Config
 	make_end func(string) *labrpc.ClientEnd
 	// You will have to modify this struct.
+	clientId  int64
+	requestId int
+	leaderId  int
 }
 
 //
@@ -56,6 +61,9 @@ func MakeClerk(ctrlers []*labrpc.ClientEnd, make_end func(string) *labrpc.Client
 	ck.sm = shardctrler.MakeClerk(ctrlers)
 	ck.make_end = make_end
 	// You'll have to add code here.
+	ck.clientId = nrand()
+	ck.leaderId = mathrand.Intn(len(ck.sm.Servers))
+	ck.requestId = 0
 	return ck
 }
 
@@ -66,9 +74,12 @@ func MakeClerk(ctrlers []*labrpc.ClientEnd, make_end func(string) *labrpc.Client
 // You will have to modify this function.
 //
 func (ck *Clerk) Get(key string) string {
+	ck.requestId++
 	args := GetArgs{}
+	requestId := ck.requestId
 	args.Key = key
-
+	args.ClientId = ck.clientId
+	args.RequestId = requestId
 	for {
 		shard := key2shard(key)
 		gid := ck.config.Shards[shard]
@@ -100,17 +111,22 @@ func (ck *Clerk) Get(key string) string {
 // You will have to modify this function.
 //
 func (ck *Clerk) PutAppend(key string, value string, op string) {
+	ck.requestId++
 	args := PutAppendArgs{}
 	args.Key = key
 	args.Value = value
 	args.Op = op
 
+	requestId := ck.requestId
+	args.ClientId = ck.clientId
+	args.RequestId = requestId
 
 	for {
 		shard := key2shard(key)
 		gid := ck.config.Shards[shard]
 		if servers, ok := ck.config.Groups[gid]; ok {
 			for si := 0; si < len(servers); si++ {
+				DPrintf("name[%s]",servers[si])
 				srv := ck.make_end(servers[si])
 				var reply PutAppendReply
 				ok := srv.Call("ShardKV.PutAppend", &args, &reply)
