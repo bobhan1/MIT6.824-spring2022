@@ -42,7 +42,7 @@ type Op struct {
 func (sc *ShardCtrler) Join(args *JoinArgs, reply *JoinReply) {
 	// Your code here.
 
-	// DPrintf("[GET Request]From Client %d (RequestId %d) To Server %d", args.ClientId, args.RequestId, kv.me)
+	DPrintf("[JOIN Request]From shardctrler.Client %d (RequestId %d)", args.ClientId, args.RequestId)
 	if sc.killed() {
 		reply.Err = ErrWrongLeader
 		return

@@ -10,7 +10,7 @@ import "crypto/rand"
 import "math/big"
 
 type Clerk struct {
-	servers []*labrpc.ClientEnd
+	Servers []*labrpc.ClientEnd
 	// Your data here.
 	clientId  int64
 	requestId int
@@ -25,7 +25,7 @@ func nrand() int64 {
 
 func MakeClerk(servers []*labrpc.ClientEnd) *Clerk {
 	ck := new(Clerk)
-	ck.servers = servers
+	ck.Servers = servers
 	ck.clientId = nrand()
 	ck.requestId = 0
 	// Your code here.
@@ -41,10 +41,10 @@ func (ck *Clerk) Query(num int) Config {
 	args.ClientId = ck.clientId
 	args.RequestId = ck.requestId
 
-	DPrintf("len(ck.servers)=[%d]",len(ck.servers))
+	DPrintf("len(ck.Servers)=[%d]",len(ck.Servers))
 	for {
 		// try each known server.
-		for _, srv := range ck.servers {
+		for _, srv := range ck.Servers {
 			var reply QueryReply
 			DPrintf("client send a query request")
 			ok := srv.Call("ShardCtrler.Query", args, &reply)
@@ -71,7 +71,7 @@ func (ck *Clerk) Join(servers map[int][]string) {
 	args.RequestId = ck.requestId
 	for {
 		// try each known server.
-		for _, srv := range ck.servers {
+		for _, srv := range ck.Servers {
 			var reply JoinReply
 			DPrintf("client send a join request")
 			ok := srv.Call("ShardCtrler.Join", args, &reply)
@@ -98,7 +98,7 @@ func (ck *Clerk) Leave(gids []int) {
 
 	for {
 		// try each known server.
-		for _, srv := range ck.servers {
+		for _, srv := range ck.Servers {
 			var reply LeaveReply
 			DPrintf("client send a leave request")
 			ok := srv.Call("ShardCtrler.Leave", args, &reply)
@@ -126,7 +126,7 @@ func (ck *Clerk) Move(shard int, gid int) {
 
 	for {
 		// try each known server.
-		for _, srv := range ck.servers {
+		for _, srv := range ck.Servers {
 			var reply MoveReply
 			DPrintf("client send a move request")
 			ok := srv.Call("ShardCtrler.Move", args, &reply)

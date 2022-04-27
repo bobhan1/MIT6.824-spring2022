@@ -11,7 +11,7 @@ func (sc *ShardCtrler) ApplyLoop() {
 	for msg := range sc.applyCh {
 		//get command from applyCh either command or snapshot
 		if msg.CommandValid {
-			DPrintf("apply a msg.command")
+			// DPrintf("apply a msg.command")
 			sc.ApplyCommand(msg)
 		}
 	}
@@ -107,7 +107,7 @@ func (config *Config) getGIDCountMap() ([]int, map[int]int){
 		count[gid] = count[gid] + 1
 	}
 	sort.Ints(keys)
-	DPrintf("len(keys):[%d]", len(keys))
+	// DPrintf("len(keys):[%d]", len(keys))
 	// ensure that the operations executed the same results on every raft node
 	return keys, count
 }
@@ -160,7 +160,7 @@ func (config *Config) shardRebalance(){
 		// migrate a shard from a largest group to a smallest group
 		maxGid, maxSize := config.getMaxGroup()
 		minGid, minSize := config.getMinGroup()
-		DPrintf("min:[%d], max[%d]", minSize, maxSize)
+		// DPrintf("min:[%d], max[%d]", minSize, maxSize)
 		if maxSize <= minSize + 1 {
 			return 
 		} 
@@ -173,22 +173,22 @@ func (sc *ShardCtrler) join(servers map[int][]string) {
 	newConfig := sc.getConfig(-1)
 	newConfig.Num++
 	for k, v := range servers {
-		DPrintf("append for [%d]",k)
+		// DPrintf("append for [%d]",k)
 		newConfig.Groups[k] = append([]string{}, v...)
 	}
 	newShards := make([]int, 10)
 	for shard, gid := range newConfig.Shards {
-		DPrintf("[%d]:[%d]",shard, gid)
+		// DPrintf("[%d]:[%d]",shard, gid)
 		if gid == 0{
 			newShards = append(newShards, shard)
 		}
 	}
 	for _, shard := range newShards {
 		minGid, _ := newConfig.getMinGroup()
-		DPrintf("minGid[%d]", minGid)
+		// DPrintf("minGid[%d]", minGid)
 		newConfig.Shards[shard] = minGid
 	}
-	DPrintf("before shardRebalance");
+	// DPrintf("before shardRebalance");
 	newConfig.shardRebalance()
 	sc.configs = append(sc.configs, newConfig)
 }
