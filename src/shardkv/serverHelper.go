@@ -3,6 +3,7 @@ package shardkv
 import (
 	"6.824/labgob"
 	"6.824/raft"
+	"6.824/shardctrler"
 	"bytes"
 )
 
@@ -40,14 +41,12 @@ func (kv *ShardKV) DecodeSnapshot(snapshot []byte) {
 	r := bytes.NewBuffer(snapshot)
 	d := labgob.NewDecoder(r)
 
-	var persistKVDB map[string]string
-	var persistLastRequestId map[int64]int
+	var persistKVDB [shardctrler.NShards]Shard
 
-	if d.Decode(&persistKVDB) != nil || d.Decode(&persistLastRequestId) != nil {
+	if d.Decode(&persistKVDB) != nil  {
 		// DPrintf("kv server %d cannot decode", kv.me)
 	} else {
 		kv.kvDB = persistKVDB
-		kv.lastRequestId = persistLastRequestId
 		// DPrintf("KVserver: %d, KVDB: %v, lastRequestId: %d", kv.me, persistKVDB, persistLastRequestId)
 	}
 }
@@ -60,7 +59,6 @@ func (kv *ShardKV) EncodeSnapshot() []byte {
 	w := new(bytes.Buffer)
 	e := labgob.NewEncoder(w)
 	e.Encode(kv.kvDB)
-	e.Encode(kv.lastRequestId)
 	data := w.Bytes()
 	return data
 }
@@ -68,8 +66,9 @@ func (kv *ShardKV) EncodeSnapshot() []byte {
 // ExecuteGet fetch the value from kvDB if exists
 func (kv *ShardKV) ExecuteGet(op Op) (string, bool) {
 	kv.mu.Lock()
-	value, exist := kv.kvDB[op.Key]
-	kv.lastRequestId[op.ClientId] = op.RequestId
+	shard := key2shard(op.Key)
+	value, exist := kv.kvDB[shard].data[op.Key]
+	kv.kvDB[shard].lastRequestId[op.ClientId] = op.RequestId
 	kv.mu.Unlock()
 
 	if exist {
@@ -81,10 +80,10 @@ func (kv *ShardKV) ExecuteGet(op Op) (string, bool) {
 }
 
 //check if request is duplicated, if yes return true
-func (kv *ShardKV) checkDuplicateRequest(newClientId int64, newRequestId int) bool {
+func (kv *ShardKV) checkDuplicateRequest(newClientId int64, newRequestId int, shard int) bool {
 	kv.mu.Lock()
 	// return true if message is duplicate
-	lastRequestId, ifClientInRecord := kv.lastRequestId[newClientId]
+	lastRequestId, ifClientInRecord := kv.kvDB[shard].lastRequestId[newClientId]
 	kv.mu.Unlock()
 	if !ifClientInRecord {
 		return false
@@ -108,8 +107,9 @@ func (kv *ShardKV) ApplyCommand(message raft.ApplyMsg) {
 		return
 	}
 
+	shard := key2shard(op.Key)
 	// duplicate command will not be executed
-	if !kv.checkDuplicateRequest(op.ClientId, op.RequestId) {
+	if !kv.checkDuplicateRequest(op.ClientId, op.RequestId, shard) {
 		// execute command
 		if op.Command == "Put" {
 			kv.Put(op)
@@ -146,8 +146,9 @@ func (kv *ShardKV) SendMsgToWaitChan(op Op, raftIndex int) bool {
 func (kv *ShardKV) Put(op Op) {
 	kv.mu.Lock()
 	defer kv.mu.Unlock()
-	kv.kvDB[op.Key] = op.Value
-	kv.lastRequestId[op.ClientId] = op.RequestId
+	shard := key2shard(op.Key)
+	kv.kvDB[shard].data[op.Key] = op.Value
+	kv.kvDB[shard].lastRequestId[op.ClientId] = op.RequestId
 	//kv.mu.Unlock()
 	// DPrintf("[KVServerExePUT]ClientId :%d ,RequestID :%d ,Key: %v, value: %v", op.ClientId, op.RequestId, op.Key, op.Value)
 }
@@ -156,14 +157,20 @@ func (kv *ShardKV) Put(op Op) {
 func (kv *ShardKV) Append(op Op) {
 	kv.mu.Lock()
 	defer kv.mu.Unlock()
-	value, exist := kv.kvDB[op.Key]
+	shard := key2shard(op.Key)
+	value, exist := kv.kvDB[shard].data[op.Key]
 	if exist {
-		kv.kvDB[op.Key] = value + op.Value
+		kv.kvDB[shard].data[op.Key] = value + op.Value
 	} else {
-		kv.kvDB[op.Key] = op.Value
+		kv.kvDB[shard].data[op.Key] = op.Value
 	}
-	kv.lastRequestId[op.ClientId] = op.RequestId
+	kv.kvDB[shard].lastRequestId[op.ClientId] = op.RequestId
 	//kv.mu.Unlock()
 
 	// DPrintf("[KVServerExeAPPEND]ClientId :%d ,RequestID:%d ,Key: %v, value: %v", op.ClientId, op.RequestId, op.Key, op.Value)
+}
+
+
+func (kv *ShardKV) fetchConfigs() {
+	
 }

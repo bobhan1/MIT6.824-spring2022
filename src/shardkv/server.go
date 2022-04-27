@@ -25,6 +25,13 @@ type Op struct {
 	RequestId int
 }
 
+type Shard struct {
+	id int
+	data map[string]string
+	configNum int
+	lastRequestId map[int64]int     // clientId -> requestID,//make sure operation only executed once
+}
+
 type ShardKV struct {
 	mu           sync.Mutex
 	me           int
@@ -38,11 +45,13 @@ type ShardKV struct {
 
 	// Your definitions here.
 
-	kvDB          map[string]string // store client key/value
+	kvDB          [shardctrler.NShards] Shard // store client key/value
 	waitApplyCh   map[int]chan Op   // index(raft) -> chan, waiting to get the applied msg from raft
-	lastRequestId map[int64]int     // clientId -> requestID,//make sure operation only executed once
 	mck           *shardctrler.Clerk
 	lastIncludedIndex int
+
+	configs []shardctrler.Config
+	latConfig shardctrler.Config
 }
 
 
@@ -239,10 +248,15 @@ func StartServer(servers []*labrpc.ClientEnd, me int, persister *raft.Persister,
 
 	kv.rf = raft.Make(servers, me, persister, kv.applyCh)
 
-
-	kv.kvDB = make(map[string]string)
+	for index, _ := range kv.kvDB{
+		kv.kvDB[index] = Shard{
+			id: index,
+			data: map[string]string{},
+			configNum: 0,
+			lastRequestId: map[int64]int{},
+		}
+	}
 	kv.waitApplyCh = make(map[int]chan Op)
-	kv.lastRequestId = make(map[int64]int)
 
 	snapshot := persister.ReadSnapshot()
 
@@ -251,5 +265,7 @@ func StartServer(servers []*labrpc.ClientEnd, me int, persister *raft.Persister,
 	}
 
 	go kv.ApplyLoop()
+	go kv.fetchConfigs()
+	
 	return kv
 }
