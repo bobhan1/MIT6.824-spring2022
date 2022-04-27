@@ -10,7 +10,8 @@ import "sync/atomic"
 import "6.824/shardctrler"
 
 const (
-	rpcTimeOutInterval = time.Millisecond * 200
+	raftTimeOutInterval = time.Millisecond * 200
+	fetchConfigsInterval = time.Millisecond * 80
 )
 
 
@@ -18,18 +19,30 @@ type Op struct {
 	// Your definitions here.
 	// Field names must start with capital letters,
 	// otherwise RPC will break.
-	Command   string // "get" "put" "append"
+	Command   string // "Get"/"Put"/"Append"/"UpdateConfig"/"TransferShrads"/"DeleteShards"
+
 	Key       string
 	Value     string
+
+	Config    shardctrler.Config 
+
 	ClientId  int64
 	RequestId int
 }
+
+const (
+	Normal int = iota
+	Sending
+	toBeDelete
+	deleting
+) 
 
 type Shard struct {
 	id int
 	data map[string]string
 	configNum int
 	lastRequestId map[int64]int     // clientId -> requestID,//make sure operation only executed once
+	status int
 }
 
 type ShardKV struct {
@@ -49,14 +62,75 @@ type ShardKV struct {
 	waitApplyCh   map[int]chan Op   // index(raft) -> chan, waiting to get the applied msg from raft
 	mck           *shardctrler.Clerk
 	lastIncludedIndex int
-
 	configs []shardctrler.Config
-	latConfig shardctrler.Config
+
+	shardsInclude []int
+
 }
 
+func (shard *Shard) Copy() Shard{
+	newData := map[string]string{}
+	newLastRequestId := map[int64]int{}
+	for k, v := range shard.data {
+		newData[k] = v
+	} 
+	for k, v := range shard.lastRequestId {
+		newLastRequestId[k] = v
+	}
+	newShard := Shard{
+		id : shard.id,
+		data: newData,
+		configNum : shard.configNum,
+		lastRequestId : newLastRequestId,    
+		status : Normal,
+	}
+	return newShard
+}
+
+func (kv *ShardKV) getConfig(num int) shardctrler.Config {
+	if num < 0 || num >= len(kv.configs) {
+		return kv.configs[len(kv.configs)-1].Copy()
+	} else{
+		return kv.configs[num].Copy()
+	}
+}
+
+func (kv *ShardKV) containsShard(shard int) bool {
+	kv.mu.Lock()
+	defer kv.mu.Unlock()
+	return kv.shardsInclude[shard] == 1
+}
+
+func (kv *ShardKV) shardIsNormal(shard int) bool{
+	kv.mu.Lock()
+	defer kv.mu.Unlock()
+	return kv.kvDB[shard].status == Normal
+}
 
 func (kv *ShardKV) Get(args *GetArgs, reply *GetReply) {
 	// Your code here.
+	kv.mu.Lock()
+	curConfigNum := kv.getConfig(-1).Num
+	kv.mu.Unlock() 
+	if args.ConfigNum < curConfigNum {
+		reply.Err = ErrConfigNumOutDated
+		return 
+	}
+	if args.ConfigNum > curConfigNum {
+		reply.Err = ErrTimeOut
+		return 
+	}
+	shard := key2shard(args.Key)
+	if !kv.containsShard(shard) {
+		reply.Err = ErrWrongGroup
+		return 
+	}
+
+	if !kv.shardIsNormal(shard) {
+		reply.Err = ErrTimeOut
+		return 
+	}
+
 	DPrintf("[=]recieved Get ")
 	// DPrintf("[GET Request]From Client %d (RequestId %d) To Server %d", args.ClientId, args.RequestId, kv.me)
 	if kv.killed() {
@@ -71,7 +145,7 @@ func (kv *ShardKV) Get(args *GetArgs, reply *GetReply) {
 		return
 	}
 	op := Op{
-		Command:   "get",
+		Command:   "Get",
 		Key:       args.Key,
 		Value:     "",
 		ClientId:  args.ClientId,
@@ -97,7 +171,7 @@ func (kv *ShardKV) Get(args *GetArgs, reply *GetReply) {
 
 	// timeout
 	select {
-	case <-time.After(rpcTimeOutInterval):
+	case <-time.After(raftTimeOutInterval):
 		// DPrintf("GET timeout From Client %d (Request %d) To Server %d, key %v, raftIndex %d", args.ClientId, args.RequestId, kv.me, op.Key, index)
 		reply.Err = ErrTimeOut
 
@@ -129,6 +203,29 @@ func (kv *ShardKV) PutAppend(args *PutAppendArgs, reply *PutAppendReply) {
 		reply.Err = ErrWrongLeader
 		return
 	}
+
+	kv.mu.Lock()
+	curConfigNum := kv.getConfig(-1).Num
+	kv.mu.Unlock() 
+	if args.ConfigNum < curConfigNum {
+		reply.Err = ErrConfigNumOutDated
+		return 
+	}
+	if args.ConfigNum > curConfigNum {
+		reply.Err = ErrTimeOut
+		return 
+	}
+	shard := key2shard(args.Key)
+	if !kv.containsShard(shard) {
+		reply.Err = ErrWrongGroup
+		return 
+	}
+
+	if !kv.shardIsNormal(shard) {
+		reply.Err = ErrTimeOut
+		return 
+	}
+
 	_, isLeader := kv.rf.GetState()
 	if !isLeader {
 		reply.Err = ErrWrongLeader
@@ -161,7 +258,7 @@ func (kv *ShardKV) PutAppend(args *PutAppendArgs, reply *PutAppendReply) {
 	kv.mu.Unlock()
 
 	select {
-	case <-time.After(rpcTimeOutInterval):
+	case <-time.After(raftTimeOutInterval):
 		reply.Err = ErrTimeOut
 
 	case raftCommitOp := <-ch:
@@ -197,6 +294,10 @@ func (kv *ShardKV) killed() bool {
 }
 
 
+func init(){
+	labgob.Register(Op{})
+	labgob.Register(shardctrler.Config{})
+}
 
 //
 // servers[] contains the ports of the servers in this group.
@@ -231,8 +332,6 @@ func StartServer(servers []*labrpc.ClientEnd, me int, persister *raft.Persister,
 	// Go's RPC library to marshall/unmarshall.
 	// DPrintf("==========")
 
-	labgob.Register(Op{})
-
 	kv := new(ShardKV)
 	kv.me = me
 	kv.maxraftstate = maxraftstate
@@ -245,6 +344,7 @@ func StartServer(servers []*labrpc.ClientEnd, me int, persister *raft.Persister,
 	// Use something like this to talk to the shardctrler:
 	kv.mck = shardctrler.MakeClerk(kv.ctrlers)
 	kv.applyCh = make(chan raft.ApplyMsg, 10)
+	kv.configs = make([]shardctrler.Config, 1)
 
 	kv.rf = raft.Make(servers, me, persister, kv.applyCh)
 
@@ -266,6 +366,7 @@ func StartServer(servers []*labrpc.ClientEnd, me int, persister *raft.Persister,
 
 	go kv.ApplyLoop()
 	go kv.fetchConfigs()
+	go sendingShards()
 	
 	return kv
 }

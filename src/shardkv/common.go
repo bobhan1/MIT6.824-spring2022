@@ -15,6 +15,7 @@ const (
 	ErrWrongGroup  = "ErrWrongGroup"
 	ErrWrongLeader = "ErrWrongLeader"
 	ErrTimeOut     = "ErrTimeout"
+	ErrConfigNumOutDated = "ErrConfigNumOutDated"
 )
 
 type Err string
@@ -22,6 +23,7 @@ type Err string
 type CommonArgsFields struct {
 	ClientId  int64
 	RequestId int
+	ConfigNum int 
 }
 
 // Put or Append

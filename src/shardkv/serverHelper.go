@@ -5,6 +5,7 @@ import (
 	"6.824/raft"
 	"6.824/shardctrler"
 	"bytes"
+	"time"
 )
 
 // ApplyLoop keep fetching command or snapshot from applyCha
@@ -113,10 +114,13 @@ func (kv *ShardKV) ApplyCommand(message raft.ApplyMsg) {
 		// execute command
 		if op.Command == "Put" {
 			kv.Put(op)
-		}
-		if op.Command == "Append" {
+		} else if op.Command == "Append" {
 			kv.Append(op)
-		}
+		} else if op.Command == "UpdateConfig" {
+			kv.updateConfig(op)
+		} else if op.Command == "TransferShards" {
+			kv.transferShards(op)
+		} 
 	}
 	//check if raft server needs to make snapshot
 	if kv.maxraftstate != -1 {
@@ -149,7 +153,6 @@ func (kv *ShardKV) Put(op Op) {
 	shard := key2shard(op.Key)
 	kv.kvDB[shard].data[op.Key] = op.Value
 	kv.kvDB[shard].lastRequestId[op.ClientId] = op.RequestId
-	//kv.mu.Unlock()
 	// DPrintf("[KVServerExePUT]ClientId :%d ,RequestID :%d ,Key: %v, value: %v", op.ClientId, op.RequestId, op.Key, op.Value)
 }
 
@@ -165,12 +168,85 @@ func (kv *ShardKV) Append(op Op) {
 		kv.kvDB[shard].data[op.Key] = op.Value
 	}
 	kv.kvDB[shard].lastRequestId[op.ClientId] = op.RequestId
-	//kv.mu.Unlock()
-
 	// DPrintf("[KVServerExeAPPEND]ClientId :%d ,RequestID:%d ,Key: %v, value: %v", op.ClientId, op.RequestId, op.Key, op.Value)
 }
 
 
 func (kv *ShardKV) fetchConfigs() {
+	for !kv.killed() {
+		_, isLeader := kv.rf.GetState()
+		if isLeader {
+			kv.mu.Lock()
+			curConfigNum := kv.getConfig(-1).Num
+			kv.mu.Unlock()
+		
+			newConfig := kv.mck.Query(curConfigNum + 1)
+			if newConfig.Num == curConfigNum + 1 {
+				op := Op{
+					Command: "UpdateConfig",
+					Config: newConfig,
+				}
+				kv.rf.Start(op)
+			}
+
+		}
+		time.Sleep(fetchConfigsInterval)
+	}
+}
+
+
+func (kv *ShardKV) updateConfig(op Op) {
+	newConfig := op.Config
+	kv.mu.Lock()
+	curConfig := kv.getConfig(-1)
+	kv.mu.Unlock()
+
+	if newConfig.Num <= curConfig.Num {
+		return 
+	}
 	
+	if newConfig.Num > curConfig.Num + 1 {
+		panic("updateconfig get wrong newConfig!")
+	}
+	gid := kv.gid
+	toSend := map[int]Shard{}
+	newShardsInclude := make([]int, 10)
+
+	kv.mu.Lock()
+	for _, k := range newConfig.Shards {
+		if curConfig.Shards[k] != gid{
+			toSend[k] = kv.kvDB[k].Copy()
+			kv.kvDB[k].status = Sending
+			newShardsInclude[k] = 0
+		} else {
+			newShardsInclude[k] = 1
+		}
+	}
+	
+	for _, k := range curConfig.Shards {
+		if newConfig.Shards[k] != gid {
+			kv.kvDB[k].status = Sending
+		}
+	}
+	kv.shardsInclude = newShardsInclude
+
+	_, isLeader := kv.rf.GetState()
+	if !isLeader {
+		return 
+	}
+
+	for k, v := range toSend {
+		newGid := newConfig.Shards[k]
+		for 
+	}
+
+
+
+	kv.mu.Unlock()
+}
+
+
+// the sender call this rpc
+func (kv *ShardKV) transferShards(op Op) {
+
 }
