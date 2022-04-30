@@ -52,3 +52,27 @@ type GetReply struct {
 	Err   Err
 	Value string
 }
+
+type TransferShardsArgs struct {
+	Shard Shard
+}
+
+type TransferShardsReply struct {
+	Err Err
+}
+
+type DeleteShardsArgs struct {
+	ShardId int
+}
+
+type DeleteShardsReply struct {
+	Err Err
+}
+
+type ShardsSentArgs struct {
+	shard int
+}
+
+type ShardsSentReply struct {
+	Err Err
+}

@@ -12,6 +12,7 @@ import "6.824/shardctrler"
 const (
 	raftTimeOutInterval = time.Millisecond * 200
 	fetchConfigsInterval = time.Millisecond * 80
+	sendingShardsInterval = time.Millisecond * 40
 )
 
 
@@ -23,7 +24,8 @@ type Op struct {
 
 	Key       string
 	Value     string
-
+	Shard     Shard
+	ShardId   int  
 	Config    shardctrler.Config 
 
 	ClientId  int64
@@ -95,6 +97,7 @@ func (kv *ShardKV) getConfig(num int) shardctrler.Config {
 	}
 }
 
+
 func (kv *ShardKV) containsShard(shard int) bool {
 	kv.mu.Lock()
 	defer kv.mu.Unlock()
@@ -138,8 +141,7 @@ func (kv *ShardKV) Get(args *GetArgs, reply *GetReply) {
 		return
 	}
 
-	_, isLeader := kv.rf.GetState()
-	if !isLeader {
+	if _, isLeader := kv.rf.GetState(); !isLeader {
 		reply.Err = ErrWrongLeader
 		// DPrintf("[GET SendToWrongLeader]From Client %d, Request %d To Server %d", args.ClientId, args.RequestId, kv.me)
 		return
@@ -226,8 +228,8 @@ func (kv *ShardKV) PutAppend(args *PutAppendArgs, reply *PutAppendReply) {
 		return 
 	}
 
-	_, isLeader := kv.rf.GetState()
-	if !isLeader {
+	
+	if _, isLeader := kv.rf.GetState(); !isLeader {
 		reply.Err = ErrWrongLeader
 		return
 	}
@@ -275,6 +277,129 @@ func (kv *ShardKV) PutAppend(args *PutAppendArgs, reply *PutAppendReply) {
 	kv.mu.Unlock()
 	return
 }
+
+
+// the sender call this rpc
+func (kv *ShardKV) TransferShards(args *TransferShardsArgs, reply *TransferShardsReply) {
+
+	if kv.killed() {
+		reply.Err = ErrWrongLeader
+		return
+	}
+	if _, isLeader := kv.rf.GetState(); !isLeader {	
+		reply.Err = ErrWrongLeader
+		return
+	}
+	kv.mu.Lock()
+	curConfigNum := kv.getConfig(-1).Num
+	kv.mu.Unlock() 
+	newShard := args.Shard
+	if newShard.configNum != curConfigNum{
+		reply.Err = ErrTimeOut
+		return 
+	}
+	kv.mu.Lock()
+	if kv.kvDB[newShard.id].status != Sending {
+		reply.Err = ErrTimeOut
+		kv.mu.Unlock() 
+		return 
+	}
+	kv.mu.Unlock() 
+
+	op := Op{
+		Command : "InsertShard",
+		Shard : newShard,
+	}
+	raftIndex, _, isLeader := kv.rf.Start(op)
+	if !isLeader {
+		reply.Err = ErrWrongLeader
+		// DPrintf("[PUTAPPEND SendToWrongLeader]From Client %d (Request %d) To Server %d", args.ClientId, args.RequestId, kv.me)
+		return
+	}
+
+	kv.mu.Lock()
+	ch, exist := kv.waitApplyCh[raftIndex]
+	if !exist {
+		kv.waitApplyCh[raftIndex] = make(chan Op, 1)
+		ch = kv.waitApplyCh[raftIndex]
+	}
+	kv.mu.Unlock()
+
+	select {
+	case <-time.After(raftTimeOutInterval):
+		reply.Err = ErrTimeOut
+
+	case <-ch:
+		// DPrintf("WaitCha Server %d,Index:%d, ClientId %d, RequestId %d, Opreation %v, Key :%v, Value :%v", kv.me, raftIndex, op.ClientId, op.RequestId, op.Command, op.Key, op.Value)
+		reply.Err = OK
+
+	}
+	kv.mu.Lock()
+	delete(kv.waitApplyCh, raftIndex)
+	kv.mu.Unlock()
+	return
+}
+
+func (kv *ShardKV) DeleteShards(args *TransferShardsArgs, reply *TransferShardsReply) {
+
+	if kv.killed() {
+		reply.Err = ErrWrongLeader
+		return
+	}
+	if _, isLeader := kv.rf.GetState(); !isLeader {	
+		reply.Err = ErrWrongLeader
+		return
+	}
+	kv.mu.Lock()
+	curConfigNum := kv.getConfig(-1).Num
+	kv.mu.Unlock() 
+	newShard := args.Shard
+	if newShard.configNum != curConfigNum{
+		reply.Err = ErrTimeOut
+		return 
+	}
+	kv.mu.Lock()
+	if kv.kvDB[newShard.id].status != Sending {
+		reply.Err = ErrTimeOut
+		kv.mu.Unlock() 
+		return 
+	}
+	kv.mu.Unlock() 
+
+	op := Op{
+		Command : "DeleteShard",
+		ShardId : newShard.id,
+	}
+	raftIndex, _, isLeader := kv.rf.Start(op)
+	if !isLeader {
+		reply.Err = ErrWrongLeader
+		// DPrintf("[PUTAPPEND SendToWrongLeader]From Client %d (Request %d) To Server %d", args.ClientId, args.RequestId, kv.me)
+		return
+	}
+
+	kv.mu.Lock()
+	ch, exist := kv.waitApplyCh[raftIndex]
+	if !exist {
+		kv.waitApplyCh[raftIndex] = make(chan Op, 1)
+		ch = kv.waitApplyCh[raftIndex]
+	}
+	kv.mu.Unlock()
+
+	select {
+	case <-time.After(raftTimeOutInterval):
+		reply.Err = ErrTimeOut
+
+	case <-ch:
+		// DPrintf("WaitCha Server %d,Index:%d, ClientId %d, RequestId %d, Opreation %v, Key :%v, Value :%v", kv.me, raftIndex, op.ClientId, op.RequestId, op.Command, op.Key, op.Value)
+		reply.Err = OK
+
+	}
+	kv.mu.Lock()
+	delete(kv.waitApplyCh, raftIndex)
+	kv.mu.Unlock()
+	return
+}
+
 
 //
 // the tester calls Kill() when a ShardKV instance won't
@@ -365,8 +490,8 @@ func StartServer(servers []*labrpc.ClientEnd, me int, persister *raft.Persister,
 	}
 
 	go kv.ApplyLoop()
-	go kv.fetchConfigs()
-	go sendingShards()
+	go kv.fetchConfigsLoop()
+	go kv.sendingShardsLoop()
 	
 	return kv
 }
