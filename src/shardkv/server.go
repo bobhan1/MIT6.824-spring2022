@@ -58,7 +58,7 @@ type ShardKV struct {
 	maxraftstate int // snapshot if log grows this big
 	dead    	 int32
 
-	updating int32 // if the kv server is updating config 
+	// updating int32 // if the kv server is updating config 
 
 	// Your definitions here.
 
@@ -432,18 +432,18 @@ func (kv *ShardKV) killed() bool {
 	return z == 1
 }
 
-func (kv *ShardKV) isUpdateConfig() bool {
-	z := atomic.LoadInt32(&kv.updating)
-	return z == 1
-}
+// func (kv *ShardKV) isUpdateConfig() bool {
+// 	z := atomic.LoadInt32(&kv.updating)
+// 	return z == 1
+// }
 
-func (kv *ShardKV)setUpdateConcig() {
-	atomic.StoreInt32(&kv.updating, 1)
-}
+// func (kv *ShardKV)setUpdateConcig() {
+// 	atomic.StoreInt32(&kv.updating, 1)
+// }
 
-func (kv *ShardKV)unsetUpdateConcig() {
-	atomic.StoreInt32(&kv.updating, 0)
-}
+// func (kv *ShardKV)unsetUpdateConcig() {
+// 	atomic.StoreInt32(&kv.updating, 0)
+// }
 
 
 func init(){

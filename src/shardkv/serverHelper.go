@@ -25,10 +25,12 @@ func (kv *ShardKV) ApplyLoop() {
 // ApplySnapShot GetSnapShot from rf.applyCh
 func (kv *ShardKV) ApplySnapShot(msg raft.ApplyMsg) {
 	//do not use kv.mu.lock before operation raft
+	D2Printf("[=]applySnapShot")
 	if kv.rf.CondInstallSnapshot(msg.SnapshotTerm, msg.SnapshotIndex, msg.Snapshot) {
 		kv.mu.Lock()
 		defer kv.mu.Unlock()
 		snapshot := msg.Snapshot
+		D2Printf("[=============]DecodeSnapShot[================]")
 		kv.DecodeSnapshot(snapshot)
 		kv.lastIncludedIndex = msg.SnapshotIndex
 	}
@@ -44,11 +46,20 @@ func (kv *ShardKV) DecodeSnapshot(snapshot []byte) {
 	d := labgob.NewDecoder(r)
 
 	var persistKVDB [shardctrler.NShards]Shard
+	var latestConfig shardctrler.Config
+	var lastConfig shardctrler.Config
+	var shardsInclude []int
 
-	if d.Decode(&persistKVDB) != nil  {
+	if d.Decode(&persistKVDB) != nil ||
+		 d.Decode(&latestConfig) != nil || 
+		 d.Decode(&lastConfig) != nil ||
+		 d.Decode(&shardsInclude) != nil {
 		// DPrintf("kv server %d cannot decode", kv.me)
 	} else {
 		kv.kvDB = persistKVDB
+		kv.latestConfig = latestConfig
+		kv.lastConfig = lastConfig
+		kv.shardsInclude = shardsInclude
 		// DPrintf("KVserver: %d, KVDB: %v, lastRequestId: %d", kv.me, persistKVDB, persistLastRequestId)
 	}
 }
@@ -60,7 +71,12 @@ func (kv *ShardKV) EncodeSnapshot() []byte {
 	defer kv.mu.Unlock()
 	w := new(bytes.Buffer)
 	e := labgob.NewEncoder(w)
+
 	e.Encode(kv.kvDB)
+	e.Encode(kv.latestConfig)
+	e.Encode(kv.lastConfig)
+	e.Encode(kv.shardsInclude)
+
 	data := w.Bytes()
 	return data
 }
@@ -206,7 +222,9 @@ func (kv *ShardKV) UpdateConfig(op Op) {
 	}
 	
 	if newConfig.Num > curConfig.Num + 1 {
+		DPrintf("[=][newConfig.Num:%d][curConfig.Num:%d]", newConfig.Num, curConfig.Num)
 		panic("UpdateConfig get wrong newConfig!")
+		return 
 	}
 
 	gid := kv.gid
@@ -329,11 +347,11 @@ func (kv *ShardKV) pullingShardsLoop() {
 			kv.mu.Lock()
 			shards := kv.getCurPullingShards()
 			if len(shards) > 0 {
-				DPrintf("[=][server:%d]try pull new shard [len(shrads):%d][%v]", kv.me, len(shards), shards)
+				D2Printf("[=][server:%d]try pull new shard [len(shrads):%d][%v]", kv.me, len(shards), shards)
 				curConfigNum := kv.latestConfig.Num
 				for shardId, servers := range shards {
 					for _, server := range servers {
-						DPrintf("[=][server:%d]send [shard:%d]request to [server:%s]", kv.me, shardId, server)
+						D2Printf("[=][server:%d]send [shard:%d]request to [server:%s]", kv.me, shardId, server)
 						dst := kv.make_end(server)
 						args := TransferShardsArgs{shardId, curConfigNum}
 						reply := TransferShardsReply{}
