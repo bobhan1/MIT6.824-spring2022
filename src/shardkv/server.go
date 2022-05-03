@@ -290,7 +290,7 @@ func (kv *ShardKV) PutAppend(args *PutAppendArgs, reply *PutAppendReply) {
 
 // the reciever call this rpc
 func (kv *ShardKV) TransferShards(args *TransferShardsArgs, reply *TransferShardsReply) {
-	DPrintf("[=][server:%d] recieved a TransferShards rpc[configNum:%d][shardId:%d]",kv.me, args.ConfigNum, args.ShardId)
+	D2Printf("[=][server:%d] recieved a TransferShards rpc[configNum:%d][shardId:%d]",kv.me, args.ConfigNum, args.ShardId)
 	if kv.killed() {
 		reply.Err = ErrWrongLeader
 		return
@@ -302,8 +302,9 @@ func (kv *ShardKV) TransferShards(args *TransferShardsArgs, reply *TransferShard
 	kv.mu.Lock()
 	curConfigNum := kv.latestConfig.Num
 	kv.mu.Unlock() 
-	if args.ConfigNum != curConfigNum{
-		DPrintf("[=][args.ConfigNum:%d][curConfigNum:%d]", args.ConfigNum, curConfigNum)
+	if args.ConfigNum > curConfigNum{
+		// D2Printf("[=][server:%d][args.ConfigNum:%d][curConfigNum:%d]", kv.me, args.ConfigNum, curConfigNum)
+		// panic("UpdateConfig get wrong newConfig!")
 		reply.Err = ErrTimeOut
 		return 
 	}
@@ -317,7 +318,7 @@ func (kv *ShardKV) TransferShards(args *TransferShardsArgs, reply *TransferShard
 
 	reply.Err = OK
 	reply.Shard = kv.kvDB[args.ShardId]
-	DPrintf("[=][server:%d] reply a TransferShards rpc[configNum:%d][shardId:%d]",kv.me, args.ConfigNum, args.ShardId)
+	D2Printf("[=][server:%d] reply a TransferShards rpc[configNum:%d][shardId:%d]",kv.me, args.ConfigNum, args.ShardId)
 	return 
 
 	// op := Op{

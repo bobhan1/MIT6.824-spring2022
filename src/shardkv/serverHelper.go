@@ -308,11 +308,12 @@ func (kv *ShardKV) fetchConfigsLoop() {
 			kv.mu.Lock()
 			curConfigNum := kv.latestConfig.Num
 			kv.mu.Unlock()
-
+			// D2Printf("[=][server:%d]try to fetch new config", kv.me, )
 			newConfig := kv.mck.Query(curConfigNum + 1)
 			// try to fetch the new config
 			if newConfig.Num == curConfigNum + 1 {
 				// kv.setUpdateConcig()
+				D2Printf("[=][server:%d]start a updateConfig into raft",kv.me)
 				op := Op{
 					Command: "UpdateConfig",
 					Config: newConfig,
@@ -347,11 +348,11 @@ func (kv *ShardKV) pullingShardsLoop() {
 			kv.mu.Lock()
 			shards := kv.getCurPullingShards()
 			if len(shards) > 0 {
-				D2Printf("[=][server:%d]try pull new shard [len(shrads):%d][%v]", kv.me, len(shards), shards)
+				// D2Printf("[=][server:%d]try pull new shard [len(shrads):%d][%v]", kv.me, len(shards), shards)
 				curConfigNum := kv.latestConfig.Num
 				for shardId, servers := range shards {
 					for _, server := range servers {
-						D2Printf("[=][server:%d]send [shard:%d]request to [server:%s]", kv.me, shardId, server)
+						// D2Printf("[=][server:%d]send [shard:%d]request to [server:%s]", kv.me, shardId, server)
 						dst := kv.make_end(server)
 						args := TransferShardsArgs{shardId, curConfigNum}
 						reply := TransferShardsReply{}
