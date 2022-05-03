@@ -55,6 +55,7 @@ type GetReply struct {
 
 type TransferShardsArgs struct {
 	ShardId int
+	ConfigNum int
 }
 
 type TransferShardsReply struct {

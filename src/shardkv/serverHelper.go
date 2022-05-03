@@ -6,7 +6,7 @@ import (
 	"6.824/shardctrler"
 	"bytes"
 	"time"
-	"sync"
+	// "sync"
 )
 
 // ApplyLoop keep fetching command or snapshot from applyCha
@@ -88,6 +88,7 @@ func (kv *ShardKV) checkDuplicateRequest(newClientId int64, newRequestId int, sh
 	lastRequestId, ifClientInRecord := kv.kvDB[shard].LastRequestId[newClientId]
 	kv.mu.Unlock()
 	if !ifClientInRecord {
+		DPrintf("[=]request from[client:%d]with[requestId:%d] duplicate!", newClientId, newRequestId)
 		return false
 	}
 	return newRequestId <= lastRequestId
@@ -100,11 +101,12 @@ func (kv *ShardKV) ApplyCommand(message raft.ApplyMsg) {
 	if _, ok := message.Command.(int); ok {
 		// a no-op log
 		// DPrintf("I AM INT")
+		DPrintf("[=][server %d] apply recieve a no-op log", kv.me)
 		return
 	}
 
 	op := message.Command.(Op)
-	// DPrintf("[RaftApplyCommand]Server %d, Got Command -> Index:%d, ClientId %d, RequestId %d, Command %v, Key: %v, Value: %v", kv.me, message.CommandIndex, op.ClientId, op.RequestId, op.Command, op.Key, op.Value)
+	DPrintf("[RaftApplyCommand]Server %d, Got Command -> Index:%d, ClientId %d, RequestId %d, Command %v, Key: %v, Value: %v", kv.me, message.CommandIndex, op.ClientId, op.RequestId, op.Command, op.Key, op.Value)
 
 	if message.CommandIndex <= kv.lastIncludedIndex {
 		return
@@ -112,12 +114,23 @@ func (kv *ShardKV) ApplyCommand(message raft.ApplyMsg) {
 
 	shard := key2shard(op.Key)
 	// duplicate command will not be executed
-	if !kv.checkDuplicateRequest(op.ClientId, op.RequestId, shard) {
+	isRepeated := kv.checkDuplicateRequest(op.ClientId, op.RequestId, shard)
+	// if !kv.checkDuplicateRequest(op.ClientId, op.RequestId, shard) {
 		// execute command
 		if op.Command == "Put" {
-			kv.Put(op)
+			if !isRepeated {
+				kv.Put(op)
+				shardId := key2shard(op.Key)
+				kv.kvDB[shardId].LastRequestId[op.ClientId] = op.RequestId
+			}
+		
 		} else if op.Command == "Append" {
-			kv.Append(op)
+			if !isRepeated {
+				kv.Append(op)
+				shardId := key2shard(op.Key)
+				kv.kvDB[shardId].LastRequestId[op.ClientId] = op.RequestId
+			}
+
 		} else if op.Command == "UpdateConfig" {
 			kv.UpdateConfig(op)
 		} else if op.Command == "InsertShard" {
@@ -130,7 +143,7 @@ func (kv *ShardKV) ApplyCommand(message raft.ApplyMsg) {
 		// } else if op.Command == "ShardRecieved" {
 		// 	kv.shardSent(op)
 		// }
-	}
+	//}
 	//check if raft server needs to make snapshot
 	if kv.maxraftstate != -1 {
 		if kv.rf.GetRaftSize() > (kv.maxraftstate * 9 / 10) {
@@ -162,7 +175,7 @@ func (kv *ShardKV) Put(op Op) {
 	shard := key2shard(op.Key)
 	kv.kvDB[shard].Data[op.Key] = op.Value
 	kv.kvDB[shard].LastRequestId[op.ClientId] = op.RequestId
-	// DPrintf("[KVServerExePUT]ClientId :%d ,RequestID :%d ,Key: %v, value: %v", op.ClientId, op.RequestId, op.Key, op.Value)
+	DPrintf("[KVServerExePUT]ClientId :%d ,RequestID :%d ,Key: %v, value: %v", op.ClientId, op.RequestId, op.Key, op.Value)
 }
 
 // Append op to kvDB
@@ -177,7 +190,7 @@ func (kv *ShardKV) Append(op Op) {
 		kv.kvDB[shard].Data[op.Key] = op.Value
 	}
 	kv.kvDB[shard].LastRequestId[op.ClientId] = op.RequestId
-	// DPrintf("[KVServerExeAPPEND]ClientId :%d ,RequestID:%d ,Key: %v, value: %v", op.ClientId, op.RequestId, op.Key, op.Value)
+	DPrintf("[KVServerExeAPPEND]ClientId :%d ,RequestID:%d ,Key: %v, value: %v", op.ClientId, op.RequestId, op.Key, op.Value)
 }
 
 func (kv *ShardKV) UpdateConfig(op Op) {
@@ -185,7 +198,7 @@ func (kv *ShardKV) UpdateConfig(op Op) {
 	// defer kv.unsetUpdateConcig()
 	newConfig := op.Config
 	kv.mu.Lock()
-	curConfig := kv.getConfig(-1)
+	curConfig := kv.latestConfig.Copy()
 	kv.mu.Unlock()
 
 	if newConfig.Num <= curConfig.Num {
@@ -204,25 +217,33 @@ func (kv *ShardKV) UpdateConfig(op Op) {
 	for k, shardId :=range newConfig.Shards {
 		if shardId == gid {
 			newShardsInclude[k] = 1
-			if curConfig.Shards[k] != gid {
+			if curConfig.Shards[k] != 0 && curConfig.Shards[k] != gid {
 				kv.kvDB[k].Status = Recieving
 			}
 		} else {
 			newShardsInclude[k] = 0
-			if curConfig.Shards[k] == gid {
+			if curConfig.Shards[k] != 0 && curConfig.Shards[k] == gid {
 				kv.kvDB[k].Status = Sending
 			}
 		}
 	}
 
 	kv.shardsInclude = newShardsInclude
-	if newConfig.Num == 1 {
-		for k:=0; k< shardctrler.NShards; k++ {
-			kv.kvDB[k].Status = Normal
-		}
-	}
-	kv.configs = append(kv.configs, newConfig)
+	// if newConfig.Num == 1 {
+	// 	for k:=0; k< shardctrler.NShards; k++ {
+	// 		kv.kvDB[k].Status = Normal
+	// 	}
+	// }
+	// kv.configs = append(kv.configs, newConfig)
+	kv.lastConfig = kv.latestConfig.Copy()
+	kv.latestConfig = newConfig.Copy()
 	kv.mu.Unlock()
+	DPrintf("=======shard status==========")
+	for k:=0; k<shardctrler.NShards; k++ {
+		DPrintf("[%d:%d]",k, kv.kvDB[k].Status)
+	}
+	DPrintf("=============================")
+	DPrintf("[=][server:%d] update [config:%d] successfully",kv.me, newConfig.Num)
 }
 
 func (kv *ShardKV) InsertShard(op Op) {
@@ -238,7 +259,7 @@ func (kv *ShardKV) ShardsRecieved(op Op) {
 	kv.mu.Lock()
 	defer kv.mu.Unlock()
 	id := op.ShardId
-	kv.kvDB[id].Stauts = Normal
+	kv.kvDB[id].Status = Normal
 }
 
 
@@ -267,7 +288,7 @@ func (kv *ShardKV) fetchConfigsLoop() {
 				continue
 			}
 			kv.mu.Lock()
-			curConfigNum := kv.getConfig(-1).Num
+			curConfigNum := kv.latestConfig.Num
 			kv.mu.Unlock()
 
 			newConfig := kv.mck.Query(curConfigNum + 1)
@@ -280,7 +301,6 @@ func (kv *ShardKV) fetchConfigsLoop() {
 				}
 				kv.rf.Start(op)
 			}
-
 		}
 		time.Sleep(fetchConfigsInterval)
 	}
@@ -289,13 +309,14 @@ func (kv *ShardKV) fetchConfigsLoop() {
 
 // return shardId -> []servers
 func (kv *ShardKV) getCurPullingShards() map[int][]string {
-	res := map[int][]string
-	newConfig := kv.getConfig(-1)
-	lastConfig := kv.getConfig(newConfig.Num - 1)
+	res := map[int][]string{}
+	newConfig := kv.latestConfig.Copy()
+	lastConfig := kv.lastConfig.Copy()
+	DPrintf("[=][newConfig:%v][lastConfig:%v]", newConfig, lastConfig)
 	for i, shard := range kv.kvDB {
 		if shard.Status == Recieving {
 			gid := lastConfig.Shards[i]
-			res[i] = lastConfig.Groups[gid]
+			res[i] = append([]string{}, lastConfig.Groups[gid]...)
 		}
 	}
 	return res
@@ -308,12 +329,16 @@ func (kv *ShardKV) pullingShardsLoop() {
 			kv.mu.Lock()
 			shards := kv.getCurPullingShards()
 			if len(shards) > 0 {
+				DPrintf("[=][server:%d]try pull new shard [len(shrads):%d][%v]", kv.me, len(shards), shards)
+				curConfigNum := kv.latestConfig.Num
 				for shardId, servers := range shards {
-					for _, server := servers {
+					for _, server := range servers {
+						DPrintf("[=][server:%d]send [shard:%d]request to [server:%s]", kv.me, shardId, server)
 						dst := kv.make_end(server)
-						args := TransferShardsArgs{shardId}
+						args := TransferShardsArgs{shardId, curConfigNum}
 						reply := TransferShardsReply{}
-						if dst.Call("ShradKV.TransferShards", args, &reply) && reply.Err == OK {
+						if dst.Call("ShardKV.TransferShards", &args, &reply) && reply.Err == OK {
+							DPrintf("OK[=][server:%d]recieved [shard:%d] from [server:%s]",kv.me, shardId, server)
 							op := Op{
 								Command: "InsertShard",
 								Shard: reply.Shard,
@@ -322,9 +347,7 @@ func (kv *ShardKV) pullingShardsLoop() {
 						}
 					}
 				}
-				
-				
-				
+
 				//var waitGroup sync.WaitGroup
 				// curConfig := kv.getConfig(-1)
 				// for gid, sendShards := range shards {
@@ -360,6 +383,7 @@ func (kv *ShardKV) checkCanUpdateConfig() bool {
 	kv.mu.Lock()
 	defer kv.mu.Unlock()
 	for _, shard := range kv.kvDB {
+		// fix me later when considering delete part
 		if shard.Status == Recieving {
 			return false
 		}

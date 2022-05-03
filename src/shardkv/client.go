@@ -81,6 +81,8 @@ func (ck *Clerk) Get(key string) string {
 	args.ClientId = ck.clientId
 	args.RequestId = requestId
 	for {
+		args.ConfigNum = ck.config.Num
+
 		shard := key2shard(key)
 		gid := ck.config.Shards[shard]
 		if servers, ok := ck.config.Groups[gid]; ok {
@@ -116,13 +118,15 @@ func (ck *Clerk) PutAppend(key string, value string, op string) {
 	args.Value = value
 	args.Op = op
 
-	requestId := ck.requestId
 	args.ClientId = ck.clientId
-	args.RequestId = requestId
+	args.RequestId = ck.requestId
 
 	for {
+		args.ConfigNum = ck.config.Num
+
 		shard := key2shard(key)
 		gid := ck.config.Shards[shard]
+		DPrintf("[=]request on config %d",ck.config.Num)
 		if servers, ok := ck.config.Groups[gid]; ok {
 			for si := 0; si < len(servers); si++ {
 				DPrintf("name[%s]",servers[si])
