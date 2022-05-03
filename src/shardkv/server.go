@@ -40,11 +40,11 @@ const (
 ) 
 
 type Shard struct {
-	id int
-	data map[string]string
-	configNum int
-	lastRequestId map[int64]int     // clientId -> requestID,//make sure operation only executed once
-	status int
+	Id int
+	Data map[string]string
+	ConfigNum int
+	LastRequestId map[int64]int     // clientId -> requestID
+	Status int
 }
 
 type ShardKV struct {
@@ -56,7 +56,9 @@ type ShardKV struct {
 	gid          int
 	ctrlers      []*labrpc.ClientEnd
 	maxraftstate int // snapshot if log grows this big
-	dead    int32
+	dead    	 int32
+
+	updating int32 // if the kv server is updating config 
 
 	// Your definitions here.
 
@@ -66,25 +68,25 @@ type ShardKV struct {
 	lastIncludedIndex int
 	configs []shardctrler.Config
 
-	shardsInclude []int
+	shardsInclude []int  // which shard I'm resiponsible for 
 
 }
 
 func (shard *Shard) Copy() Shard{
 	newData := map[string]string{}
 	newLastRequestId := map[int64]int{}
-	for k, v := range shard.data {
+	for k, v := range shard.Data {
 		newData[k] = v
 	} 
-	for k, v := range shard.lastRequestId {
+	for k, v := range shard.LastRequestId {
 		newLastRequestId[k] = v
 	}
 	newShard := Shard{
-		id : shard.id,
-		data: newData,
-		configNum : shard.configNum,
-		lastRequestId : newLastRequestId,    
-		status : Normal,
+		Id : shard.Id,
+		Data: newData,
+		ConfigNum : shard.ConfigNum,
+		LastRequestId : newLastRequestId,    
+		Status : Normal,
 	}
 	return newShard
 }
@@ -107,7 +109,7 @@ func (kv *ShardKV) containsShard(shard int) bool {
 func (kv *ShardKV) shardIsNormal(shard int) bool{
 	kv.mu.Lock()
 	defer kv.mu.Unlock()
-	return kv.kvDB[shard].status == Normal
+	return kv.kvDB[shard].Status == Normal
 }
 
 func (kv *ShardKV) Get(args *GetArgs, reply *GetReply) {
@@ -294,12 +296,12 @@ func (kv *ShardKV) TransferShards(args *TransferShardsArgs, reply *TransferShard
 	curConfigNum := kv.getConfig(-1).Num
 	kv.mu.Unlock() 
 	newShard := args.Shard
-	if newShard.configNum != curConfigNum{
+	if newShard.ConfigNum != curConfigNum{
 		reply.Err = ErrTimeOut
 		return 
 	}
 	kv.mu.Lock()
-	if kv.kvDB[newShard.id].status != Sending {
+	if kv.kvDB[newShard.Id].Status != Sending {
 		reply.Err = ErrTimeOut
 		kv.mu.Unlock() 
 		return 
@@ -354,12 +356,12 @@ func (kv *ShardKV) DeleteShards(args *TransferShardsArgs, reply *TransferShardsR
 	curConfigNum := kv.getConfig(-1).Num
 	kv.mu.Unlock() 
 	newShard := args.Shard
-	if newShard.configNum != curConfigNum{
+	if newShard.ConfigNum != curConfigNum{
 		reply.Err = ErrTimeOut
 		return 
 	}
 	kv.mu.Lock()
-	if kv.kvDB[newShard.id].status != Sending {
+	if kv.kvDB[newShard.Id].Status != Sending {
 		reply.Err = ErrTimeOut
 		kv.mu.Unlock() 
 		return 
@@ -368,7 +370,7 @@ func (kv *ShardKV) DeleteShards(args *TransferShardsArgs, reply *TransferShardsR
 
 	op := Op{
 		Command : "DeleteShard",
-		ShardId : newShard.id,
+		ShardId : newShard.Id,
 	}
 	raftIndex, _, isLeader := kv.rf.Start(op)
 	if !isLeader {
@@ -416,6 +418,19 @@ func (kv *ShardKV) Kill() {
 func (kv *ShardKV) killed() bool {
 	z := atomic.LoadInt32(&kv.dead)
 	return z == 1
+}
+
+func (kv *ShardKV) isUpdateConfig() bool {
+	z := atomic.LoadInt32(&kv.updating)
+	return z == 1
+}
+
+func (kv *ShardKV)setUpdateConcig() {
+	atomic.StoreInt32(&kv.updating, 1)
+}
+
+func (kv *ShardKV)unsetUpdateConcig() {
+	atomic.StoreInt32(&kv.updating, 0)
 }
 
 
@@ -475,10 +490,10 @@ func StartServer(servers []*labrpc.ClientEnd, me int, persister *raft.Persister,
 
 	for index, _ := range kv.kvDB{
 		kv.kvDB[index] = Shard{
-			id: index,
-			data: map[string]string{},
-			configNum: 0,
-			lastRequestId: map[int64]int{},
+			Id: index,
+			Data: map[string]string{},
+			ConfigNum: 0,
+			LastRequestId: map[int64]int{},
 		}
 	}
 	kv.waitApplyCh = make(map[int]chan Op)
