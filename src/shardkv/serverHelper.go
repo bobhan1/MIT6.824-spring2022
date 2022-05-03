@@ -98,6 +98,7 @@ func (kv *ShardKV) ApplyCommand(message raft.ApplyMsg) {
 
 	//ignore dummy command
 	if _, ok := message.Command.(int); ok {
+		// a no-op log
 		// DPrintf("I AM INT")
 		return
 	}
@@ -118,14 +119,17 @@ func (kv *ShardKV) ApplyCommand(message raft.ApplyMsg) {
 		} else if op.Command == "Append" {
 			kv.Append(op)
 		} else if op.Command == "UpdateConfig" {
-			kv.updateConfig(op)
+			kv.UpdateConfig(op)
 		} else if op.Command == "InsertShard" {
-			kv.insertShard(op)
-		} else if op.Command == "DeleteShard" {
-			kv.deleteShard(op)
-		} else if op.Command == "ShardRecieved" {
-			kv.shardSent(op)
+			kv.InsertShard(op)
+		} else if op.Command == "ShardsRecieved" {
+			kv.ShardsRecieved(op)
 		}
+		// else if op.Command == "DeleteShard" {
+		// 	kv.deleteShard(op)
+		// } else if op.Command == "ShardRecieved" {
+		// 	kv.shardSent(op)
+		// }
 	}
 	//check if raft server needs to make snapshot
 	if kv.maxraftstate != -1 {
@@ -176,10 +180,87 @@ func (kv *ShardKV) Append(op Op) {
 	// DPrintf("[KVServerExeAPPEND]ClientId :%d ,RequestID:%d ,Key: %v, value: %v", op.ClientId, op.RequestId, op.Key, op.Value)
 }
 
+func (kv *ShardKV) UpdateConfig(op Op) {
+	// kv.setUpdateConcig()
+	// defer kv.unsetUpdateConcig()
+	newConfig := op.Config
+	kv.mu.Lock()
+	curConfig := kv.getConfig(-1)
+	kv.mu.Unlock()
+
+	if newConfig.Num <= curConfig.Num {
+		return 
+	}
+	
+	if newConfig.Num > curConfig.Num + 1 {
+		panic("UpdateConfig get wrong newConfig!")
+	}
+
+	gid := kv.gid
+	newShardsInclude := make([]int, shardctrler.NShards)
+
+	// update status of each shard
+	kv.mu.Lock()
+	for k, shardId :=range newConfig.Shards {
+		if shardId == gid {
+			newShardsInclude[k] = 1
+			if curConfig.Shards[k] != gid {
+				kv.kvDB[k].Status = Recieving
+			}
+		} else {
+			newShardsInclude[k] = 0
+			if curConfig.Shards[k] == gid {
+				kv.kvDB[k].Status = Sending
+			}
+		}
+	}
+
+	kv.shardsInclude = newShardsInclude
+	if newConfig.Num == 1 {
+		for k:=0; k< shardctrler.NShards; k++ {
+			kv.kvDB[k].Status = Normal
+		}
+	}
+	kv.configs = append(kv.configs, newConfig)
+	kv.mu.Unlock()
+}
+
+func (kv *ShardKV) InsertShard(op Op) {
+	kv.mu.Lock()
+	newShard := op.Shard
+	newShard.Status = Normal
+	id := newShard.Id
+	kv.kvDB[id] = newShard
+	kv.mu.Unlock()
+}
+
+func (kv *ShardKV) ShardsRecieved(op Op) {
+	kv.mu.Lock()
+	defer kv.mu.Unlock()
+	id := op.ShardId
+	kv.kvDB[id].Stauts = Normal
+}
+
+
+// delete part
+// 
+// func (kv *ShardKV) shardSent(op Op) {
+// 	kv.mu.Lock()
+// 	defer kv.mu.Unlock()
+// 	id := op.ShardId
+// 	kv.kvDB[id].Status = toBeDelete
+// }
+// func (kv *ShardKV) deleteShard(op Op) {
+// 	kv.mu.Lock()
+// 	defer kv.mu.Unlock()
+// 	id := op.ShardId
+// 	kv.kvDB[id].Status = Normal
+// }
+
+
 
 func (kv *ShardKV) fetchConfigsLoop() {
 	for !kv.killed() {
-		
 		if _, isLeader := kv.rf.GetState(); isLeader {
 			if !kv.checkCanUpdateConfig() {
 				time.Sleep(fetchConfigsInterval)
@@ -206,112 +287,70 @@ func (kv *ShardKV) fetchConfigsLoop() {
 }
 
 
-func (kv *ShardKV) updateConfig(op Op) {
-	// kv.setUpdateConcig()
-	// defer kv.unsetUpdateConcig()
-	newConfig := op.Config
-	kv.mu.Lock()
-	curConfig := kv.getConfig(-1)
-	kv.mu.Unlock()
-
-	if newConfig.Num <= curConfig.Num {
-		return 
-	}
-	
-	if newConfig.Num > curConfig.Num + 1 {
-		panic("updateconfig get wrong newConfig!")
-	}
-	gid := kv.gid
-	newShardsInclude := make([]int, shardctrler.NShards)
-
-	kv.mu.Lock()
-	for k, _ := range newConfig.Shards {
-		if curConfig.Shards[k] != gid{
-			// toSend[k] = kv.kvDB[k].Copy()
-			kv.kvDB[k].Status = Sending
-			newShardsInclude[k] = 0
-		} else {
-			newShardsInclude[k] = 1
-		}
-	}
-	
-	for _, k := range curConfig.Shards {
-		if newConfig.Shards[k] != gid {
-			kv.kvDB[k].Status = Sending
-		}
-	}
-	kv.shardsInclude = newShardsInclude
-
-	
-	if _, isLeader := kv.rf.GetState(); !isLeader {
-		return 
-	}
-
-	// for k, v := range toSend {
-	// 	newGid := newConfig.Shards[k]
-	// }
-
-
-
-	kv.mu.Unlock()
-}
-
-func (kv *ShardKV) getCurSendingShards() map[int][]Shard {
-	res := map[int][]Shard{}
+// return shardId -> []servers
+func (kv *ShardKV) getCurPullingShards() map[int][]string {
+	res := map[int][]string
 	newConfig := kv.getConfig(-1)
+	lastConfig := kv.getConfig(newConfig.Num - 1)
 	for i, shard := range kv.kvDB {
-		if shard.Status == Sending {
-			newGid := newConfig.Shards[i]
-			if _, ok := res[newGid]; ok {
-				res[newGid] = append(res[newGid], shard)
-			} else {
-				res[newGid] = append([]Shard{}, shard)
-			}
+		if shard.Status == Recieving {
+			gid := lastConfig.Shards[i]
+			res[i] = lastConfig.Groups[gid]
 		}
 	}
 	return res
 }
 
 
-func (kv *ShardKV) sendingShardsLoop() {
-	for !kv.killed() {
-		
+func (kv *ShardKV) pullingShardsLoop() {
+	for !kv.killed() {	
 		if _, isLeader := kv.rf.GetState(); isLeader {
 			kv.mu.Lock()
-			var waitGroup sync.WaitGroup
-			shards := kv.getCurSendingShards()
+			shards := kv.getCurPullingShards()
 			if len(shards) > 0 {
-				curConfig := kv.getConfig(-1)
-				for gid, sendShards := range shards {
-
-					go func(gid int, shards []Shard, servers []string){
-						waitGroup.Add(1)
-						defer waitGroup.Done()
-						for _, shard := range shards {
-							for _, server := range servers {
-								dst := kv.make_end(server)
-								reply := TransferShardsReply{}
-								args := TransferShardsArgs{shard}
-								if dst.Call("ShardKV.TransferShards", &args, &reply) && reply.Err == OK {
-									// op := Op{
-									// 	Command : "ShardSent",
-									// 	ShardId : shard.id,
-									// }
-									// kv.rf.Start(op)
-								}
+				for shardId, servers := range shards {
+					for _, server := servers {
+						dst := kv.make_end(server)
+						args := TransferShardsArgs{shardId}
+						reply := TransferShardsReply{}
+						if dst.Call("ShradKV.TransferShards", args, &reply) && reply.Err == OK {
+							op := Op{
+								Command: "InsertShard",
+								Shard: reply.Shard,
 							}
+							kv.rf.Start(op)
 						}
-					}(gid, sendShards, curConfig.Groups[gid])
+					}
 				}
+				
+				
+				
+				//var waitGroup sync.WaitGroup
+				// curConfig := kv.getConfig(-1)
+				// for gid, sendShards := range shards {
+				// 	go func(gid int, shards []Shard, servers []string){
+				// 		waitGroup.Add(1)
+				// 		defer waitGroup.Done()
+				// 		for _, shard := range shards {
+				// 			for _, server := range servers {
+				// 				dst := kv.make_end(server)
+				// 				reply := TransferShardsReply{}
+				// 				args := TransferShardsArgs{shard}
+				// 				if dst.Call("ShardKV.TransferShards", &args, &reply) && reply.Err == OK {
+				// 					// op := Op{
+				// 					// 	Command : "ShardSent",
+				// 					// 	ShardId : shard.id,
+				// 					// }
+				// 					// kv.rf.Start(op)
+				// 				}
+				// 			}
+				// 		}
+				// 	}(gid, sendShards, curConfig.Groups[gid])
+				// }
+				//waitGroup.Wait()
 			}
-			waitGroup.Wait()
 			kv.mu.Unlock()
-
-
-			
-
 		}
-		
 		time.Sleep(sendingShardsInterval)
 	}
 }
@@ -321,33 +360,9 @@ func (kv *ShardKV) checkCanUpdateConfig() bool {
 	kv.mu.Lock()
 	defer kv.mu.Unlock()
 	for _, shard := range kv.kvDB {
-		if shard.Status != Normal {
+		if shard.Status == Recieving {
 			return false
 		}
 	}
 	return true
-}
-
-func (kv *ShardKV) shardSent(op Op) {
-	kv.mu.Lock()
-	defer kv.mu.Unlock()
-	id := op.ShardId
-	kv.kvDB[id].Status = toBeDelete
-}
-
-func (kv *ShardKV) insertShard(op Op) {
-	kv.mu.Lock()
-	defer kv.mu.Unlock()
-	newShard := op.Shard
-	newShard.Status = Normal
-	id := newShard.Id
-	kv.kvDB[id] = newShard
-}
-
-func (kv *ShardKV) deleteShard(op Op) {
-	kv.mu.Lock()
-	defer kv.mu.Unlock()
-	id := op.ShardId
-
-	kv.kvDB[id].Status = Normal
 }

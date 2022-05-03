@@ -54,11 +54,12 @@ type GetReply struct {
 }
 
 type TransferShardsArgs struct {
-	Shard Shard
+	ShardId int
 }
 
 type TransferShardsReply struct {
 	Err Err
+	Shard Shard
 }
 
 type DeleteShardsArgs struct {

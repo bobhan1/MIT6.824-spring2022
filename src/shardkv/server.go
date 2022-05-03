@@ -20,7 +20,7 @@ type Op struct {
 	// Your definitions here.
 	// Field names must start with capital letters,
 	// otherwise RPC will break.
-	Command   string // "Get"/"Put"/"Append"/"UpdateConfig"/"TransferShrads"/"DeleteShards"
+	Command   string // "Get"/"Put"/"Append"/"UpdateConfig"/
 
 	Key       string
 	Value     string
@@ -35,8 +35,8 @@ type Op struct {
 const (
 	Normal int = iota
 	Sending
-	toBeDelete
-	deleting
+	Recieving
+	// deleting
 ) 
 
 type Shard struct {
@@ -62,7 +62,7 @@ type ShardKV struct {
 
 	// Your definitions here.
 
-	kvDB          [shardctrler.NShards] Shard // store client key/value
+	kvDB          [shardctrler.NShards] Shard // store key/value by shards seperately
 	waitApplyCh   map[int]chan Op   // index(raft) -> chan, waiting to get the applied msg from raft
 	mck           *shardctrler.Clerk
 	lastIncludedIndex int
@@ -114,6 +114,19 @@ func (kv *ShardKV) shardIsNormal(shard int) bool{
 
 func (kv *ShardKV) Get(args *GetArgs, reply *GetReply) {
 	// Your code here.
+
+	// DPrintf("[GET Request]From Client %d (RequestId %d) To Server %d", args.ClientId, args.RequestId, kv.me)
+	if kv.killed() {
+		reply.Err = ErrWrongLeader
+		return
+	}
+	
+	if _, isLeader := kv.rf.GetState(); !isLeader {
+		reply.Err = ErrWrongLeader
+		// DPrintf("[GET SendToWrongLeader]From Client %d, Request %d To Server %d", args.ClientId, args.RequestId, kv.me)
+		return
+	}
+
 	kv.mu.Lock()
 	curConfigNum := kv.getConfig(-1).Num
 	kv.mu.Unlock() 
@@ -137,17 +150,6 @@ func (kv *ShardKV) Get(args *GetArgs, reply *GetReply) {
 	}
 
 	DPrintf("[=]recieved Get ")
-	// DPrintf("[GET Request]From Client %d (RequestId %d) To Server %d", args.ClientId, args.RequestId, kv.me)
-	if kv.killed() {
-		reply.Err = ErrWrongLeader
-		return
-	}
-
-	if _, isLeader := kv.rf.GetState(); !isLeader {
-		reply.Err = ErrWrongLeader
-		// DPrintf("[GET SendToWrongLeader]From Client %d, Request %d To Server %d", args.ClientId, args.RequestId, kv.me)
-		return
-	}
 	op := Op{
 		Command:   "Get",
 		Key:       args.Key,
@@ -208,6 +210,11 @@ func (kv *ShardKV) PutAppend(args *PutAppendArgs, reply *PutAppendReply) {
 		return
 	}
 
+	if _, isLeader := kv.rf.GetState(); !isLeader {
+		reply.Err = ErrWrongLeader
+		return
+	}
+
 	kv.mu.Lock()
 	curConfigNum := kv.getConfig(-1).Num
 	kv.mu.Unlock() 
@@ -230,11 +237,6 @@ func (kv *ShardKV) PutAppend(args *PutAppendArgs, reply *PutAppendReply) {
 		return 
 	}
 
-	
-	if _, isLeader := kv.rf.GetState(); !isLeader {
-		reply.Err = ErrWrongLeader
-		return
-	}
 	op := Op{
 		Command:   args.Op,
 		Key:       args.Key,
@@ -281,7 +283,7 @@ func (kv *ShardKV) PutAppend(args *PutAppendArgs, reply *PutAppendReply) {
 }
 
 
-// the sender call this rpc
+// the reciever call this rpc
 func (kv *ShardKV) TransferShards(args *TransferShardsArgs, reply *TransferShardsReply) {
 
 	if kv.killed() {
@@ -484,7 +486,7 @@ func StartServer(servers []*labrpc.ClientEnd, me int, persister *raft.Persister,
 	// Use something like this to talk to the shardctrler:
 	kv.mck = shardctrler.MakeClerk(kv.ctrlers)
 	kv.applyCh = make(chan raft.ApplyMsg, 10)
-	kv.configs = make([]shardctrler.Config, 1)
+	kv.configs = make([]shardctrler.Config, 100)
 
 	kv.rf = raft.Make(servers, me, persister, kv.applyCh)
 
@@ -506,7 +508,7 @@ func StartServer(servers []*labrpc.ClientEnd, me int, persister *raft.Persister,
 
 	go kv.ApplyLoop()
 	go kv.fetchConfigsLoop()
-	go kv.sendingShardsLoop()
+	go kv.pullingShardsLoop()
 	
 	return kv
 }
