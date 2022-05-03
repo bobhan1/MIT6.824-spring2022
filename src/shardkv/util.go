@@ -4,7 +4,7 @@ import "log"
 
 // Debugging
 const Debug = false
-const Debug2 = true
+const Debug2 = false
 
 func DPrintf(format string, a ...interface{}) (n int, err error) {
 	if Debug {

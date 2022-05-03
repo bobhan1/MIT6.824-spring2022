@@ -6,7 +6,7 @@ import (
 	"6.824/shardctrler"
 	"bytes"
 	"time"
-	// "sync"
+	"sync"
 )
 
 // ApplyLoop keep fetching command or snapshot from applyCha
@@ -350,22 +350,30 @@ func (kv *ShardKV) pullingShardsLoop() {
 			if len(shards) > 0 {
 				// D2Printf("[=][server:%d]try pull new shard [len(shrads):%d][%v]", kv.me, len(shards), shards)
 				curConfigNum := kv.latestConfig.Num
-				for shardId, servers := range shards {
-					for _, server := range servers {
-						// D2Printf("[=][server:%d]send [shard:%d]request to [server:%s]", kv.me, shardId, server)
-						dst := kv.make_end(server)
-						args := TransferShardsArgs{shardId, curConfigNum}
-						reply := TransferShardsReply{}
-						if dst.Call("ShardKV.TransferShards", &args, &reply) && reply.Err == OK {
-							DPrintf("OK[=][server:%d]recieved [shard:%d] from [server:%s]",kv.me, shardId, server)
-							op := Op{
-								Command: "InsertShard",
-								Shard: reply.Shard,
+				var waitGroup sync.WaitGroup
+				waitGroup.Add(1)
+				go func(shards map[int][]string, curConfigNum int){ 
+					defer waitGroup.Done()
+					for shardId, servers := range shards {
+						for _, server := range servers {
+							// D2Printf("[=][server:%d]send [shard:%d]request to [server:%s]", kv.me, shardId, server)
+							dst := kv.make_end(server)
+							args := TransferShardsArgs{shardId, curConfigNum}
+							reply := TransferShardsReply{}
+							if dst.Call("ShardKV.TransferShards", &args, &reply) && reply.Err == OK {
+								DPrintf("OK[=][server:%d]recieved [shard:%d] from [server:%s]",kv.me, shardId, server)
+								op := Op{
+									Command: "InsertShard",
+									Shard: reply.Shard,
+								}
+								kv.rf.Start(op)
 							}
-							kv.rf.Start(op)
 						}
 					}
-				}
+				}(shards, curConfigNum)
+
+				kv.mu.Unlock()
+				waitGroup.Wait()
 
 				//var waitGroup sync.WaitGroup
 				// curConfig := kv.getConfig(-1)
@@ -390,8 +398,9 @@ func (kv *ShardKV) pullingShardsLoop() {
 				// 	}(gid, sendShards, curConfig.Groups[gid])
 				// }
 				//waitGroup.Wait()
+			} else {
+				kv.mu.Unlock()
 			}
-			kv.mu.Unlock()
 		}
 		time.Sleep(sendingShardsInterval)
 	}

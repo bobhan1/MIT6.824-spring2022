@@ -12,7 +12,7 @@ import "6.824/shardctrler"
 const (
 	raftTimeOutInterval = time.Millisecond * 200
 	fetchConfigsInterval = time.Millisecond * 100
-	sendingShardsInterval = time.Millisecond * 100
+	sendingShardsInterval = time.Millisecond * 200
 )
 
 
@@ -303,18 +303,18 @@ func (kv *ShardKV) TransferShards(args *TransferShardsArgs, reply *TransferShard
 	curConfigNum := kv.latestConfig.Num
 	kv.mu.Unlock() 
 	if args.ConfigNum > curConfigNum{
-		// D2Printf("[=][server:%d][args.ConfigNum:%d][curConfigNum:%d]", kv.me, args.ConfigNum, curConfigNum)
+		D2Printf("[=][server:%d][args.ConfigNum:%d][curConfigNum:%d]", kv.me, args.ConfigNum, curConfigNum)
 		// panic("UpdateConfig get wrong newConfig!")
 		reply.Err = ErrTimeOut
 		return 
 	}
-	kv.mu.Lock()
-	if kv.kvDB[args.ShardId].Status != Sending {
-		reply.Err = ErrTimeOut
-		kv.mu.Unlock() 
-		return 
-	}
-	kv.mu.Unlock() 
+	// kv.mu.Lock()
+	// if kv.kvDB[args.ShardId].Status != Sending {
+	// 	reply.Err = ErrTimeOut
+	// 	kv.mu.Unlock() 
+	// 	return 
+	// }
+	// kv.mu.Unlock() 
 
 	reply.Err = OK
 	reply.Shard = kv.kvDB[args.ShardId]
