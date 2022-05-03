@@ -66,6 +66,7 @@ func (sc *ShardCtrler) ApplyCommand(message raft.ApplyMsg) {
 			sc.lastRequestId[op.ClientId] = op.RequestId
 			//sc.mu.Unlock()
 		case "Query":
+			// sc.lastRequestId[op.ClientId] = op.RequestId
 		}
 		sc.mu.Unlock()
 	}
