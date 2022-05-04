@@ -58,18 +58,16 @@ type ShardKV struct {
 	maxraftstate int // snapshot if log grows this big
 	dead    	 int32
 
-	// updating int32 // if the kv server is updating config 
-
 	// Your definitions here.
 
-	kvDB          [shardctrler.NShards] Shard // store key/value by shards seperately
+	kvDB          [shardctrler.NShards]Shard // store key/value by shards seperately
 	waitApplyCh   map[int]chan Op   // index(raft) -> chan, waiting to get the applied msg from raft
 	mck           *shardctrler.Clerk
 	lastIncludedIndex int
-	//configs []shardctrler.Config
+
 	latestConfig shardctrler.Config
 	lastConfig shardctrler.Config
-	shardsInclude []int  // which shard I'm resiponsible for 
+	shardsInclude []int  
 
 }
 
@@ -150,7 +148,6 @@ func (kv *ShardKV) Get(args *GetArgs, reply *GetReply) {
 		return 
 	}
 
-	DPrintf("[=]recieved Get ")
 	op := Op{
 		Command:   "Get",
 		Key:       args.Key,
@@ -205,7 +202,7 @@ func (kv *ShardKV) Get(args *GetArgs, reply *GetReply) {
 
 func (kv *ShardKV) PutAppend(args *PutAppendArgs, reply *PutAppendReply) {
 	// Your code here.
-	DPrintf("[PUTAPPEND Request]From Client %d (Request %d) To Server %d", args.ClientId, args.RequestId, kv.me)
+	// DPrintf("[PUTAPPEND Request]From Client %d (Request %d) To Server %d", args.ClientId, args.RequestId, kv.me)
 	if kv.killed() {
 		reply.Err = ErrWrongLeader
 		return
@@ -219,9 +216,8 @@ func (kv *ShardKV) PutAppend(args *PutAppendArgs, reply *PutAppendReply) {
 	kv.mu.Lock()
 	curConfigNum := kv.latestConfig.Num
 	kv.mu.Unlock() 
-	DPrintf("[=][args.ConfigNum:%d][curConfigNum:%d]", args.ConfigNum, curConfigNum)
+	// DPrintf("[=][args.ConfigNum:%d][curConfigNum:%d]", args.ConfigNum, curConfigNum)
 	if args.ConfigNum < curConfigNum {
-		
 		reply.Err = ErrConfigNumOutDated
 		return 
 	}
@@ -231,13 +227,13 @@ func (kv *ShardKV) PutAppend(args *PutAppendArgs, reply *PutAppendReply) {
 	}
 	shard := key2shard(args.Key)
 	if !kv.containsShard(shard) {
-		DPrintf("[=]server %d dont;t contain shard %d", kv.me, shard)
+		// DPrintf("[=]server %d dont;t contain shard %d", kv.me, shard)
 		reply.Err = ErrWrongGroup
 		return 
 	}
 
 	if !kv.shardIsNormal(shard) {
-		DPrintf("[=][server %d][shard %d] is not normal", kv.me, shard)
+		// DPrintf("[=][server %d][shard %d] is not normal", kv.me, shard)
 		reply.Err = ErrTimeOut
 		return 
 	}
@@ -290,7 +286,7 @@ func (kv *ShardKV) PutAppend(args *PutAppendArgs, reply *PutAppendReply) {
 
 // the reciever call this rpc
 func (kv *ShardKV) TransferShards(args *TransferShardsArgs, reply *TransferShardsReply) {
-	D2Printf("[=][server:%d] recieved a TransferShards rpc[configNum:%d][shardId:%d]",kv.me, args.ConfigNum, args.ShardId)
+	// D2Printf("[=][server:%d] recieved a TransferShards rpc[configNum:%d][shardId:%d]",kv.me, args.ConfigNum, args.ShardId)
 	if kv.killed() {
 		reply.Err = ErrWrongLeader
 		return
@@ -303,60 +299,27 @@ func (kv *ShardKV) TransferShards(args *TransferShardsArgs, reply *TransferShard
 	curConfigNum := kv.latestConfig.Num
 	kv.mu.Unlock() 
 	if args.ConfigNum > curConfigNum{
-		D2Printf("[=][server:%d][args.ConfigNum:%d][curConfigNum:%d]", kv.me, args.ConfigNum, curConfigNum)
+		// D2Printf("[=][server:%d][args.ConfigNum:%d][curConfigNum:%d]", kv.me, args.ConfigNum, curConfigNum)
 		// panic("UpdateConfig get wrong newConfig!")
 		reply.Err = ErrTimeOut
 		return 
 	}
-	// kv.mu.Lock()
-	// if kv.kvDB[args.ShardId].Status != Sending {
-	// 	reply.Err = ErrTimeOut
-	// 	kv.mu.Unlock() 
+	// if args.ConfigNum < curConfigNum {
+	// 	reply.Err = OK
+	// 	reply.Shard = Shard{}
 	// 	return 
 	// }
-	// kv.mu.Unlock() 
-
 	reply.Err = OK
+	kv.mu.Lock()
 	reply.Shard = kv.kvDB[args.ShardId]
-	D2Printf("[=][server:%d] reply a TransferShards rpc[configNum:%d][shardId:%d]",kv.me, args.ConfigNum, args.ShardId)
+	kv.mu.Unlock()
+	// D2Printf("[=][server:%d] reply a TransferShards rpc[configNum:%d][shardId:%d]",kv.me, args.ConfigNum, args.ShardId)
 	return 
 
-	// op := Op{
-	// 	Command : "InsertShard",
-	// 	Shard : newShard,
-	// }
-	// raftIndex, _, isLeader := kv.rf.Start(op)
-	// if !isLeader {
-	// 	reply.Err = ErrWrongLeader
-	// 	// DPrintf("[PUTAPPEND SendToWrongLeader]From Client %d (Request %d) To Server %d", args.ClientId, args.RequestId, kv.me)
-	// 	return
-	// }
-
-	// kv.mu.Lock()
-	// ch, exist := kv.waitApplyCh[raftIndex]
-	// if !exist {
-	// 	kv.waitApplyCh[raftIndex] = make(chan Op, 1)
-	// 	ch = kv.waitApplyCh[raftIndex]
-	// }
-	// kv.mu.Unlock()
-
-	// select {
-	// case <-time.After(raftTimeOutInterval):
-	// 	reply.Err = ErrTimeOut
-
-	// case <-ch:
-	// 	// DPrintf("WaitCha Server %d,Index:%d, ClientId %d, RequestId %d, Opreation %v, Key :%v, Value :%v", kv.me, raftIndex, op.ClientId, op.RequestId, op.Command, op.Key, op.Value)
-	// 	reply.Err = OK
-
-	// }
-	// kv.mu.Lock()
-	// delete(kv.waitApplyCh, raftIndex)
-	// kv.mu.Unlock()
-	// return
 }
 
-// func (kv *ShardKV) DeleteShards(args *TransferShardsArgs, reply *TransferShardsReply) {
 
+// func (kv *ShardKV) DeleteShards(args *TransferShardsArgs, reply *TransferShardsReply) {
 // 	if kv.killed() {
 // 		reply.Err = ErrWrongLeader
 // 		return
@@ -391,7 +354,6 @@ func (kv *ShardKV) TransferShards(args *TransferShardsArgs, reply *TransferShard
 // 		// DPrintf("[PUTAPPEND SendToWrongLeader]From Client %d (Request %d) To Server %d", args.ClientId, args.RequestId, kv.me)
 // 		return
 // 	}
-
 // 	kv.mu.Lock()
 // 	ch, exist := kv.waitApplyCh[raftIndex]
 // 	if !exist {
@@ -399,15 +361,12 @@ func (kv *ShardKV) TransferShards(args *TransferShardsArgs, reply *TransferShard
 // 		ch = kv.waitApplyCh[raftIndex]
 // 	}
 // 	kv.mu.Unlock()
-
 // 	select {
 // 	case <-time.After(raftTimeOutInterval):
 // 		reply.Err = ErrTimeOut
-
 // 	case <-ch:
 // 		// DPrintf("WaitCha Server %d,Index:%d, ClientId %d, RequestId %d, Opreation %v, Key :%v, Value :%v", kv.me, raftIndex, op.ClientId, op.RequestId, op.Command, op.Key, op.Value)
 // 		reply.Err = OK
-
 // 	}
 // 	kv.mu.Lock()
 // 	delete(kv.waitApplyCh, raftIndex)
@@ -432,19 +391,6 @@ func (kv *ShardKV) killed() bool {
 	z := atomic.LoadInt32(&kv.dead)
 	return z == 1
 }
-
-// func (kv *ShardKV) isUpdateConfig() bool {
-// 	z := atomic.LoadInt32(&kv.updating)
-// 	return z == 1
-// }
-
-// func (kv *ShardKV)setUpdateConcig() {
-// 	atomic.StoreInt32(&kv.updating, 1)
-// }
-
-// func (kv *ShardKV)unsetUpdateConcig() {
-// 	atomic.StoreInt32(&kv.updating, 0)
-// }
 
 
 func init(){
@@ -483,7 +429,6 @@ func init(){
 func StartServer(servers []*labrpc.ClientEnd, me int, persister *raft.Persister, maxraftstate int, gid int, ctrlers []*labrpc.ClientEnd, make_end func(string) *labrpc.ClientEnd) *ShardKV {
 	// call labgob.Register on structures you want
 	// Go's RPC library to marshall/unmarshall.
-	// DPrintf("==========")
 
 	kv := new(ShardKV)
 	kv.me = me
@@ -497,7 +442,6 @@ func StartServer(servers []*labrpc.ClientEnd, me int, persister *raft.Persister,
 	// Use something like this to talk to the shardctrler:
 	kv.mck = shardctrler.MakeClerk(kv.ctrlers)
 	kv.applyCh = make(chan raft.ApplyMsg, 10)
-	// kv.configs = make([]shardctrler.Config, 10)
 	
 	kv.latestConfig = shardctrler.Config{
 		Num:    0,
@@ -532,6 +476,5 @@ func StartServer(servers []*labrpc.ClientEnd, me int, persister *raft.Persister,
 	go kv.fetchConfigsLoop()
 	go kv.pullingShardsLoop()
 	
-	DPrintf("[====]server[%d]begin",kv.me)
 	return kv
 }
