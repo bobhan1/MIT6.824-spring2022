@@ -256,7 +256,7 @@ func (kv *ShardKV) UpdateConfig(op Op) {
 
 func (kv *ShardKV) InsertShard(op Op) {
 	kv.mu.Lock()
-	newShard := op.Shard
+	newShard := op.Shard.Copy()
 	newShard.Status = Normal
 	id := newShard.Id
 	kv.kvDB[id] = newShard
@@ -354,7 +354,7 @@ func (kv *ShardKV) pullingShardsLoop() {
 								DPrintf("OK[=][server:%d]recieved [shard:%d] from [server:%s]",kv.me, shardId, server)
 								op := Op{
 									Command: "InsertShard",
-									Shard: reply.Shard,
+									Shard: reply.Shard.Copy(),
 								}
 								kv.rf.Start(op)
 							}

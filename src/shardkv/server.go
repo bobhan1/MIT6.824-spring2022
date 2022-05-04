@@ -311,7 +311,7 @@ func (kv *ShardKV) TransferShards(args *TransferShardsArgs, reply *TransferShard
 	// }
 	reply.Err = OK
 	kv.mu.Lock()
-	reply.Shard = kv.kvDB[args.ShardId]
+	reply.Shard = kv.kvDB[args.ShardId].Copy()
 	kv.mu.Unlock()
 	// D2Printf("[=][server:%d] reply a TransferShards rpc[configNum:%d][shardId:%d]",kv.me, args.ConfigNum, args.ShardId)
 	return 
