@@ -304,11 +304,6 @@ func (kv *ShardKV) TransferShards(args *TransferShardsArgs, reply *TransferShard
 		reply.Err = ErrTimeOut
 		return 
 	}
-	// if args.ConfigNum < curConfigNum {
-	// 	reply.Err = OK
-	// 	reply.Shard = Shard{}
-	// 	return 
-	// }
 	reply.Err = OK
 	kv.mu.Lock()
 	reply.Shard = kv.kvDB[args.ShardId].Copy()
